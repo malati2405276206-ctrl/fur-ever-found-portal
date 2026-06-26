@@ -1,13 +1,13 @@
-export default function Home() {
+export default function HomePage() {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center">
-      <h1 className="text-5xl font-bold">
-        🐾 Paws of Hope
+    <main className="min-h-screen flex flex-col items-center justify-center bg-orange-50">
+      <h1 className="text-5xl font-bold text-orange-500 mb-4">
+        PawFinder 🐱
       </h1>
 
-      <p className="mt-4 text-lg">
-        Rescue • Rehome • Recover
+      <p className="text-lg text-gray-700">
+        Helping reunite lost cats with families.
       </p>
     </main>
-  );
+  )
 }
