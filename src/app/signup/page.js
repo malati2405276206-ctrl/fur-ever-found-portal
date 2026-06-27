@@ -59,8 +59,7 @@ const handleSignup = async (e) => {
   // ── Success screen ──
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 
-                      flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">📬</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -73,8 +72,7 @@ const handleSignup = async (e) => {
           </p>
           <Link
             href="/login"
-            className="inline-block bg-orange-500 hover:bg-orange-600 
-                       text-white px-6 py-3 rounded-xl font-semibold transition"
+            className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition"
           >
             Go to Login
           </Link>
@@ -97,8 +95,7 @@ const handleSignup = async (e) => {
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-600 text-sm 
-                          px-4 py-3 rounded-xl mb-5">
+          <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-5">
             {error}
           </div>
         )}
@@ -116,9 +113,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your full name"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-orange-400 
-                         transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
             />
           </div>
 
@@ -133,9 +128,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-orange-400 
-                         transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
             />
           </div>
 
@@ -150,9 +143,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimum 6 characters"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-orange-400 
-                         transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
             />
           </div>
 
@@ -167,24 +158,18 @@ const handleSignup = async (e) => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repeat your password"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900
-                         focus:outline-none focus:ring-2 focus:ring-orange-400 
-                         transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 
-                       disabled:bg-orange-300 disabled:cursor-not-allowed
-                       text-white font-semibold py-3 rounded-xl 
-                       transition flex items-center justify-center gap-2"
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent 
-                                  rounded-full animate-spin inline-block" />
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
                 Creating account...
               </>
             ) : (
