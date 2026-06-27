@@ -3,54 +3,74 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useAuth } from './useAuth'
 
 export function useRole() {
-  const { user, loading: authLoading } = useAuth()
-  const [role, setRole]       = useState(null)   // null = guest or not loaded yet
+  const [role,    setRole]    = useState(null)
   const [loading, setLoading] = useState(true)
+  const [userId,  setUserId]  = useState(null)
 
   useEffect(() => {
-    // If auth is still loading, wait
-    if (authLoading) return
+    // Step 1: Get current session directly
+    // (more reliable than waiting for useAuth)
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
 
-    // If no user is logged in, they are a guest
-    if (!user) {
-      setRole(null)
-      setLoading(false)
-      return
-    }
-
-    // Fetch this user's role from the profiles table
-    const fetchRole = async () => {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)   // match by user ID
-        .single()            // expect exactly one row
-
-      if (error) {
-        console.error('Error fetching role:', error.message)
-        setRole('user')      // fallback to basic user
-      } else {
-        setRole(data.role)   // 'user' or 'ngo'
+      if (!session?.user) {
+        // No user logged in — guest
+        setRole(null)
+        setLoading(false)
+        return
       }
 
-      setLoading(false)
+      setUserId(session.user.id)
+      await fetchRole(session.user.id)
     }
 
-    fetchRole()
-  }, [user, authLoading])
+    init()
 
-  // Convenience booleans — easier to use in components
-  return {
-    role,                          // raw value: null | 'user' | 'ngo'
-    loading,
-    isGuest: !user,                // true if not logged in
-    isUser:  role === 'user',      // true if regular user
-    isNGO:   role === 'ngo',       // true if verified NGO
+    // Step 2: Re-fetch role whenever auth state changes
+    // (catches login, logout, token refresh)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (!session?.user) {
+          setRole(null)
+          setUserId(null)
+          setLoading(false)
+          return
+        }
+
+        setUserId(session.user.id)
+        await fetchRole(session.user.id)
+      }
+    )
+
+    return () => subscription.unsubscribe()
+  }, [])
+
+  const fetchRole = async (uid) => {
+    setLoading(true)
+
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', uid)
+      .single()
+
+    if (error) {
+      console.error('useRole error:', error.message)
+      setRole('user') // safe fallback
+    } else {
+      setRole(data?.role ?? 'user')
+    }
+
+    setLoading(false)
   }
 
-  // Usage example in any component:
-  // const { isNGO, isGuest, role } = useRole()
+  return {
+    role,
+    loading,
+    isGuest: !userId,
+    isUser:  role === 'user',
+    isNGO:   role === 'ngo',
+  }
 }

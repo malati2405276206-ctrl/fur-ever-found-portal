@@ -10,7 +10,7 @@ import { logout } from '@/lib/auth'
 
 export default function Navbar() {
   const { user, loading: authLoading } = useAuth()
-  const { isNGO } = useRole()
+  const { isNGO, loading: roleLoading } = useRole()
   const router = useRouter()
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -22,14 +22,18 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { href: '/',           label: 'Home'       },
-    { href: '/lost-cats',  label: '😿 Lost'    },
-    { href: '/found-cats', label: '😊 Found'   },
-    { href: '/adoption',   label: '🏠 Adoption' },
+    { href: '/',            label: 'Home'        },
+    { href: '/lost-cats',   label: '😿 Lost'     },
+    { href: '/found-cats',  label: '😊 Found'    },
+    { href: '/adoption',    label: '🏠 Adoption' },
   ]
 
+  // Wait for BOTH auth AND role to finish loading
+  // before showing any auth buttons
+  const isLoading = authLoading || roleLoading
+
   return (
-    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100 shadow-sm" suppressHydrationWarning>
+    <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100 shadow-sm">
       <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
 
         {/* Logo */}
@@ -40,7 +44,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        {/* Desktop links */}
+        {/* Desktop nav links */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
@@ -53,24 +57,22 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Desktop auth buttons */}
+        {/* Desktop auth buttons — only ONE block renders */}
         <div className="hidden md:flex items-center gap-3">
-          {authLoading ? (
+          {isLoading ? (
+            // Show placeholder while loading
             <div className="w-24 h-9 bg-gray-100 rounded-xl animate-pulse" />
           ) : user ? (
+            // Logged in — show ONE set of buttons
             <>
-              {/* NGO Dashboard — only visible to NGOs */}
-              {isNGO && (
+              {isNGO ? (
                 <Link
                   href="/ngo-dashboard"
                   className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition"
                 >
                   🏢 Dashboard
                 </Link>
-              )}
-
-              {/* Report Cat — visible to all logged-in users */}
-              {!isNGO && (
+              ) : (
                 <Link
                   href="/report"
                   className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition"
@@ -78,7 +80,6 @@ export default function Navbar() {
                   + Report Cat
                 </Link>
               )}
-
               <button
                 onClick={handleLogout}
                 className="text-gray-500 hover:text-red-500 text-sm font-medium transition"
@@ -87,6 +88,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
+            // Not logged in
             <>
               <Link
                 href="/login"
@@ -128,7 +130,9 @@ export default function Navbar() {
           ))}
 
           <div className="pt-3 border-t border-gray-100 space-y-2">
-            {user ? (
+            {isLoading ? (
+              <div className="w-full h-9 bg-gray-100 rounded-xl animate-pulse" />
+            ) : user ? (
               <>
                 {isNGO ? (
                   <Link
