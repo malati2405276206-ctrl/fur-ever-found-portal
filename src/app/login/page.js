@@ -70,9 +70,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 
-                         focus:outline-none focus:ring-2 focus:ring-orange-400 
-                         transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
             />
           </div>
 
@@ -88,16 +86,13 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
                 required
-                className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 
-                           focus:outline-none focus:ring-2 focus:ring-orange-400 
-                           transition text-sm"
+                className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
               />
               {/* Show/Hide password toggle */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 
-                           hover:text-gray-600 text-xs font-medium"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs font-medium"
               >
                 {showPassword ? 'Hide' : 'Show'}
               </button>
@@ -108,15 +103,11 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 
-                       disabled:bg-orange-300 disabled:cursor-not-allowed
-                       text-white font-semibold py-3 rounded-xl 
-                       transition flex items-center justify-center gap-2"
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent 
-                                  rounded-full animate-spin inline-block" />
+                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
                 Signing in...
               </>
             ) : (

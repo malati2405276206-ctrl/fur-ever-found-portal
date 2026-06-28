@@ -1,9 +1,293 @@
+// src/app/adoption/page.js
+'use client'
+
+import { useState, useEffect } from 'react'
+import { supabase } from '@/lib/supabase'
+import Link from 'next/link'
+
 export default function AdoptionPage() {
+  const [cats,        setCats]        = useState([])
+  const [loading,     setLoading]     = useState(true)
+  const [filter,      setFilter]      = useState('all')   // 'all' | 'male' | 'female'
+  const [searchCity,  setSearchCity]  = useState('')
+
+  useEffect(() => {
+    fetchCats()
+  }, [])
+
+  const fetchCats = async () => {
+  setLoading(true)
+
+  const { data, error } = await supabase
+    .from('adoption_cats')
+    .select(`
+      *,
+      ngo_profiles (
+        org_name,
+        city,
+        contact_phone
+      )
+    `)
+    .eq('status', 'available')
+    .order('created_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching cats:', error.message)
+  } else {
+    setCats(data || [])
+  }
+
+  setLoading(false)
+}
+
+  // Filter cats by gender and city search
+  const filteredCats = cats.filter((cat) => {
+    const matchesGender = filter === 'all' || cat.gender === filter
+    const matchesCity   = searchCity === '' ||
+      cat.city.toLowerCase().includes(searchCity.toLowerCase())
+    return matchesGender && matchesCity
+  })
+
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-bold">
-        Adoption Page
-      </h1>
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+
+      {/* ── Hero ── */}
+      <section className="py-14 px-4 text-center">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-5xl mb-4">🏠</div>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-3">
+            Find Your <span className="text-purple-500">Fur Ever</span> Friend
+          </h1>
+          <p className="text-gray-500 text-lg">
+            Every cat here has a rescue story. Give them their forever home.
+          </p>
+        </div>
+      </section>
+
+      {/* ── Filters ── */}
+      <section className="px-4 pb-8">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
+
+          {/* City search */}
+          <input
+            type="text"
+            value={searchCity}
+            onChange={(e) => setSearchCity(e.target.value)}
+            placeholder="🔍 Search by city..."
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-200
+                       focus:outline-none focus:ring-2 focus:ring-purple-400
+                       transition text-sm bg-white"
+          />
+
+          {/* Gender filter */}
+          <div className="flex gap-2">
+            {[
+              { value: 'all',    label: 'All'    },
+              { value: 'male',   label: '♂ Male'   },
+              { value: 'female', label: '♀ Female' },
+            ].map((f) => (
+              <button
+                key={f.value}
+                onClick={() => setFilter(f.value)}
+                className={`px-4 py-3 rounded-xl text-sm font-medium transition
+                  ${filter === f.value
+                    ? 'bg-purple-500 text-white shadow-md'
+                    : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'
+                  }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── Cat Grid ── */}
+      <section className="px-4 pb-16">
+        <div className="max-w-5xl mx-auto">
+
+          {/* Loading skeleton */}
+          {loading && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="bg-white rounded-3xl overflow-hidden
+                                        border border-gray-100 animate-pulse">
+                  <div className="h-52 bg-gray-200" />
+                  <div className="p-5 space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-1/2" />
+                    <div className="h-3 bg-gray-100 rounded w-3/4" />
+                    <div className="h-3 bg-gray-100 rounded w-full" />
+                    <div className="h-10 bg-gray-200 rounded-xl mt-2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {!loading && filteredCats.length === 0 && (
+            <div className="text-center py-20">
+              <div className="text-6xl mb-4">🐾</div>
+              <h3 className="text-xl font-bold text-gray-700 mb-2">
+                No cats found
+              </h3>
+              <p className="text-gray-400 text-sm">
+                {searchCity
+                  ? `No cats available in "${searchCity}" right now.`
+                  : 'No cats available for adoption right now. Check back soon!'}
+              </p>
+            </div>
+          )}
+
+          {/* Cat cards */}
+          {!loading && filteredCats.length > 0 && (
+            <>
+              {/* Result count */}
+              <p className="text-gray-400 text-sm mb-5">
+                Showing <strong className="text-gray-700">{filteredCats.length}</strong> cat
+                {filteredCats.length !== 1 ? 's' : ''} available for adoption
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredCats.map((cat) => (
+                  <CatCard key={cat.id} cat={cat} />
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* ── NGO CTA ── */}
+      <section className="px-4 pb-16">
+        <div className="max-w-2xl mx-auto bg-gradient-to-r from-purple-500
+                        to-indigo-500 rounded-3xl p-8 text-center text-white">
+          <div className="text-4xl mb-3">🏢</div>
+          <h2 className="text-2xl font-bold mb-2">Are you a rescue organisation?</h2>
+          <p className="text-purple-100 text-sm mb-6">
+            Register your NGO to list cats for adoption and share their rescue stories.
+          </p>
+          <Link
+            href="/ngo-signup"
+            className="inline-block bg-white text-purple-600 hover:bg-purple-50
+                       px-6 py-3 rounded-xl font-bold transition"
+          >
+            Register Your NGO →
+          </Link>
+        </div>
+      </section>
+
+    </div>
+  )
+}
+
+// ── Cat Card Component ────────────────────────────────────
+function CatCard({ cat }) {
+  const [showStory, setShowStory] = useState(false)
+
+  const genderEmoji = {
+    male:    '♂',
+    female:  '♀',
+    unknown: '?',
+  }
+
+  return (
+    <div className="bg-white rounded-3xl overflow-hidden border border-gray-100
+                    shadow-sm hover:shadow-md transition-shadow duration-300
+                    flex flex-col">
+
+      {/* Cat image */}
+      <div className="relative">
+        {cat.image_url ? (
+          <img
+            src={cat.image_url}
+            alt={cat.name}
+            className="w-full h-52 object-cover"
+          />
+        ) : (
+          <div className="w-full h-52 bg-gradient-to-br from-purple-100
+                          to-indigo-100 flex items-center justify-center">
+            <span className="text-6xl">🐱</span>
+          </div>
+        )}
+
+        {/* Status badge */}
+        <div className="absolute top-3 left-3 bg-green-500 text-white
+                        text-xs font-bold px-3 py-1 rounded-full">
+          Available
+        </div>
+
+        {/* Gender badge */}
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm
+                        text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
+          {genderEmoji[cat.gender] || '?'} {cat.gender}
+        </div>
+      </div>
+
+      {/* Card body */}
+      <div className="p-5 flex flex-col flex-1">
+
+        {/* Name + age */}
+        <div className="flex items-start justify-between mb-1">
+          <h3 className="text-xl font-bold text-gray-900">{cat.name}</h3>
+          {cat.age && (
+            <span className="text-xs text-gray-400 bg-gray-100
+                             px-2 py-1 rounded-full ml-2 shrink-0">
+              {cat.age}
+            </span>
+          )}
+        </div>
+
+        {/* Breed + city */}
+        <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
+          {cat.breed && <span>🐾 {cat.breed}</span>}
+          {cat.breed && <span>·</span>}
+          <span>📍 {cat.city}</span>
+        </div>
+
+        {/* Description */}
+        <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-3">
+          {cat.description}
+        </p>
+
+        {/* NGO name */}
+        {cat.ngo_profiles?.org_name && (
+          <p className="text-xs text-purple-400 font-medium mb-4">
+            🏢 {cat.ngo_profiles.org_name}
+          </p>
+        )}
+
+        {/* Storyline toggle */}
+        <div className="mt-auto">
+          <button
+            onClick={() => setShowStory(!showStory)}
+            className="w-full text-left bg-purple-50 hover:bg-purple-100
+                       rounded-xl px-4 py-3 text-sm text-purple-600
+                       font-medium transition flex items-center justify-between"
+          >
+            <span>✨ Read rescue story</span>
+            <span>{showStory ? '▲' : '▼'}</span>
+          </button>
+
+          {/* Expandable storyline */}
+          {showStory && (
+            <div className="bg-purple-50 rounded-b-xl px-4 pb-4 -mt-1">
+              <p className="text-sm text-gray-600 leading-relaxed italic pt-2 border-t border-purple-100">
+                &ldquo;{cat.storyline}&rdquo;
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Contact button */}
+        <a
+          href={`mailto:?subject=Interested in adopting ${cat.name}&body=Hi, I saw ${cat.name} on Fur Ever Found and I am interested in adopting them.`}
+          className="mt-3 w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition text-center text-sm block"
+        >
+          🐱 I Want to Adopt
+        </a>
+
+      </div>
     </div>
   )
 }

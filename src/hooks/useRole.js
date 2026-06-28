@@ -10,13 +10,10 @@ export function useRole() {
   const [userId,  setUserId]  = useState(null)
 
   useEffect(() => {
-    // Step 1: Get current session directly
-    // (more reliable than waiting for useAuth)
     const init = async () => {
       const { data: { session } } = await supabase.auth.getSession()
 
       if (!session?.user) {
-        // No user logged in — guest
         setRole(null)
         setLoading(false)
         return
@@ -28,8 +25,6 @@ export function useRole() {
 
     init()
 
-    // Step 2: Re-fetch role whenever auth state changes
-    // (catches login, logout, token refresh)
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         if (!session?.user) {
@@ -38,7 +33,6 @@ export function useRole() {
           setLoading(false)
           return
         }
-
         setUserId(session.user.id)
         await fetchRole(session.user.id)
       }
@@ -54,11 +48,11 @@ export function useRole() {
       .from('profiles')
       .select('role')
       .eq('id', uid)
-      .single()
+      .maybeSingle()  // ← safe — never crashes on 0 or multiple rows
 
     if (error) {
       console.error('useRole error:', error.message)
-      setRole('user') // safe fallback
+      setRole('user')
     } else {
       setRole(data?.role ?? 'user')
     }

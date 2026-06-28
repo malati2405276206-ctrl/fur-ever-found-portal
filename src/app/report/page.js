@@ -6,32 +6,38 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import { useFormPersist, clearPersistedForm } from '@/hooks/useFormPersist'
 
 function ReportForm() {
   const router = useRouter()
   const { user } = useAuth()
 
-  const [reportType,    setReportType]    = useState('lost')
-  const [catName,       setCatName]       = useState('')
-  const [description,   setDescription]   = useState('')
-  const [location,      setLocation]      = useState('')
-  const [contactEmail,  setContactEmail]  = useState('')
-  const [contactPhone,  setContactPhone]  = useState('')
-  const [imageFile,     setImageFile]     = useState(null)
-  const [imagePreview,  setImagePreview]  = useState(null)
-  const [loading,       setLoading]       = useState(false)
-  const [error,         setError]         = useState('')
-  const [success,       setSuccess]       = useState(false)
+  // ── Persisted form fields ─────────────────────────
+  // These survive tab switches, remounts, refreshes
+  const [reportType,   setReportType]   = useFormPersist('report_type',   'lost')
+  const [catName,      setCatName]      = useFormPersist('report_name',    '')
+  const [description,  setDescription]  = useFormPersist('report_desc',    '')
+  const [location,     setLocation]     = useFormPersist('report_location','')
+  const [contactEmail, setContactEmail] = useFormPersist('report_email',   '')
+  const [contactPhone, setContactPhone] = useFormPersist('report_phone',   '')
 
-  // Pre-fill email
+  // ── Non-persisted (image can't go in localStorage) ──
+  const [imageFile,    setImageFile]    = useState(null)
+  const [imagePreview, setImagePreview] = useState(null)
+  const [loading,      setLoading]      = useState(false)
+  const [error,        setError]        = useState('')
+  const [success,      setSuccess]      = useState(false)
+
+  // Pre-fill email only if field is empty
   useEffect(() => {
-    if (user?.email) setContactEmail(user.email)
+    if (user?.email && !contactEmail) {
+      setContactEmail(user.email)
+    }
   }, [user])
 
   const handleImageChange = (e) => {
     const file = e.target.files?.[0]
     if (!file) return
-
     if (!file.type.startsWith('image/')) {
       setError('Please select an image file.')
       return
@@ -40,7 +46,6 @@ function ReportForm() {
       setError('Image must be under 5MB.')
       return
     }
-
     setImageFile(file)
     setImagePreview(URL.createObjectURL(file))
     setError('')
@@ -49,6 +54,21 @@ function ReportForm() {
   const handleRemoveImage = () => {
     setImageFile(null)
     setImagePreview(null)
+  }
+
+  // Clear all persisted form data after success
+  const clearForm = () => {
+    clearPersistedForm([
+      'report_type', 'report_name', 'report_desc',
+      'report_location', 'report_email', 'report_phone'
+    ])
+    setCatName('')
+    setDescription('')
+    setLocation('')
+    setContactPhone('')
+    setImageFile(null)
+    setImagePreview(null)
+    setError('')
   }
 
   const handleSubmit = async (e) => {
@@ -61,7 +81,6 @@ function ReportForm() {
     try {
       let imageUrl = null
 
-      // Upload image if selected
       if (imageFile) {
         const fileExt  = imageFile.name.split('.').pop()
         const fileName = `${user.id}_${Date.now()}.${fileExt}`
@@ -79,7 +98,6 @@ function ReportForm() {
         imageUrl = urlData.publicUrl
       }
 
-      // Save to correct table
       if (reportType === 'lost') {
         const { error: dbError } = await supabase
           .from('lost_cats')
@@ -107,10 +125,12 @@ function ReportForm() {
         if (dbError) throw dbError
       }
 
+      // Clear persisted data on success
+      clearForm()
       setSuccess(true)
 
     } catch (err) {
-      setError(err.message || 'Something went wrong. Please try again.')
+      setError(err.message || 'Something went wrong.')
     } finally {
       setLoading(false)
     }
@@ -118,33 +138,22 @@ function ReportForm() {
 
   const handleReset = () => {
     setSuccess(false)
-    setCatName('')
-    setDescription('')
-    setLocation('')
-    setContactPhone('')
-    setImageFile(null)
-    setImagePreview(null)
-    setError('')
+    setReportType('lost')
+    clearForm()
   }
 
-  // ── Success screen ──
   if (success) {
     return (
       <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
-            Report Submitted!
-          </h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Report Submitted!</h2>
           <p className="text-gray-500 text-sm mb-8">
-            Your {reportType === 'lost' ? 'lost cat' : 'found cat'} report
-            is now live. Our community will help.
+            Your {reportType === 'lost' ? 'lost cat' : 'found cat'} report is now live.
           </p>
           <div className="space-y-3">
             <button
-              onClick={() =>
-                router.push(reportType === 'lost' ? '/lost-cats' : '/found-cats')
-              }
+              onClick={() => router.push(reportType === 'lost' ? '/lost-cats' : '/found-cats')}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition"
             >
               View All Reports
@@ -164,15 +173,25 @@ function ReportForm() {
   return (
     <div className="min-h-screen bg-orange-50 py-10 px-4">
       <div className="max-w-2xl mx-auto">
-
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Report a Cat</h1>
-          <p className="text-gray-500 text-sm">
-            Fill in the details to alert our community
-          </p>
+          <p className="text-gray-500 text-sm">Fill in the details to alert our community</p>
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm border border-orange-100 p-8">
+
+          {/* Draft saved indicator */}
+          {(catName || description || location) && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-700 text-xs px-4 py-2 rounded-xl mb-5 flex justify-between items-center">
+              <span>📝 Draft saved automatically</span>
+              <button
+                onClick={clearForm}
+                className="text-amber-500 hover:text-amber-700 font-medium"
+              >
+                Clear draft
+              </button>
+            </div>
+          )}
 
           {/* Report type toggle */}
           <div className="flex gap-3 mb-8">
@@ -199,14 +218,14 @@ function ReportForm() {
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">
+            <div className="bg-red-50 border border-red-200 text-red-600
+                            text-sm px-4 py-3 rounded-xl mb-6">
               ⚠️ {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
 
-            {/* Cat name — lost only */}
             {reportType === 'lost' && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -223,7 +242,6 @@ function ReportForm() {
               </div>
             )}
 
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description <span className="text-red-400">*</span>
@@ -242,7 +260,6 @@ function ReportForm() {
               />
             </div>
 
-            {/* Location */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Location <span className="text-red-400">*</span>
@@ -257,15 +274,11 @@ function ReportForm() {
               />
             </div>
 
-            {/* Image upload */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Photo
-                <span className="text-gray-400 font-normal ml-1">
-                  (recommended)
-                </span>
+                <span className="text-gray-400 font-normal ml-1">(recommended)</span>
               </label>
-
               {imagePreview ? (
                 <div className="relative mb-2">
                   <img
@@ -284,23 +297,13 @@ function ReportForm() {
               ) : (
                 <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-orange-300 rounded-xl cursor-pointer bg-orange-50 hover:bg-orange-100 transition">
                   <span className="text-3xl mb-2">📷</span>
-                  <span className="text-sm font-medium text-orange-500">
-                    Click to upload photo
-                  </span>
-                  <span className="text-xs text-gray-400 mt-1">
-                    PNG, JPG up to 5MB
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
+                  <span className="text-sm font-medium text-orange-500">Click to upload photo</span>
+                  <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
+                  <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
               )}
             </div>
 
-            {/* Contact info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -329,7 +332,6 @@ function ReportForm() {
               </div>
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={loading}
@@ -347,7 +349,6 @@ function ReportForm() {
                 `Submit ${reportType === 'lost' ? '😿 Lost' : '😊 Found'} Cat Report`
               )}
             </button>
-
           </form>
         </div>
       </div>
@@ -355,7 +356,6 @@ function ReportForm() {
   )
 }
 
-// Wrap with ProtectedRoute — any logged-in user can access
 export default function ReportPage() {
   return (
     <ProtectedRoute>
