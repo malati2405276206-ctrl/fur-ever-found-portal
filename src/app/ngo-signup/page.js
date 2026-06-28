@@ -47,6 +47,22 @@ export default function NGOSignupPage() {
     setError('')
     setLoading(true)
 
+    const { allowed, message } = checkRateLimit('ngoSignup')
+    if (!allowed) {
+      setError(message)
+      setLoading(false)
+      return
+    }
+
+    // Sanitize NGO fields
+    const clean = sanitizeForm({
+      orgName:        { value: orgName,        type: 'text',  maxLength: 200 },
+      orgDescription: { value: orgDescription, type: 'text',  maxLength: 1000 },
+      city:           { value: city,           type: 'text',  maxLength: 100 },
+      website:        { value: website,        type: 'url'                   },
+      contactPhone:   { value: contactPhone,   type: 'phone'                 },
+    })
+
     // Create auth account
     const { data, error: signUpError } = await supabase.auth.signUp({
       email,

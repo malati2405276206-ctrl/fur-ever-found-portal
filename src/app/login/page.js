@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { login } from '@/lib/auth'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -22,6 +23,11 @@ export default function LoginPage() {
     e.preventDefault()     // Stop page from refreshing
     setLoading(true)
     setError('')           // Clear old errors
+
+    if (!allowed) {
+      setError(message)
+      return
+    }
 
     const { error } = await login(email, password)
 

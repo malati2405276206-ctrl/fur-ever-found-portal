@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useFormPersist, clearPersistedForm } from '@/hooks/useFormPersist'
+import { sanitizeForm } from '@/lib/sanitize'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 function ReportForm() {
   const router = useRouter()
@@ -71,70 +73,102 @@ function ReportForm() {
     setError('')
   }
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-    if (!user) return
+    // Replace handleSubmit with this:
+    const handleSubmit = async (e) => {
+      e.preventDefault()
+      if (!user) return
 
-    setLoading(true)
-    setError('')
-
-    try {
-      let imageUrl = null
-
-      if (imageFile) {
-        const fileExt  = imageFile.name.split('.').pop()
-        const fileName = `${user.id}_${Date.now()}.${fileExt}`
-
-        const { error: uploadError } = await supabase.storage
-          .from('cat-images')
-          .upload(fileName, imageFile)
-
-        if (uploadError) throw uploadError
-
-        const { data: urlData } = supabase.storage
-          .from('cat-images')
-          .getPublicUrl(fileName)
-
-        imageUrl = urlData.publicUrl
+      // Rate limit check
+      const { allowed, message } = checkRateLimit('report')
+      if (!allowed) {
+        setError(message)
+        return
       }
 
-      if (reportType === 'lost') {
-        const { error: dbError } = await supabase
-          .from('lost_cats')
-          .insert({
-            user_id:       user.id,
-            name:          catName,
-            description,
-            location,
-            image_url:     imageUrl,
-            contact_email: contactEmail,
-            contact_phone: contactPhone || null,
-          })
-        if (dbError) throw dbError
-      } else {
-        const { error: dbError } = await supabase
-          .from('found_cats')
-          .insert({
-            user_id:       user.id,
-            description,
-            location,
-            image_url:     imageUrl,
-            contact_email: contactEmail,
-            contact_phone: contactPhone || null,
-          })
-        if (dbError) throw dbError
+      setLoading(true)
+      setError('')
+
+      // Sanitize all inputs before saving
+      const clean = sanitizeForm({
+        catName:      { value: catName,      type: 'text',  maxLength: 100  },
+        description:  { value: description,  type: 'text',  maxLength: 1000 },
+        location:     { value: location,     type: 'text',  maxLength: 200  },
+        contactEmail: { value: contactEmail, type: 'email'                  },
+        contactPhone: { value: contactPhone, type: 'phone'                  },
+      })
+
+      // Validate required fields after sanitization
+      if (!clean.description || !clean.location || !clean.contactEmail) {
+        setError('Please fill in all required fields.')
+        setLoading(false)
+        return
       }
 
-      // Clear persisted data on success
-      clearForm()
-      setSuccess(true)
+      try {
+        let imageUrl = null
 
-    } catch (err) {
-      setError(err.message || 'Something went wrong.')
-    } finally {
-      setLoading(false)
+        if (imageFile) {
+          const fileExt  = imageFile.name.split('.').pop().toLowerCase()
+          const allowed  = ['jpg', 'jpeg', 'png', 'webp']
+
+          // Validate file type
+          if (!allowed.includes(fileExt)) {
+            setError('Only JPG, PNG or WebP images are allowed.')
+            setLoading(false)
+            return
+          }
+
+          const fileName = `${user.id}_${Date.now()}.${fileExt}`
+
+          const { error: uploadError } = await supabase.storage
+            .from('cat-images')
+            .upload(fileName, imageFile)
+
+          if (uploadError) throw uploadError
+
+          const { data: urlData } = supabase.storage
+            .from('cat-images')
+            .getPublicUrl(fileName)
+
+          imageUrl = urlData.publicUrl
+        }
+
+        if (reportType === 'lost') {
+          const { error: dbError } = await supabase
+            .from('lost_cats')
+            .insert({
+              user_id:       user.id,
+              name:          clean.catName,
+              description:   clean.description,
+              location:      clean.location,
+              image_url:     imageUrl,
+              contact_email: clean.contactEmail,
+              contact_phone: clean.contactPhone || null,
+            })
+          if (dbError) throw dbError
+        } else {
+          const { error: dbError } = await supabase
+            .from('found_cats')
+            .insert({
+              user_id:       user.id,
+              description:   clean.description,
+              location:      clean.location,
+              image_url:     imageUrl,
+              contact_email: clean.contactEmail,
+              contact_phone: clean.contactPhone || null,
+            })
+          if (dbError) throw dbError
+        }
+
+        clearForm()
+        setSuccess(true)
+
+      } catch (err) {
+        setError(err.message || 'Something went wrong.')
+      } finally {
+        setLoading(false)
+      }
     }
-  }
 
   const handleReset = () => {
     setSuccess(false)

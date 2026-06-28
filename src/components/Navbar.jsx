@@ -22,11 +22,12 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { href: '/',            label: 'Home'        },
-    { href: '/lost-cats',   label: '😿 Lost'     },
-    { href: '/found-cats',  label: '😊 Found'    },
-    { href: '/adoption',    label: '🏠 Adoption' },
-  ]
+  { href: '/',         label: 'Home'          },
+  { href: '/lost-cats',  label: '😿 Lost'     },
+  { href: '/found-cats', label: '😊 Found'    },
+  { href: '/adoption',   label: '🏠 Adoption' },
+  { href: '/stories',    label: '📖 Stories'  },  // ← add this
+]
 
   // Wait for BOTH auth AND role to finish loading
   // before showing any auth buttons
@@ -80,6 +81,9 @@ export default function Navbar() {
                   + Report Cat
                 </Link>
               )}
+              <Link href="/profile" className="text-gray-500 hover:text-orange-500 text-sm font-medium transition">
+                👤 Profile
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-gray-500 hover:text-red-500 text-sm font-medium transition"
