@@ -59,8 +59,8 @@ const handleSignup = async (e) => {
   // ── Success screen ──
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center px-4 py-8 sm:py-12">
+        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md">
           <div className="text-6xl mb-4">📬</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Check your email!

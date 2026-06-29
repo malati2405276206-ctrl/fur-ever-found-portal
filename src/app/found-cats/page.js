@@ -8,9 +8,9 @@ import { useAuth } from '@/hooks/useAuth'
 
 export default function FoundCatsPage() {
   const { user } = useAuth()
-  const [cats,    setCats]    = useState([])
+  const [cats, setCats] = useState([])
   const [loading, setLoading] = useState(true)
-  const [search,  setSearch]  = useState('')
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     fetchCats()
@@ -48,12 +48,15 @@ export default function FoundCatsPage() {
       <section className="py-14 px-4 text-center">
         <div className="max-w-2xl mx-auto">
           <div className="text-5xl mb-4">😊</div>
+
           <h1 className="text-4xl font-extrabold text-gray-900 mb-3">
             Found <span className="text-green-500">Cats</span>
           </h1>
+
           <p className="text-gray-500 text-lg">
             Someone found these cats. Is one of them yours?
           </p>
+
           {user && (
             <Link
               href="/report"
@@ -62,11 +65,14 @@ export default function FoundCatsPage() {
               + Report a Found Cat
             </Link>
           )}
+          <Link href="/map?type=found" className="inline-block mt-3 border border-green-300 text-green-500 hover:bg-green-50 px-6 py-3 rounded-xl font-semibold transition text-sm">
+            🗺️ View on Map
+          </Link>
         </div>
       </section>
 
       {/* ── Search ── */}
-      <section className="px-4 pb-8">
+      <section className="px-4 sm:px-6 pb-8">
         <div className="max-w-5xl mx-auto">
           <input
             type="text"
@@ -84,10 +90,14 @@ export default function FoundCatsPage() {
 
           {/* Loading skeleton */}
           {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse">
+                <div
+                  key={i}
+                  className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse"
+                >
                   <div className="h-48 bg-gray-200" />
+
                   <div className="p-5 space-y-3">
                     <div className="h-4 bg-gray-200 rounded w-1/2" />
                     <div className="h-3 bg-gray-100 rounded w-3/4" />
@@ -102,14 +112,17 @@ export default function FoundCatsPage() {
           {!loading && filteredCats.length === 0 && (
             <div className="text-center py-20">
               <div className="text-6xl mb-4">🐾</div>
+
               <h3 className="text-xl font-bold text-gray-700 mb-2">
                 No found cats reported yet
               </h3>
+
               <p className="text-gray-400 text-sm mb-4">
                 {search
                   ? `No results for "${search}"`
                   : 'Nobody has reported a found cat yet.'}
               </p>
+
               {user && (
                 <Link
                   href="/report"
@@ -125,11 +138,14 @@ export default function FoundCatsPage() {
           {!loading && filteredCats.length > 0 && (
             <>
               <p className="text-gray-400 text-sm mb-5">
-                <strong className="text-gray-700">{filteredCats.length}</strong> found cat
+                <strong className="text-gray-700">
+                  {filteredCats.length}
+                </strong>{' '}
+                found cat
                 {filteredCats.length !== 1 ? 's' : ''} reported
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {filteredCats.map((cat) => (
                   <FoundCatCard
                     key={cat.id}
@@ -186,8 +202,11 @@ function FoundCatCard({ cat, currentUserId }) {
 
         {/* Date */}
         <p className="text-xs text-gray-300 mb-4">
-          Found on {new Date(cat.created_at).toLocaleDateString('en-IN', {
-            day: 'numeric', month: 'short', year: 'numeric'
+          Found on{' '}
+          {new Date(cat.created_at).toLocaleDateString('en-IN', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
           })}
         </p>
 

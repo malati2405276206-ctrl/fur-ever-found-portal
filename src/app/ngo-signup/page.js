@@ -106,8 +106,7 @@ export default function NGOSignupPage() {
   // ── Success screen ──
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50
-                      flex items-center justify-center px-4">
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center px-4">
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -117,8 +116,7 @@ export default function NGOSignupPage() {
             Thanks for registering <strong>{orgName}</strong>.
             Please confirm your email, then wait for admin verification.
           </p>
-          <div className="bg-amber-50 border border-amber-200
-                          rounded-xl p-4 mb-6 text-left">
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-left">
             <p className="text-amber-700 text-xs font-semibold mb-2">
               ⏳ What happens next?
             </p>
@@ -131,8 +129,7 @@ export default function NGOSignupPage() {
           </div>
           <Link
             href="/login"
-            className="inline-block bg-purple-500 hover:bg-purple-600
-                       text-white px-6 py-3 rounded-xl font-semibold transition"
+            className="inline-block bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-xl font-semibold transition"
           >
             Go to Login
           </Link>
@@ -142,9 +139,8 @@ export default function NGOSignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50
-                    py-10 px-4">
-      <div className="max-w-lg mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 py-8 sm:py-10 px-4">
+        <div className="max-w-lg mx-auto">
 
         {/* Header */}
         <div className="text-center mb-8">

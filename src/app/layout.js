@@ -3,6 +3,9 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
 
+// Import Leaflet CSS globally — required for map to display correctly
+import 'leaflet/dist/leaflet.css'
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
@@ -12,8 +15,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
+    <html lang="en">
+      <body className={inter.className}>
         <Navbar />
         <main>{children}</main>
       </body>

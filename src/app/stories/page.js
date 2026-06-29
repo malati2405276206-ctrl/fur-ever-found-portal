@@ -43,7 +43,7 @@ export default function StoriesPage() {
       <section className="py-16 px-4 text-center">
         <div className="max-w-2xl mx-auto">
           <div className="text-5xl mb-4">📖</div>
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
             Every Cat Has a
             <span className="text-amber-500"> Story</span>
           </h1>
@@ -153,8 +153,7 @@ function StoryCard({ cat, index }) {
     : cat.storyline
 
   return (
-    <div className={`bg-gradient-to-br ${accent.bg} rounded-3xl border
-                     ${accent.border} p-8 transition-all duration-300`}>
+    <div className={`bg-gradient-to-br ${accent.bg} rounded-3xl border ${accent.border} p-5 sm:p-8 transition-all duration-300`}>
 
       {/* Top row: image + header info */}
       <div className="flex flex-col sm:flex-row gap-6 mb-6">
@@ -241,7 +240,7 @@ function StoryCard({ cat, index }) {
           &ldquo;
         </div>
 
-        <p className="text-gray-700 text-base leading-relaxed italic pl-4 border-l-2 border-white/80">
+        <p className="text-gray-700 text-sm sm:text-base leading-relaxed italic pl-4 border-l-2 border-white/80">
           {previewText}
         </p>
 

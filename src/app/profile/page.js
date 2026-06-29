@@ -129,20 +129,20 @@ function ProfileContent() {
           </div>
 
           {/* Stats row */}
-          <div className="grid grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-100">
-            <div className="text-center">
-              <div className="text-2xl font-extrabold text-orange-500">{lostCats.length}</div>
-              <div className="text-xs text-gray-400 mt-0.5">Lost Reports</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-extrabold text-green-500">{foundCats.length}</div>
-              <div className="text-xs text-gray-400 mt-0.5">Found Reports</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-extrabold text-purple-500">
-                {lostCats.filter((c) => c.status === 'reunited').length}
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-100">
+              <div className="text-center p-2 sm:p-0">
+                <div className="text-xl sm:text-2xl font-extrabold text-orange-500">{lostCats.length}</div>
+                <div className="text-xs text-gray-400 mt-0.5">Lost Reports</div>
               </div>
-              <div className="text-xs text-gray-400 mt-0.5">Reunited</div>
+              <div className="text-center p-2 sm:p-0">
+                <div className="text-xl sm:text-2xl font-extrabold text-green-500">{foundCats.length}</div>
+                <div className="text-xs text-gray-400 mt-0.5">Found Reports</div>
+              </div>
+              <div className="text-center p-2 sm:p-0">
+                <div className="text-xl sm:text-2xl font-extrabold text-purple-500">
+                  {lostCats.filter((c) => c.status === 'reunited').length}
+                </div>
+                <div className="text-xs text-gray-400 mt-0.5">Reunited</div>
             </div>
           </div>
         </div>

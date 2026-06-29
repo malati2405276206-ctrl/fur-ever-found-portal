@@ -88,44 +88,40 @@ export default function LostCatsPage() {
               + Report a Lost Cat
             </Link>
           )}
+          <Link href="/map?type=lost" className="inline-block mt-3 border border-orange-300 text-orange-500 hover:bg-orange-50 px-6 py-3 rounded-xl font-semibold transition text-sm">
+            🗺️ View on Map
+          </Link>
         </div>
       </section>
 
       {/* ── Filters ── */}
-      <section className="px-4 pb-8">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
+      <section className="px-4 sm:px-6 pb-8">
+        <div className="max-w-5xl mx-auto flex flex-col gap-3">
 
-          {/* Search */}
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="🔍 Search by name, location or description..."
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-orange-400
-                       transition text-sm bg-white"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm bg-white"
           />
 
-          {/* Status filter */}
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {[
-              { value: 'lost',     label: '😿 Lost'     },
+              { value: 'lost', label: '😿 Lost' },
               { value: 'reunited', label: '🎉 Reunited' },
-              { value: 'all',      label: 'All'          },
+              { value: 'all', label: 'All' },
             ].map((f) => (
               <button
                 key={f.value}
                 onClick={() => setFilterStatus(f.value)}
-                className={`px-4 py-3 rounded-xl text-sm font-medium transition
-                  ${filterStatus === f.value
-                    ? 'bg-orange-500 text-white shadow-md'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300'
-                  }`}
+                className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-sm font-medium transition ${filterStatus === f.value ? 'bg-orange-500 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:border-orange-300'}`}
               >
                 {f.label}
               </button>
             ))}
           </div>
+
         </div>
       </section>
 
@@ -135,10 +131,9 @@ export default function LostCatsPage() {
 
           {/* Loading skeleton */}
           {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-3xl overflow-hidden
-                                        border border-gray-100 animate-pulse">
+                <div key={i} className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse">
                   <div className="h-48 bg-gray-200" />
                   <div className="p-5 space-y-3">
                     <div className="h-4 bg-gray-200 rounded w-1/2" />
@@ -165,9 +160,7 @@ export default function LostCatsPage() {
               {user && (
                 <Link
                   href="/report"
-                  className="mt-4 inline-block bg-orange-500 text-white
-                             px-5 py-2 rounded-xl text-sm font-semibold
-                             hover:bg-orange-600 transition"
+                  className="mt-4 inline-block bg-orange-500 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-orange-600 transition"
                 >
                   Be the first to report →
                 </Link>
@@ -207,9 +200,7 @@ function LostCatCard({ cat, currentUserId, onMarkReunited }) {
   const isReunited = cat.status === 'reunited'
 
   return (
-    <div className={`bg-white rounded-3xl overflow-hidden border shadow-sm
-                     hover:shadow-md transition-shadow duration-300 flex flex-col
-                     ${isReunited ? 'border-green-200' : 'border-gray-100'}`}>
+    <div className={`bg-white rounded-3xl overflow-hidden border shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col ${isReunited ? 'border-green-200' : 'border-gray-100'}`}>
 
       {/* Image */}
       <div className="relative">
@@ -217,12 +208,10 @@ function LostCatCard({ cat, currentUserId, onMarkReunited }) {
           <img
             src={cat.image_url}
             alt={cat.name}
-            className={`w-full h-48 object-cover
-              ${isReunited ? 'opacity-70 grayscale' : ''}`}
+            className={`w-full h-48 object-cover ${isReunited ? 'opacity-70 grayscale' : ''}`}
           />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-orange-100
-                          to-amber-100 flex items-center justify-center">
+          <div className="w-full h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
             <span className="text-6xl">🐱</span>
           </div>
         )}

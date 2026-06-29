@@ -9,6 +9,10 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 import { useFormPersist, clearPersistedForm } from '@/hooks/useFormPersist'
 import { sanitizeForm } from '@/lib/sanitize'
 import { checkRateLimit } from '@/lib/rateLimit'
+import dynamic from 'next/dynamic'
+
+// Dynamic import — prevents SSR issues with Leaflet
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false })
 
 function ReportForm() {
   const router = useRouter()
@@ -29,6 +33,8 @@ function ReportForm() {
   const [loading,      setLoading]      = useState(false)
   const [error,        setError]        = useState('')
   const [success,      setSuccess]      = useState(false)
+  const [latitude,  setLatitude]  = useState(null)
+  const [longitude, setLongitude] = useState(null)  
 
   // Pre-fill email only if field is empty
   useEffect(() => {
@@ -79,9 +85,10 @@ function ReportForm() {
       if (!user) return
 
       // Rate limit check
-      const { allowed, message } = checkRateLimit('report')
+      const { allowed, message } = checkRateLimit(`report_${user.id}`, 5, 15 * 60 * 1000)
       if (!allowed) {
         setError(message)
+        setLoading(false)
         return
       }
 
@@ -141,6 +148,8 @@ function ReportForm() {
               name:          clean.catName,
               description:   clean.description,
               location:      clean.location,
+              latitude:      latitude  || null,
+              longitude:     longitude || null,
               image_url:     imageUrl,
               contact_email: clean.contactEmail,
               contact_phone: clean.contactPhone || null,
@@ -153,6 +162,8 @@ function ReportForm() {
               user_id:       user.id,
               description:   clean.description,
               location:      clean.location,
+              latitude:      latitude  || null,
+              longitude:     longitude || null,
               image_url:     imageUrl,
               contact_email: clean.contactEmail,
               contact_phone: clean.contactPhone || null,
@@ -179,7 +190,7 @@ function ReportForm() {
   if (success) {
     return (
       <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
+        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Report Submitted!</h2>
           <p className="text-gray-500 text-sm mb-8">
@@ -212,7 +223,7 @@ function ReportForm() {
           <p className="text-gray-500 text-sm">Fill in the details to alert our community</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-orange-100 p-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-orange-100 p-5 sm:p-8">
 
           {/* Draft saved indicator */}
           {(catName || description || location) && (
@@ -228,7 +239,7 @@ function ReportForm() {
           )}
 
           {/* Report type toggle */}
-          <div className="flex gap-3 mb-8">
+          <div className="flex flex-col sm:flex-row gap-3 mb-8">
             <button
               type="button"
               onClick={() => setReportType('lost')}
@@ -305,6 +316,20 @@ function ReportForm() {
                 placeholder="e.g. Near Bandra Station, Mumbai"
                 required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Pin on Map
+                <span className="text-gray-400 font-normal ml-1">(recommended)</span>
+              </label>
+              <LocationPicker
+                lat={latitude}
+                lng={longitude}
+                onLocationSelect={(lat, lng) => {
+                  setLatitude(lat)
+                  setLongitude(lng)
+                }}
               />
             </div>
 

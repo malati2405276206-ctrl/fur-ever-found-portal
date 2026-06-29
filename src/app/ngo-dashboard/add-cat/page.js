@@ -6,6 +6,9 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import { useFormPersist, clearPersistedForm } from '@/hooks/useFormPersist'
+import dynamic from 'next/dynamic'
+
+const LocationPicker = dynamic(() => import('@/components/LocationPicker'), { ssr: false })
 
 function AddCatForm() {
   const router = useRouter()
@@ -27,6 +30,9 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
   const [success, setSuccess] = useState(false)
+
+  const [latitude,  setLatitude]  = useState(null)
+  const [longitude, setLongitude] = useState(null)
 
   // Pre-fill city from NGO profile
   useEffect(() => {
@@ -109,6 +115,8 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
           gender,
           breed:       breed    || null,
           city,
+          latitude:  latitude  || null,
+          longitude: longitude || null,
           description,
           storyline,
           image_url:   imageUrl,
@@ -176,8 +184,8 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
 
   // ── Main form ─────────────────────────────────────
   return (
-    <div className="min-h-screen bg-purple-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-purple-50 py-8 sm:py-10 px-4">
+        <div className="max-w-2xl mx-auto">
 
         {/* Header */}
         <div className="flex items-center gap-3 mb-8">
@@ -292,7 +300,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                 </div>
 
                 {/* Age + Gender in a row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Age
@@ -325,7 +333,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                 </div>
 
                 {/* Breed + City in a row */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Breed
@@ -336,9 +344,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                       value={breed}
                       onChange={(e) => setBreed(e.target.value)}
                       placeholder="e.g. Tabby, Persian"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200
-                                 focus:outline-none focus:ring-2 focus:ring-purple-400
-                                 transition text-sm"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm"
                     />
                   </div>
                   <div>
@@ -351,9 +357,21 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="Mumbai"
                       required
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200
-                                 focus:outline-none focus:ring-2 focus:ring-purple-400
-                                 transition text-sm"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Pin on Map
+                      <span className="text-gray-400 font-normal ml-1">(recommended)</span>
+                    </label>
+                    <LocationPicker
+                      lat={latitude}
+                      lng={longitude}
+                      onLocationSelect={(lat, lng) => {
+                        setLatitude(lat)
+                        setLongitude(lng)
+                      }}
                     />
                   </div>
                 </div>
@@ -363,8 +381,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
 
             {/* ── Description ── */}
             <div>
-              <h2 className="text-sm font-semibold text-gray-500 uppercase
-                             tracking-widest mb-4">
+              <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-4">
                 About This Cat
               </h2>
 
@@ -378,9 +395,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                   placeholder="Personality, behaviour, vaccinated?, neutered?, good with kids/other pets..."
                   required
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200
-                             focus:outline-none focus:ring-2 focus:ring-purple-400
-                             transition text-sm resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm resize-none"
                 />
               </div>
             </div>
@@ -403,10 +418,7 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
                 placeholder="We found Luna shivering under a car during the monsoon rains. She had an injured paw and was severely malnourished. After 3 weeks of care, medication, and love — she started purring for the first time..."
                 required
                 rows={6}
-                className="w-full px-4 py-3 rounded-xl border border-purple-200
-                           focus:outline-none focus:ring-2 focus:ring-purple-400
-                           transition text-sm resize-none bg-purple-50
-                           placeholder-purple-300"
+                className="w-full px-4 py-3 rounded-xl border border-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm resize-none bg-purple-50 placeholder-purple-300"
               />
               <p className="text-xs text-gray-400 mt-1 text-right">
                 {storyline.length} characters
@@ -417,15 +429,11 @@ const [storyline,   setStoryline]   = useFormPersist('addcat_storyline',  '')
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-purple-500 hover:bg-purple-600
-                         disabled:bg-purple-300 disabled:cursor-not-allowed
-                         text-white font-bold py-4 rounded-xl transition
-                         flex items-center justify-center gap-2 text-base"
+              className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 text-base"
             >
               {loading ? (
                 <>
-                  <span className="w-5 h-5 border-2 border-white border-t-transparent
-                                    rounded-full animate-spin inline-block" />
+                  <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
                   Listing cat...
                 </>
               ) : (

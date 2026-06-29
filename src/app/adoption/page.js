@@ -61,46 +61,39 @@ export default function AdoptionPage() {
           <p className="text-gray-500 text-lg">
             Every cat here has a rescue story. Give them their forever home.
           </p>
+          <Link href="/map?type=adoption" className="inline-block mt-3 border border-purple-300 text-purple-500 hover:bg-purple-50 px-6 py-3 rounded-xl font-semibold transition text-sm">
+            🗺️ View on Map
+          </Link>
         </div>
       </section>
 
-      {/* ── Filters ── */}
-      <section className="px-4 pb-8">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
-
-          {/* City search */}
-          <input
-            type="text"
-            value={searchCity}
-            onChange={(e) => setSearchCity(e.target.value)}
-            placeholder="🔍 Search by city..."
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200
-                       focus:outline-none focus:ring-2 focus:ring-purple-400
-                       transition text-sm bg-white"
-          />
-
-          {/* Gender filter */}
-          <div className="flex gap-2">
-            {[
-              { value: 'all',    label: 'All'    },
-              { value: 'male',   label: '♂ Male'   },
-              { value: 'female', label: '♀ Female' },
-            ].map((f) => (
-              <button
-                key={f.value}
-                onClick={() => setFilter(f.value)}
-                className={`px-4 py-3 rounded-xl text-sm font-medium transition
-                  ${filter === f.value
-                    ? 'bg-purple-500 text-white shadow-md'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'
-                  }`}
-              >
-                {f.label}
-              </button>
-            ))}
+      {/* Filters */}
+        <section className="px-4 sm:px-6 pb-8">
+          <div className="max-w-5xl mx-auto flex flex-col gap-3">
+            <input
+              type="text"
+              value={searchCity}
+              onChange={(e) => setSearchCity(e.target.value)}
+              placeholder="🔍 Search by city..."
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm bg-white"
+            />
+            <div className="flex gap-2 flex-wrap">
+              {[
+                { value: 'all',    label: 'All'      },
+                { value: 'male',   label: '♂ Male'   },
+                { value: 'female', label: '♀ Female' },
+              ].map((f) => (
+                <button
+                  key={f.value}
+                  onClick={() => setFilter(f.value)}
+                  className={`flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-sm font-medium transition ${filter === f.value ? 'bg-purple-500 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:border-purple-300'}`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* ── Cat Grid ── */}
       <section className="px-4 pb-16">
@@ -108,7 +101,7 @@ export default function AdoptionPage() {
 
           {/* Loading skeleton */}
           {loading && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
               {[1, 2, 3, 4, 5, 6].map((i) => (
                 <div key={i} className="bg-white rounded-3xl overflow-hidden
                                         border border-gray-100 animate-pulse">
@@ -148,7 +141,7 @@ export default function AdoptionPage() {
                 {filteredCats.length !== 1 ? 's' : ''} available for adoption
               </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {filteredCats.map((cat) => (
                   <CatCard key={cat.id} cat={cat} />
                 ))}
