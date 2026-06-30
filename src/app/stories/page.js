@@ -2,11 +2,22 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/useAuth'
+import { useRole } from '@/hooks/useRole'
+import { ChevronLeft, ChevronRight, BookOpen, Plus } from 'lucide-react'
+import AddStoryModal from '@/components/AddStoryModal'
 
 export default function StoriesPage() {
+  const { user } = useAuth()
+  const { isNGO } = useRole()
+
   const [stories, setStories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [pageIndex, setPageIndex] = useState(0)
+  const [direction, setDirection] = useState(1)
+  const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
     fetchStories()
@@ -14,253 +25,208 @@ export default function StoriesPage() {
 
   const fetchStories = async () => {
     setLoading(true)
-
     const { data, error } = await supabase
       .from('adoption_cats')
-      .select(`
-        *,
-        ngo_profiles (
-          org_name,
-          city
-        )
-      `)
+      .select(`*, ngo_profiles ( org_name, city )`)
       .eq('status', 'adopted')
       .order('adopted_at', { ascending: false })
 
-    if (error) {
-      console.error('Error fetching stories:', error.message)
-    } else {
-      setStories(data || [])
-    }
-
+    if (!error) setStories(data || [])
     setLoading(false)
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-[#fdf6ec] via-[#fef9f3] to-white">
+  // Total "pages" = stories + 1 blank "add page" page (NGO only)
+  const totalPages = stories.length + (isNGO ? 1 : 0)
+  const isAddPage = isNGO && pageIndex === stories.length
 
-      {/* ── Hero ── */}
-      <section className="py-16 px-4 text-center">
-        <div className="max-w-2xl mx-auto">
-          <div className="text-5xl mb-4">📖</div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">
-            Every Cat Has a
-            <span className="text-amber-500"> Story</span>
-          </h1>
-          <p className="text-gray-500 text-lg leading-relaxed">
-            These are the rescue journeys that found their happy ending.
-            Each story is a reminder of what love and care can do.
-          </p>
+  const goNext = () => {
+    if (pageIndex < totalPages - 1) {
+      setDirection(1)
+      setPageIndex((p) => p + 1)
+    }
+  }
 
-          {/* Decorative divider */}
-          <div className="flex items-center justify-center gap-3 mt-8">
-            <div className="h-px w-16 bg-amber-200" />
-            <span className="text-amber-400 text-xl">🐾</span>
-            <div className="h-px w-16 bg-amber-200" />
-          </div>
-        </div>
-      </section>
+  const goPrev = () => {
+    if (pageIndex > 0) {
+      setDirection(-1)
+      setPageIndex((p) => p - 1)
+    }
+  }
 
-      {/* ── Stories ── */}
-      <section className="px-4 pb-20">
-        <div className="max-w-3xl mx-auto">
+  const handleDragEnd = (e, info) => {
+    if (info.offset.x < -80) goNext()
+    else if (info.offset.x > 80) goPrev()
+  }
 
-          {/* Loading */}
-          {loading && (
-            <div className="space-y-8">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-3xl p-8 animate-pulse
-                                        border border-amber-100">
-                  <div className="flex gap-6">
-                    <div className="w-32 h-32 rounded-2xl bg-gray-200 shrink-0" />
-                    <div className="flex-1 space-y-3">
-                      <div className="h-5 bg-gray-200 rounded w-1/3" />
-                      <div className="h-3 bg-gray-100 rounded w-1/4" />
-                      <div className="h-3 bg-gray-100 rounded w-full" />
-                      <div className="h-3 bg-gray-100 rounded w-5/6" />
-                      <div className="h-3 bg-gray-100 rounded w-4/6" />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+  const handleStoryAdded = async () => {
+    setModalOpen(false)
+    await fetchStories()
+    setPageIndex(0) // jump back to first page to show newest story
+  }
 
-          {/* Empty state */}
-          {!loading && stories.length === 0 && (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">🌱</div>
-              <h3 className="text-xl font-bold text-gray-700 mb-2">
-                No stories yet
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Success stories appear here when NGOs mark cats as adopted.
-                The first story is just around the corner!
-              </p>
-            </div>
-          )}
-
-          {/* Story cards */}
-          {!loading && stories.length > 0 && (
-            <div className="space-y-10">
-              {stories.map((cat, index) => (
-                <StoryCard key={cat.id} cat={cat} index={index} />
-              ))}
-            </div>
-          )}
-
-        </div>
-      </section>
-
-    </div>
-  )
-}
-
-// ── Story Card ────────────────────────────────────────────
-function StoryCard({ cat, index }) {
-  const [expanded, setExpanded] = useState(false)
-
-  // Alternate card accent colors for visual variety
-  const accents = [
-    { bg: 'from-amber-50 to-orange-50',   border: 'border-amber-200',  tag: 'bg-amber-100 text-amber-700',  quote: 'text-amber-400' },
-    { bg: 'from-purple-50 to-indigo-50',  border: 'border-purple-200', tag: 'bg-purple-100 text-purple-700', quote: 'text-purple-400' },
-    { bg: 'from-green-50 to-emerald-50',  border: 'border-green-200',  tag: 'bg-green-100 text-green-700',   quote: 'text-green-400' },
-    { bg: 'from-pink-50 to-rose-50',      border: 'border-pink-200',   tag: 'bg-pink-100 text-pink-700',     quote: 'text-pink-400' },
-    { bg: 'from-sky-50 to-blue-50',       border: 'border-sky-200',    tag: 'bg-sky-100 text-sky-700',       quote: 'text-sky-400' },
-  ]
-
-  const accent = accents[index % accents.length]
-
-  // How long ago was this cat adopted?
   const timeAgo = (dateStr) => {
     if (!dateStr) return ''
     const diff = Date.now() - new Date(dateStr).getTime()
-    const days  = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
     if (days === 0) return 'Today'
     if (days === 1) return 'Yesterday'
-    if (days < 30)  return `${days} days ago`
+    if (days < 30) return `${days} days ago`
     const months = Math.floor(days / 30)
-    if (months === 1) return '1 month ago'
-    if (months < 12)  return `${months} months ago`
+    if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`
     return `${Math.floor(months / 12)} year${Math.floor(months / 12) > 1 ? 's' : ''} ago`
   }
 
-  // Truncate storyline for preview
-  const previewLength = 200
-  const isLong        = cat.storyline?.length > previewLength
-  const previewText   = isLong && !expanded
-    ? cat.storyline.slice(0, previewLength) + '...'
-    : cat.storyline
+  const pageVariants = {
+    enter: (dir) => ({ rotateY: dir > 0 ? 90 : -90, opacity: 0 }),
+    center: { rotateY: 0, opacity: 1 },
+    exit: (dir) => ({ rotateY: dir > 0 ? -90 : 90, opacity: 0 }),
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#fdf6ec]">
+        <div className="w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (stories.length === 0 && !isNGO) {
+    return (
+      <div className="min-h-screen bg-[#fdf6ec] flex items-center justify-center px-4">
+        <div className="text-center">
+          <div className="text-6xl mb-4">🌱</div>
+          <h3 className="text-xl font-bold text-gray-700 mb-2">No stories yet</h3>
+          <p className="text-gray-400 text-sm">Success stories appear here when NGOs mark cats as adopted.</p>
+        </div>
+      </div>
+    )
+  }
+
+  const cat = !isAddPage ? stories[pageIndex] : null
 
   return (
-    <div className={`bg-gradient-to-br ${accent.bg} rounded-3xl border ${accent.border} p-5 sm:p-8 transition-all duration-300`}>
+    <div className="min-h-screen bg-gradient-to-b from-[#f5ead5] to-[#fdf6ec] py-10 px-4 flex flex-col items-center">
 
-      {/* Top row: image + header info */}
-      <div className="flex flex-col sm:flex-row gap-6 mb-6">
-
-        {/* Cat image */}
-        <div className="shrink-0">
-          {cat.image_url ? (
-            <img
-              src={cat.image_url}
-              alt={cat.name}
-              className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl object-cover shadow-md border-2 border-white"
-            />
-          ) : (
-            <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-white/60 flex items-center justify-center shadow-md border-2 border-white">
-              <span className="text-5xl">🐱</span>
-            </div>
-          )}
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-2 text-amber-600 mb-2">
+          <BookOpen size={20} />
+          <span className="text-xs font-bold uppercase tracking-widest">Success Stories</span>
         </div>
-
-        {/* Header info */}
-        <div className="flex-1">
-
-          {/* Adopted badge */}
-          <span className={`inline-block text-xs font-bold px-3 py-1
-                            rounded-full mb-3 ${accent.tag}`}>
-            🎉 Successfully Adopted
-          </span>
-
-          {/* Cat name */}
-          <h2 className="text-2xl font-extrabold text-gray-900 mb-1">
-            {cat.name}
-          </h2>
-
-          {/* Meta info */}
-          <div className="flex flex-wrap gap-3 text-xs text-gray-500">
-            {cat.breed && (
-              <span className="flex items-center gap-1">
-                🐾 {cat.breed}
-              </span>
-            )}
-            {cat.age && (
-              <span className="flex items-center gap-1">
-                🎂 {cat.age}
-              </span>
-            )}
-            {cat.gender !== 'unknown' && (
-              <span className="flex items-center gap-1">
-                {cat.gender === 'male' ? '♂' : '♀'} {cat.gender}
-              </span>
-            )}
-            <span className="flex items-center gap-1">
-              📍 {cat.city}
-            </span>
-          </div>
-
-          {/* NGO name + time */}
-          <div className="mt-3 flex flex-wrap gap-2 items-center">
-            {cat.ngo_profiles?.org_name && (
-              <span className="text-xs font-medium text-gray-600 bg-white/70
-                               px-3 py-1 rounded-full">
-                🏢 {cat.ngo_profiles.org_name}
-              </span>
-            )}
-            {cat.adopted_at && (
-              <span className="text-xs text-gray-400">
-                · Adopted {timeAgo(cat.adopted_at)}
-              </span>
-            )}
-          </div>
-        </div>
+        <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900">Every Cat Has a Story</h1>
       </div>
 
-      {/* Divider */}
-      <div className="border-t border-white/60 mb-6" />
+      <div className="relative w-full max-w-2xl">
+        <div className="absolute inset-x-4 -bottom-3 h-6 bg-amber-900/10 rounded-full blur-md" />
 
-      {/* Storyline */}
-      <div>
-        <p className={`text-xs font-bold uppercase tracking-widest mb-3 ${accent.quote}`}>
-          ✨ Rescue Story
-        </p>
+        <div className="relative" style={{ perspective: '1500px' }}>
+          <AnimatePresence custom={direction} mode="wait">
+            <motion.div
+              key={isAddPage ? 'add-page' : cat.id}
+              custom={direction}
+              variants={pageVariants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ duration: 0.45, ease: 'easeInOut' }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.2}
+              onDragEnd={handleDragEnd}
+              style={{ transformStyle: 'preserve-3d' }}
+              className="bg-[#fffdf8] rounded-r-2xl rounded-l-sm shadow-2xl border border-amber-100 overflow-hidden cursor-grab active:cursor-grabbing"
+            >
+              <div
+                className="relative px-8 sm:px-12 py-10 min-h-[480px] flex flex-col"
+                style={{
+                  backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, #f0e4d0 32px)',
+                  backgroundPosition: '0 8px',
+                }}
+              >
+                <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-amber-200/40 to-transparent flex flex-col justify-evenly items-center py-6">
+                  {Array.from({ length: 14 }).map((_, i) => (
+                    <div key={i} className="w-2 h-2 rounded-full bg-amber-700/20" />
+                  ))}
+                </div>
 
-        {/* Big opening quote mark */}
-        <div className={`text-5xl font-serif leading-none mb-2 ${accent.quote} opacity-40`}>
-          &ldquo;
+                <div className="pl-4 flex-1 flex flex-col">
+
+                  {isAddPage ? (
+                    /* ── Blank "Add Page" ── */
+                    <div className="flex-1 flex flex-col items-center justify-center text-center">
+                      <button
+                        onClick={() => setModalOpen(true)}
+                        className="w-20 h-20 rounded-full bg-amber-100 hover:bg-amber-200 flex items-center justify-center text-amber-600 transition mb-4 hover:scale-105"
+                      >
+                        <Plus size={32} strokeWidth={2.5} />
+                      </button>
+                      <h3 className="text-xl font-bold text-gray-700 mb-1">Add a New Page</h3>
+                      <p className="text-sm text-gray-400 max-w-xs" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
+                        Write the rescue story for one of your adopted cats
+                      </p>
+                    </div>
+                  ) : (
+                    /* ── Story Page ── */
+                    <>
+                      <div className="flex justify-center mb-6">
+                        {cat.image_url ? (
+                          <div className="bg-white p-2 pb-4 shadow-md rotate-[-2deg]">
+                            <img src={cat.image_url} alt={cat.name} className="w-40 h-40 object-cover" />
+                          </div>
+                        ) : (
+                          <div className="bg-white p-2 pb-4 shadow-md rotate-[-2deg]">
+                            <div className="w-40 h-40 bg-amber-50 flex items-center justify-center text-5xl">🐱</div>
+                          </div>
+                        )}
+                      </div>
+
+                      <h2 className="text-3xl font-bold text-gray-900 text-center mb-1">{cat.name}</h2>
+
+                      <div className="flex flex-wrap justify-center gap-3 text-xs text-gray-500 mb-6">
+                        {cat.breed && <span>🐾 {cat.breed}</span>}
+                        {cat.age && <span>🎂 {cat.age}</span>}
+                        <span>📍 {cat.city}</span>
+                        {cat.ngo_profiles?.org_name && <span>🏢 {cat.ngo_profiles.org_name}</span>}
+                        {cat.adopted_at && <span>· {timeAgo(cat.adopted_at)}</span>}
+                      </div>
+
+                      <p className="text-gray-700 text-lg leading-loose text-center max-w-md mx-auto" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
+                        {cat.storyline}
+                      </p>
+
+                      <div className="flex justify-center mt-8">
+                        <span className="inline-block border-2 border-amber-400 text-amber-600 text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full rotate-[-3deg]">
+                          🎉 Adopted
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>
         </div>
 
-        <p className="text-gray-700 text-sm sm:text-base leading-relaxed italic pl-4 border-l-2 border-white/80">
-          {previewText}
-        </p>
-
-        {/* Closing quote */}
-        <div className={`text-5xl font-serif leading-none mt-1 text-right
-                         ${accent.quote} opacity-40`}>
-          &rdquo;
-        </div>
-
-        {/* Read more toggle */}
-        {isLong && (
-          <button
-            onClick={() => setExpanded(!expanded)}
-            className="mt-3 text-sm font-semibold text-gray-500 hover:text-gray-700 transition underline underline-offset-2"
-          >
-            {expanded ? 'Show less ▲' : 'Read full story ▼'}
-          </button>
-        )}
+        <button onClick={goPrev} disabled={pageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
+          <ChevronLeft size={20} />
+        </button>
+        <button onClick={goNext} disabled={pageIndex === totalPages - 1} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
+          <ChevronRight size={20} />
+        </button>
       </div>
 
+      <p className="mt-6 text-sm text-amber-600 font-medium">
+        Page {pageIndex + 1} of {totalPages}
+      </p>
+      <p className="text-xs text-gray-400 mt-1">Swipe or use arrows to turn the page</p>
+
+      {isNGO && (
+        <AddStoryModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onStoryAdded={handleStoryAdded}
+          currentUserId={user?.id}
+        />
+      )}
     </div>
   )
 }

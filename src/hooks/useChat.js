@@ -10,12 +10,11 @@ export function useChat(currentUserId) {
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
   const channelRef = useRef(null)
+  const subscribingRef = useRef(false) // guards against overlapping subscribe calls
 
-  // Find an existing conversation or create a new one
   const openConversation = async (catType, catId, recipientId) => {
     setLoading(true)
 
-    // Try to find an existing conversation first (either direction)
     const { data: existing } = await supabase
       .from('conversations')
       .select('*')
@@ -48,12 +47,11 @@ export function useChat(currentUserId) {
 
     setConversationId(convoId)
     await loadMessages(convoId)
-    subscribeToMessages(convoId)
+    await subscribeToMessages(convoId)
     setLoading(false)
     return convoId
   }
 
-  // Load existing messages for a conversation
   const loadMessages = async (convoId) => {
     const { data, error } = await supabase
       .from('messages')
@@ -68,7 +66,6 @@ export function useChat(currentUserId) {
 
     setMessages(data || [])
 
-    // Mark unread messages from the other person as read
     await supabase
       .from('messages')
       .update({ read: true })
@@ -77,15 +74,20 @@ export function useChat(currentUserId) {
       .eq('read', false)
   }
 
-  // Listen for new messages in real time
-  const subscribeToMessages = (convoId) => {
-    // Clean up old subscription first
+  const subscribeToMessages = async (convoId) => {
+    // Remove any existing channel fully before creating a new one
     if (channelRef.current) {
-      supabase.removeChannel(channelRef.current)
+      await supabase.removeChannel(channelRef.current)
+      channelRef.current = null
     }
 
+    // Guard: don't start a second subscribe while one is in flight
+    if (subscribingRef.current) return
+    subscribingRef.current = true
+
+    // Unique channel name per conversation AND per mount to avoid collisions
     const channel = supabase
-      .channel(`messages_${convoId}`)
+      .channel(`messages_${convoId}_${Date.now()}`)
       .on(
         'postgres_changes',
         {
@@ -95,24 +97,23 @@ export function useChat(currentUserId) {
           filter: `conversation_id=eq.${convoId}`,
         },
         (payload) => {
-          setMessages((prev) => [...prev, payload.new])
+          setMessages((prev) => {
+            // avoid duplicate inserts if the event fires twice
+            if (prev.some((m) => m.id === payload.new.id)) return prev
+            return [...prev, payload.new]
+          })
 
-          // Mark as read instantly if it's not our own message
           if (payload.new.sender_id !== currentUserId) {
-            supabase
-              .from('messages')
-              .update({ read: true })
-              .eq('id', payload.new.id)
-              .then(() => {})
+            supabase.from('messages').update({ read: true }).eq('id', payload.new.id).then(() => {})
           }
         }
       )
-      .subscribe()
 
     channelRef.current = channel
+    channel.subscribe()
+    subscribingRef.current = false
   }
 
-  // Send a message
   const sendMessage = async (content) => {
     if (!conversationId || !content.trim()) return
 
@@ -133,11 +134,11 @@ export function useChat(currentUserId) {
     setSending(false)
   }
 
-  // Cleanup subscription on unmount
   useEffect(() => {
     return () => {
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
+        channelRef.current = null
       }
     }
   }, [])

@@ -2,6 +2,7 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
+import LogoIntro from '@/components/LogoIntro'
 import { ChatProvider } from '@/context/ChatContext'
 import 'leaflet/dist/leaflet.css'
 
@@ -16,6 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
+        <LogoIntro />
         <ChatProvider>
           <Navbar />
           <main>{children}</main>

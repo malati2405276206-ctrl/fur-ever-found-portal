@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import AIMatchButton from '@/components/AIMatchButton'
 import { useChatContext } from '@/context/ChatContext'
+import { getDirectionsUrl } from '@/lib/directions'
 
 export default function LostCatsPage() {
   const { user } = useAuth()
@@ -197,7 +198,7 @@ export default function LostCatsPage() {
 // ── Lost Cat Card ─────────────────────────────────────────
 function LostCatCard({ cat, currentUserId, onMarkReunited }) {
   const { openChat } = useChatContext()
-  const isOwner    = currentUserId && currentUserId === cat.user_id
+  const isOwner = currentUserId && currentUserId === cat.user_id
   const isReunited = cat.status === 'reunited'
 
   const handleMessage = () => {
@@ -243,6 +244,17 @@ function LostCatCard({ cat, currentUserId, onMarkReunited }) {
           {!isReunited && !currentUserId && (
             <a href="/login" className="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition text-sm">
               Login to Message
+            </a>
+          )}
+
+          {cat.latitude && cat.longitude && (
+            <a
+              href={getDirectionsUrl(cat.latitude, cat.longitude)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full text-center border border-gray-200 text-gray-600 hover:bg-gray-50 font-semibold py-2.5 rounded-xl transition text-sm"
+            >
+              🧭 Get Directions
             </a>
           )}
 
