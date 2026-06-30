@@ -189,17 +189,18 @@ function ReportForm() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-orange-50 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'var(--pearl)' }}>
         <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Report Submitted!</h2>
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--police-blue)' }}>Report Submitted!</h2>
           <p className="text-gray-500 text-sm mb-8">
             Your {reportType === 'lost' ? 'lost cat' : 'found cat'} report is now live.
           </p>
           <div className="space-y-3">
             <button
               onClick={() => router.push(reportType === 'lost' ? '/lost-cats' : '/found-cats')}
-              className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-xl font-semibold transition"
+              className="w-full text-white py-3 rounded-xl font-semibold transition"
+              style={{ background: 'var(--marigold)' }}
             >
               View All Reports
             </button>
@@ -216,14 +217,14 @@ function ReportForm() {
   }
 
   return (
-    <div className="min-h-screen bg-orange-50 py-10 px-4">
+    <div className="min-h-screen py-10 px-4" style={{ background: 'var(--pearl)' }}>
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Report a Cat</h1>
+          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--police-blue)' }}>Report a Cat</h1>
           <p className="text-gray-500 text-sm">Fill in the details to alert our community</p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-sm border border-orange-100 p-5 sm:p-8">
+        <div className="bg-white rounded-3xl shadow-sm border p-5 sm:p-8" style={{ borderColor: 'var(--buff)' }}>
 
           {/* Draft saved indicator */}
           {(catName || description || location) && (
@@ -245,7 +246,7 @@ function ReportForm() {
               onClick={() => setReportType('lost')}
               className={`flex-1 py-3 rounded-xl font-semibold text-sm transition
                 ${reportType === 'lost'
-                  ? 'bg-orange-500 text-white shadow-md'
+                  ? 'bg-[#E59D2C] text-white shadow-md'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
             >
               😿 I Lost My Cat
@@ -282,7 +283,7 @@ function ReportForm() {
                   onChange={(e) => setCatName(e.target.value)}
                   placeholder="e.g. Whiskers, Luna, Mochi"
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
                 />
               </div>
             )}
@@ -301,7 +302,7 @@ function ReportForm() {
                 }
                 required
                 rows={4}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm resize-none"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm resize-none"
               />
             </div>
 
@@ -315,7 +316,7 @@ function ReportForm() {
                 onChange={(e) => setLocation(e.target.value)}
                 placeholder="e.g. Near Bandra Station, Mumbai"
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
               />
             </div>
             <div>
@@ -354,9 +355,9 @@ function ReportForm() {
                   </button>
                 </div>
               ) : (
-                <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-orange-300 rounded-xl cursor-pointer bg-orange-50 hover:bg-orange-100 transition">
+                <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed rounded-xl cursor-pointer transition" style={{ borderColor: 'var(--buff)', background: 'var(--pearl)' }}>
                   <span className="text-3xl mb-2">📷</span>
-                  <span className="text-sm font-medium text-orange-500">Click to upload photo</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--marigold)' }}>Click to upload photo</span>
                   <span className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</span>
                   <input type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
                 </label>
@@ -373,7 +374,7 @@ function ReportForm() {
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
                 />
               </div>
               <div>
@@ -386,7 +387,7 @@ function ReportForm() {
                   value={contactPhone}
                   onChange={(e) => setContactPhone(e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
                 />
               </div>
             </div>
@@ -396,7 +397,7 @@ function ReportForm() {
               disabled={loading}
               className={`w-full text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 text-base disabled:opacity-60 disabled:cursor-not-allowed
                           ${reportType === 'lost'
-                            ? 'bg-orange-500 hover:bg-orange-600'
+                            ? 'bg-[#E59D2C] hover:bg-[#c5860f]'
                             : 'bg-green-500 hover:bg-green-600'}`}
             >
               {loading ? (

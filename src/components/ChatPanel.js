@@ -51,7 +51,7 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
       <div className={`fixed top-0 right-0 h-full w-full sm:w-96 bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-orange-50">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100" style={{ background: 'var(--buff)' }}>
           <div>
             <p className="font-bold text-gray-900 text-sm">{recipientName}</p>
             <p className="text-xs text-gray-400">About: {catLabel}</p>
@@ -63,7 +63,7 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
         <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-gray-50">
           {loading && (
             <div className="flex items-center justify-center h-full">
-              <div className="w-6 h-6 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+              <div className="w-6 h-6 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
             </div>
           )}
 
@@ -78,9 +78,9 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
             const isMine = msg.sender_id === currentUserId
             return (
               <div key={msg.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMine ? 'bg-orange-500 text-white rounded-br-sm' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'}`}>
+                <div className={`max-w-[75%] px-4 py-2.5 rounded-2xl text-sm ${isMine ? 'bg-[#2E4365] text-white rounded-br-sm' : 'bg-white text-gray-800 border border-gray-100 rounded-bl-sm'}`}>
                   <p>{msg.content}</p>
-                  <p className={`text-[10px] mt-1 ${isMine ? 'text-orange-100' : 'text-gray-300'}`}>{formatTime(msg.created_at)}</p>
+                  <p className={`text-[10px] mt-1 ${isMine ? 'text-blue-200' : 'text-gray-300'}`}>{formatTime(msg.created_at)}</p>
                 </div>
               </div>
             )
@@ -96,12 +96,12 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
             disabled={sending || loading}
-            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm disabled:opacity-50"
           />
           <button
             type="submit"
             disabled={sending || loading || !input.trim()}
-            className="bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white w-10 h-10 rounded-xl flex items-center justify-center transition shrink-0"
+            className="bg-[#2E4365] hover:bg-[#243551] disabled:bg-[#d6e3f0] text-white w-10 h-10 rounded-xl flex items-center justify-center transition shrink-0"
           >
             {sending ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : '➤'}
           </button>

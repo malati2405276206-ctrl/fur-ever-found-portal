@@ -54,7 +54,7 @@ export default function NotificationBell({ userId }) {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Bell button */}
-      <button onClick={() => setOpen(!open)} className="relative text-gray-500 hover:text-orange-500 transition p-2">
+      <button onClick={() => setOpen(!open)} className="relative text-gray-500 hover:text-amber-600 transition p-2">
         <span className="text-lg">🔔</span>
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -70,7 +70,7 @@ export default function NotificationBell({ userId }) {
           <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
             <p className="font-bold text-gray-900 text-sm">Notifications</p>
             {unreadCount > 0 && (
-              <button onClick={markAllAsRead} className="text-xs text-orange-500 hover:underline font-medium">
+              <button onClick={markAllAsRead} className="text-xs text-amber-600 hover:underline font-medium">
                 Mark all read
               </button>
             )}
@@ -79,7 +79,7 @@ export default function NotificationBell({ userId }) {
           <div className="max-h-96 overflow-y-auto">
             {loading && (
               <div className="flex items-center justify-center py-10">
-                <div className="w-5 h-5 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-5 h-5 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
               </div>
             )}
 
@@ -94,7 +94,7 @@ export default function NotificationBell({ userId }) {
               <button
                 key={n.id}
                 onClick={() => handleNotificationClick(n)}
-                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-orange-50 transition flex gap-3 ${!n.read ? 'bg-orange-50/50' : ''}`}
+                className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-amber-50 transition flex gap-3 ${!n.read ? 'bg-amber-50/50' : ''}`}
               >
                 <span className="text-lg shrink-0">{typeIcon[n.type] || '🔔'}</span>
                 <div className="flex-1 min-w-0">
@@ -104,7 +104,7 @@ export default function NotificationBell({ userId }) {
                   {n.body && <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{n.body}</p>}
                   <p className="text-[10px] text-gray-300 mt-1">{timeAgo(n.created_at)}</p>
                 </div>
-                {!n.read && <span className="w-2 h-2 bg-orange-500 rounded-full shrink-0 mt-1.5" />}
+                {!n.read && <span className="w-2 h-2 bg-amber-500 rounded-full shrink-0 mt-1.5" />}
               </button>
             ))}
           </div>

@@ -1,37 +1,42 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fdfcf7;
-  --foreground: #2d3b2d;
-  --sage-50: #f4f9f4;
-  --sage-100: #e8f3e8;
-  --sage-200: #c8dfc8;
-  --sage-300: #a3c9a3;
-  --sage-400: #7bb37b;
-  --sage-500: #5a9a5a;
-  --sage-600: #4a7f4a;
-  --sage-700: #3d663d;
-  --sage-800: #2d4d2d;
-  --sage-900: #1e331e;
-  --cream: #fdfcf7;
-  --cream-dark: #f5f0e3;
-  --gold: #c5963a;
-  --gold-light: #f5e6c8;
-  --blush: #f8e8e0;
-  --mint: #e0f5ec;
-  --sky: #e0eef5;
+  --background: #EBDDC5;
+  --foreground: #2E4365;
+  --sage-50: #f7f3eb;
+  --sage-100: #EBDDC5;
+  --sage-200: #F3D58D;
+  --sage-300: #E59D2C;
+  --sage-400: #c5860f;
+  --sage-500: #2E4365;
+  --sage-600: #243551;
+  --sage-700: #1a2740;
+  --sage-800: #111c2e;
+  --sage-900: #0a111d;
+  --cream: #EBDDC5;
+  --cream-dark: #e2d0b3;
+  --gold: #E59D2C;
+  --gold-light: #F3D58D;
+  --blush: #f5ebe0;
+  --mint: #F3D58D;
+  --sky: #d6e3f0;
+  --marigold: #E59D2C;
+  --buff: #F3D58D;
+  --pearl: #EBDDC5;
+  --police-blue: #2E4365;
+  --citrine-brown: #8A3B08;
 }
 
 @theme inline {
-  --color-background: #fdfcf7;
-  --color-foreground: #2d3b2d;
+  --color-background: #EBDDC5;
+  --color-foreground: #2E4365;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: #fdfcf7 !important;
-  color: #2d3b2d !important;
+  background: #EBDDC5 !important;
+  color: #2E4365 !important;
   font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
@@ -122,14 +127,14 @@ button,
 .organic-card {
   background: white;
   border-radius: 1.5rem;
-  border: 1px solid var(--sage-200);
-  box-shadow: 0 4px 20px rgba(90, 154, 90, 0.06);
+  border: 1px solid var(--buff);
+  box-shadow: 0 4px 20px rgba(46, 67, 101, 0.06);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .organic-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(90, 154, 90, 0.12);
+  box-shadow: 0 12px 32px rgba(46, 67, 101, 0.12);
 }
 
 /* Serif heading style for artistic feel */
@@ -141,7 +146,7 @@ button,
 
 /* Soft gradient backgrounds */
 .bg-organic-gradient {
-  background: linear-gradient(135deg, var(--sage-50) 0%, var(--cream) 50%, var(--mint) 100%);
+  background: #EBDDC5;
 }
 
 /* Doodle-style circle icons */
@@ -162,7 +167,7 @@ button,
 
 /* Review card style matching inspo */
 .review-card {
-  background: var(--sage-500);
+  background: var(--police-blue);
   color: white;
   border-radius: 1.2rem;
   padding: 1.5rem;
@@ -177,4 +182,89 @@ button,
   font-size: 3rem;
   opacity: 0.3;
   font-family: Georgia, serif;
+}
+
+
+/* Gingham / checkered grid texture for About section */
+.about-gingham {
+  background-color: #EBDDC5;
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(128, 0, 0, 0.6) 0px,
+      rgba(128, 0, 0, 0.6) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(128, 0, 0, 0.6) 0px,
+      rgba(128, 0, 0, 0.6) 1px,
+      transparent 1px,
+      transparent 20px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(128, 0, 0, 0.35) 0px,
+      rgba(128, 0, 0, 0.35) 20px,
+      transparent 20px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(128, 0, 0, 0.35) 0px,
+      rgba(128, 0, 0, 0.35) 20px,
+      transparent 20px,
+      transparent 40px
+    );
+}
+
+
+/* Sticky note styles */
+.sticky-note {
+  padding: 1.5rem 1.75rem;
+  border-radius: 2px;
+  position: relative;
+  box-shadow:
+    2px 3px 8px rgba(0, 0, 0, 0.12),
+    0 1px 3px rgba(0, 0, 0, 0.08);
+  transform: rotate(-1deg);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sticky-note:nth-child(even) {
+  transform: rotate(1.5deg);
+}
+
+.sticky-note:hover {
+  transform: rotate(0deg) scale(1.02);
+  box-shadow:
+    3px 5px 14px rgba(0, 0, 0, 0.15),
+    0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Tape/pin effect at top */
+.sticky-note::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 2px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.sticky-note-yellow {
+  background: #F3D58D;
+}
+
+.sticky-note-buff {
+  background: #FFF8E7;
+}
+
+.sticky-note-pearl {
+  background: #FFFFFF;
 }

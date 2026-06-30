@@ -55,8 +55,8 @@ export default function Navbar() {
     <nav
       className={`sticky top-0 z-50 backdrop-blur-md border-b transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-none'}`}
       style={{
-        background: 'rgba(253, 252, 247, 0.92)',
-        borderColor: 'var(--sage-200)',
+        background: '#2E4365',
+        borderColor: '#2E4365',
       }}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
@@ -64,8 +64,8 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="text-xl sm:text-2xl">🐾</span>
-          <span className="text-base sm:text-lg font-bold whitespace-nowrap" style={{ color: 'var(--sage-800)' }}>
-            Fur Ever <span style={{ color: 'var(--sage-500)' }}>Found</span>
+          <span className="text-base sm:text-lg font-bold whitespace-nowrap" style={{ color: '#F3D58D' }}>
+            Fur Ever <span style={{ color: '#F3D58D' }}>Found</span>
           </span>
         </Link>
 
@@ -76,7 +76,7 @@ export default function Navbar() {
             const active = isActive(link.href)
             return (
               <Link key={link.href} href={link.href} className="relative px-3 py-2 text-sm font-medium transition flex items-center gap-1.5">
-                <span className={`flex items-center gap-1.5 transition-colors`} style={{ color: active ? 'var(--sage-600)' : 'var(--sage-700)' }}>
+                <span className={`flex items-center gap-1.5 transition-colors`} style={{ color: active ? '#F3D58D' : '#F3D58D' }}>
                   <Icon size={15} strokeWidth={2.2} />
                   {link.label}
                 </span>
@@ -84,7 +84,7 @@ export default function Navbar() {
                   <motion.div
                     layoutId="navbar-active-underline"
                     className="absolute left-2 right-2 -bottom-0.5 h-0.5 rounded-full"
-                    style={{ background: 'var(--sage-500)' }}
+                    style={{ background: '#F3D58D' }}
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -93,7 +93,7 @@ export default function Navbar() {
           })}
 
           {/* Divider */}
-          <div className="w-px h-5 mx-2" style={{ background: 'var(--sage-200)' }} />
+          <div className="w-px h-5 mx-2" style={{ background: 'rgba(243, 213, 141, 0.3)' }} />
 
           {/* Secondary icon-only links */}
           {secondaryLinks.map((link) => {
@@ -106,8 +106,8 @@ export default function Navbar() {
                 title={link.label}
                 className="p-2 rounded-lg transition"
                 style={{
-                  color: active ? 'var(--sage-600)' : 'var(--sage-400)',
-                  background: active ? 'var(--sage-100)' : 'transparent',
+                  color: active ? '#F3D58D' : '#F3D58D',
+                  background: active ? 'rgba(243, 213, 141, 0.15)' : 'transparent',
                 }}
               >
                 <Icon size={17} strokeWidth={2.2} />
@@ -119,22 +119,22 @@ export default function Navbar() {
         {/* Right side: auth */}
         <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
           {isLoading ? (
-            <div className="w-24 h-9 rounded-xl animate-pulse" style={{ background: 'var(--sage-100)' }} />
+            <div className="w-24 h-9 rounded-xl animate-pulse" style={{ background: 'rgba(243, 213, 141, 0.2)' }} />
           ) : user ? (
             <>
               <NotificationBell userId={user.id} />
 
-              <Link href="/messages" title="Messages" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: 'var(--sage-500)' }}>
+              <Link href="/messages" title="Messages" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: '#F3D58D' }}>
                 <MessageCircle size={17} strokeWidth={2.2} />
               </Link>
 
-              <div className="w-px h-5" style={{ background: 'var(--sage-200)' }} />
+              <div className="w-px h-5" style={{ background: 'rgba(243, 213, 141, 0.3)' }} />
 
               {isNGO ? (
                 <Link
                   href="/ngo-dashboard"
                   className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
-                  style={{ background: 'var(--sage-600)' }}
+                  style={{ background: '#F3D58D', color: '#2E4365' }}
                 >
                   <Building2 size={15} /> Dashboard
                 </Link>
@@ -142,13 +142,13 @@ export default function Navbar() {
                 <Link
                   href="/report"
                   className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
-                  style={{ background: 'var(--sage-500)' }}
+                  style={{ background: '#F3D58D', color: '#2E4365' }}
                 >
                   <PlusCircle size={15} /> Report
                 </Link>
               )}
 
-              <Link href="/profile" title="Profile" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: 'var(--sage-500)' }}>
+              <Link href="/profile" title="Profile" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: '#F3D58D' }}>
                 <User size={17} strokeWidth={2.2} />
               </Link>
 
@@ -158,13 +158,13 @@ export default function Navbar() {
             </>
           ) : (
             <>
-              <Link href="/login" className="text-sm font-medium transition px-2 hover:opacity-80" style={{ color: 'var(--sage-700)' }}>
+              <Link href="/login" className="text-sm font-medium transition px-2 hover:opacity-80" style={{ color: '#F3D58D' }}>
                 Login
               </Link>
               <Link
                 href="/signup"
                 className="px-4 py-2 rounded-full text-sm font-semibold transition text-white hover:opacity-90"
-                style={{ background: 'var(--sage-500)' }}
+                style={{ background: '#F3D58D', color: '#2E4365' }}
               >
                 Sign Up
               </Link>
@@ -173,7 +173,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <button className="lg:hidden p-2 transition hover:opacity-80" style={{ color: 'var(--sage-700)' }} onClick={() => setMenuOpen(!menuOpen)}>
+        <button className="lg:hidden p-2 transition hover:opacity-80" style={{ color: '#F3D58D' }} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
@@ -187,7 +187,7 @@ export default function Navbar() {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="lg:hidden border-t overflow-hidden"
-            style={{ background: 'var(--cream)', borderColor: 'var(--sage-200)' }}
+            style={{ background: '#2E4365', borderColor: 'rgba(243, 213, 141, 0.2)' }}
           >
             <div className="px-4 sm:px-6 py-4 space-y-1">
               {[...primaryLinks, ...secondaryLinks].map((link) => {
@@ -200,8 +200,8 @@ export default function Navbar() {
                     onClick={() => setMenuOpen(false)}
                     className="flex items-center gap-2.5 font-medium py-2.5 px-3 rounded-xl text-sm transition"
                     style={{
-                      background: active ? 'var(--sage-100)' : 'transparent',
-                      color: active ? 'var(--sage-600)' : 'var(--sage-700)',
+                      background: active ? 'rgba(243, 213, 141, 0.15)' : 'transparent',
+                      color: active ? '#F3D58D' : '#F3D58D',
                     }}
                   >
                     <Icon size={16} strokeWidth={2.2} /> {link.label}
@@ -209,27 +209,27 @@ export default function Navbar() {
                 )
               })}
 
-              <div className="pt-3 mt-3 border-t space-y-2" style={{ borderColor: 'var(--sage-200)' }}>
+              <div className="pt-3 mt-3 border-t space-y-2" style={{ borderColor: 'rgba(243, 213, 141, 0.2)' }}>
                 {isLoading ? (
-                  <div className="w-full h-10 rounded-xl animate-pulse" style={{ background: 'var(--sage-100)' }} />
+                  <div className="w-full h-10 rounded-xl animate-pulse" style={{ background: 'rgba(243, 213, 141, 0.2)' }} />
                 ) : user ? (
                   <>
                     {isNGO ? (
-                      <Link href="/ngo-dashboard" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-600)' }}>
+                      <Link href="/ngo-dashboard" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: '#F3D58D', color: '#2E4365' }}>
                         <Building2 size={15} /> NGO Dashboard
                       </Link>
                     ) : (
-                      <Link href="/report" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-500)' }}>
+                      <Link href="/report" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: '#F3D58D', color: '#2E4365' }}>
                         <PlusCircle size={15} /> Report a Cat
                       </Link>
                     )}
-                    <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
+                    <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.3)', color: '#F3D58D' }}>
                       <User size={15} /> My Profile
                     </Link>
-                    <Link href="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
+                    <Link href="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.3)', color: '#F3D58D' }}>
                       <Bell size={15} /> Notifications
                     </Link>
-                    <Link href="/messages" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
+                    <Link href="/messages" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.3)', color: '#F3D58D' }}>
                       <MessageCircle size={15} /> Messages
                     </Link>
                     <button onClick={handleLogout} className="flex items-center justify-center gap-2 w-full text-red-500 hover:bg-red-50 font-medium text-sm py-2.5 rounded-full transition">
@@ -238,10 +238,10 @@ export default function Navbar() {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-300)', color: 'var(--sage-600)' }}>
+                    <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.5)', color: '#F3D58D' }}>
                       Login
                     </Link>
-                    <Link href="/signup" onClick={() => setMenuOpen(false)} className="block text-center text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-500)' }}>
+                    <Link href="/signup" onClick={() => setMenuOpen(false)} className="block text-center text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: '#F3D58D', color: '#2E4365' }}>
                       Sign Up
                     </Link>
                   </>

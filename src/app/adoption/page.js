@@ -51,7 +51,7 @@ export default function AdoptionPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white">
+    <div className="min-h-screen" style={{ background: '#EBDDC5' }}>
 
       {/* ── Hero ── */}
       <section className="py-14 px-4 text-center">
@@ -155,8 +155,7 @@ export default function AdoptionPage() {
 
       {/* ── NGO CTA ── */}
       <section className="px-4 pb-16">
-        <div className="max-w-2xl mx-auto bg-gradient-to-r from-purple-500
-                        to-indigo-500 rounded-3xl p-8 text-center text-white">
+        <div className="max-w-2xl mx-auto rounded-3xl p-8 text-center text-white" style={{ background: '#2E4365' }}>
           <div className="text-4xl mb-3">🏢</div>
           <h2 className="text-2xl font-bold mb-2">Are you a rescue organisation?</h2>
           <p className="text-purple-100 text-sm mb-6">
@@ -199,7 +198,7 @@ function CatCard({ cat }) {
         {cat.image_url ? (
           <img src={cat.image_url} alt={cat.name} className="w-full h-52 object-cover" />
         ) : (
-          <div className="w-full h-52 bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center">
+          <div className="w-full h-52 flex items-center justify-center" style={{ background: '#F3D58D' }}>
             <span className="text-6xl">🐱</span>
           </div>
         )}

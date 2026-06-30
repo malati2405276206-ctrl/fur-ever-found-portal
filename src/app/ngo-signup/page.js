@@ -106,7 +106,7 @@ export default function NGOSignupPage() {
   // ── Success screen ──
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎉</div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
@@ -139,7 +139,7 @@ export default function NGOSignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-indigo-50 py-8 sm:py-10 px-4">
+    <div className="min-h-screen py-8 sm:py-10 px-4" style={{ background: '#EBDDC5' }}>
         <div className="max-w-lg mx-auto">
 
         {/* Header */}
@@ -356,7 +356,7 @@ export default function NGOSignupPage() {
 
         <p className="text-center text-gray-400 text-sm mt-6">
           Not an NGO?{' '}
-          <Link href="/signup" className="text-orange-500 font-semibold hover:underline">
+          <Link href="/signup" className="font-semibold hover:underline" style={{ color: 'var(--marigold)' }}>
             Regular signup here
           </Link>
         </p>

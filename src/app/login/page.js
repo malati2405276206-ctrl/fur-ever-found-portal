@@ -46,13 +46,13 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center px-4 py-8 sm:py-12">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12" style={{ background: '#EBDDC5' }}>
       <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md">
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🐾</div>
-          <h1 className="text-2xl font-bold text-gray-800">Welcome Back</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--police-blue)' }}>Welcome Back</h1>
           <p className="text-gray-500 text-sm mt-1">
             Sign in to help reunite cats with families
           </p>
@@ -79,7 +79,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
             />
           </div>
 
@@ -95,7 +95,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Your password"
                 required
-                className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                className="w-full px-4 py-3 pr-12 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
               />
               {/* Show/Hide password toggle */}
               <button
@@ -112,7 +112,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+            className="w-full font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2 text-white"
+            style={{ background: loading ? 'var(--buff)' : 'var(--marigold)' }}
           >
             {loading ? (
               <>
@@ -128,7 +129,7 @@ export default function LoginPage() {
         {/* Divider */}
         <p className="text-center text-gray-400 text-sm mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-orange-500 font-semibold hover:underline">
+          <Link href="/signup" className="font-semibold hover:underline" style={{ color: 'var(--marigold)' }}>
             Create one free
           </Link>
         </p>

@@ -105,7 +105,7 @@ export default function StoriesPage() {
   const cat = !isAddPage ? stories[pageIndex] : null
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5ead5] to-[#fdf6ec] py-10 px-4 flex flex-col items-center">
+    <div className="min-h-screen py-10 px-4 flex flex-col items-center" style={{ background: '#EBDDC5' }}>
 
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-2 text-amber-600 mb-2">
@@ -138,11 +138,10 @@ export default function StoriesPage() {
               <div
                 className="relative px-8 sm:px-12 py-10 min-h-[480px] flex flex-col"
                 style={{
-                  backgroundImage: 'repeating-linear-gradient(transparent, transparent 31px, #f0e4d0 32px)',
-                  backgroundPosition: '0 8px',
+                  background: '#fff',
                 }}
               >
-                <div className="absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-amber-200/40 to-transparent flex flex-col justify-evenly items-center py-6">
+                <div className="absolute left-0 top-0 bottom-0 w-6 flex flex-col justify-evenly items-center py-6" style={{ background: 'rgba(243, 213, 141, 0.3)' }}>
                   {Array.from({ length: 14 }).map((_, i) => (
                     <div key={i} className="w-2 h-2 rounded-full bg-amber-700/20" />
                   ))}

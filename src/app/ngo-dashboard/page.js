@@ -122,7 +122,8 @@ function DashboardContent() {
           </Link>
           <Link
             href="/adoption"
-            className="bg-orange-500 hover:bg-orange-600 text-white rounded-2xl p-5 text-center font-semibold transition"
+            className="text-white rounded-2xl p-5 text-center font-semibold transition"
+            style={{ background: 'var(--marigold)' }}
           >
             <div className="text-2xl mb-1">🏠</div>
             View Adoption Feed

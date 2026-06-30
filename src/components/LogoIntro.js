@@ -32,7 +32,8 @@ export default function LogoIntro() {
     <AnimatePresence>
       {show && (
         <motion.div
-          className="fixed inset-0 z-[100] bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex flex-col items-center justify-center cursor-pointer"
+          className="fixed inset-0 z-[100] flex flex-col items-center justify-center cursor-pointer"
+          style={{ background: '#EBDDC5' }}
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
@@ -49,7 +50,7 @@ export default function LogoIntro() {
             <motion.path
               d="M50 60c-12 0-22 8-22 18 0 6 5 10 11 10 5 0 7-3 11-3s6 3 11 3c6 0 11-4 11-10 0-10-10-18-22-18z"
               fill="none"
-              stroke="#f97316"
+              stroke="#E59D2C"
               strokeWidth="3"
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -58,17 +59,17 @@ export default function LogoIntro() {
                 visible: { pathLength: 1, opacity: 1, transition: { duration: 0.7, ease: 'easeOut' } },
               }}
             />
-            <motion.circle cx="30" cy="45" r="6" fill="none" stroke="#f97316" strokeWidth="3"
+            <motion.circle cx="30" cy="45" r="6" fill="none" stroke="#E59D2C" strokeWidth="3"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.6 }}
             />
-            <motion.circle cx="50" cy="38" r="6" fill="none" stroke="#f97316" strokeWidth="3"
+            <motion.circle cx="50" cy="38" r="6" fill="none" stroke="#E59D2C" strokeWidth="3"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.7 }}
             />
-            <motion.circle cx="70" cy="45" r="6" fill="none" stroke="#f97316" strokeWidth="3"
+            <motion.circle cx="70" cy="45" r="6" fill="none" stroke="#E59D2C" strokeWidth="3"
               initial={{ pathLength: 0, opacity: 0 }}
               animate={{ pathLength: 1, opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.8 }}
@@ -82,7 +83,7 @@ export default function LogoIntro() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 1 }}
           >
-            Fur Ever <span className="text-orange-500">Found</span>
+            Fur Ever <span style={{ color: '#E59D2C' }}>Found</span>
           </motion.p>
 
           {/* Skip hint */}

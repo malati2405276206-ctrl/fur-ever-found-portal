@@ -59,10 +59,10 @@ const handleSignup = async (e) => {
   // ── Success screen ──
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center px-4 py-8 sm:py-12">
+      <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12" style={{ background: '#EBDDC5' }}>
         <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md">
           <div className="text-6xl mb-4">📬</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--police-blue)' }}>
             Check your email!
           </h2>
           <p className="text-gray-500 text-sm mb-6">
@@ -72,7 +72,8 @@ const handleSignup = async (e) => {
           </p>
           <Link
             href="/login"
-            className="inline-block bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-xl font-semibold transition"
+            className="inline-block text-white px-6 py-3 rounded-xl font-semibold transition"
+            style={{ background: 'var(--marigold)' }}
           >
             Go to Login
           </Link>
@@ -82,13 +83,13 @@ const handleSignup = async (e) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 via-amber-50 to-yellow-50 flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
 
         {/* Header */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🐱</div>
-          <h1 className="text-2xl font-bold text-gray-800">Join Fur Ever Found</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--police-blue)' }}>Join Fur Ever Found</h1>
           <p className="text-gray-500 text-sm mt-1">
             Help us reunite lost cats with their families
           </p>
@@ -113,7 +114,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your full name"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
             />
           </div>
 
@@ -128,7 +129,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
             />
           </div>
 
@@ -143,7 +144,7 @@ const handleSignup = async (e) => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Minimum 6 characters"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
             />
           </div>
 
@@ -158,14 +159,15 @@ const handleSignup = async (e) => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="Repeat your password"
               required
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+            className="w-full text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+            style={{ background: loading ? 'var(--buff)' : 'var(--marigold)' }}
           >
             {loading ? (
               <>
@@ -180,7 +182,7 @@ const handleSignup = async (e) => {
 
         <p className="text-center text-gray-400 text-sm mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-orange-500 font-semibold hover:underline">
+          <Link href="/login" className="font-semibold hover:underline" style={{ color: 'var(--marigold)' }}>
             Sign in
           </Link>
         </p>

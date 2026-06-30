@@ -44,7 +44,7 @@ export default function FoundCatsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-green-50 to-white">
+    <div className="min-h-screen" style={{ background: '#EBDDC5' }}>
 
       {/* ── Hero ── */}
       <section className="py-14 px-4 text-center">
@@ -185,7 +185,7 @@ function FoundCatCard({ cat, currentUserId }) {
         {cat.image_url ? (
           <img src={cat.image_url} alt="Found cat" className="w-full h-48 object-cover" />
         ) : (
-          <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
+          <div className="w-full h-48 flex items-center justify-center" style={{ background: '#F3D58D' }}>
             <span className="text-6xl">🐱</span>
           </div>
         )}
