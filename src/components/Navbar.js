@@ -52,14 +52,20 @@ export default function Navbar() {
   const isActive = (href) => pathname === href
 
   return (
-    <nav className={`sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-100 transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-none'}`}>
+    <nav
+      className={`sticky top-0 z-50 backdrop-blur-md border-b transition-shadow duration-300 ${scrolled ? 'shadow-md' : 'shadow-none'}`}
+      style={{
+        background: 'rgba(253, 252, 247, 0.92)',
+        borderColor: 'var(--sage-200)',
+      }}
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="text-xl sm:text-2xl">🐾</span>
-          <span className="text-base sm:text-lg font-bold text-gray-800 whitespace-nowrap">
-            Fur Ever <span className="text-orange-500">Found</span>
+          <span className="text-base sm:text-lg font-bold whitespace-nowrap" style={{ color: 'var(--sage-800)' }}>
+            Fur Ever <span style={{ color: 'var(--sage-500)' }}>Found</span>
           </span>
         </Link>
 
@@ -70,14 +76,15 @@ export default function Navbar() {
             const active = isActive(link.href)
             return (
               <Link key={link.href} href={link.href} className="relative px-3 py-2 text-sm font-medium transition flex items-center gap-1.5">
-                <span className={`flex items-center gap-1.5 transition-colors ${active ? 'text-orange-600' : 'text-gray-600 hover:text-orange-500'}`}>
+                <span className={`flex items-center gap-1.5 transition-colors`} style={{ color: active ? 'var(--sage-600)' : 'var(--sage-700)' }}>
                   <Icon size={15} strokeWidth={2.2} />
                   {link.label}
                 </span>
                 {active && (
                   <motion.div
                     layoutId="navbar-active-underline"
-                    className="absolute left-2 right-2 -bottom-0.5 h-0.5 bg-orange-500 rounded-full"
+                    className="absolute left-2 right-2 -bottom-0.5 h-0.5 rounded-full"
+                    style={{ background: 'var(--sage-500)' }}
                     transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                   />
                 )}
@@ -86,7 +93,7 @@ export default function Navbar() {
           })}
 
           {/* Divider */}
-          <div className="w-px h-5 bg-gray-200 mx-2" />
+          <div className="w-px h-5 mx-2" style={{ background: 'var(--sage-200)' }} />
 
           {/* Secondary icon-only links */}
           {secondaryLinks.map((link) => {
@@ -97,7 +104,11 @@ export default function Navbar() {
                 key={link.href}
                 href={link.href}
                 title={link.label}
-                className={`p-2 rounded-lg transition ${active ? 'text-orange-600 bg-orange-50' : 'text-gray-400 hover:text-orange-500 hover:bg-orange-50'}`}
+                className="p-2 rounded-lg transition"
+                style={{
+                  color: active ? 'var(--sage-600)' : 'var(--sage-400)',
+                  background: active ? 'var(--sage-100)' : 'transparent',
+                }}
               >
                 <Icon size={17} strokeWidth={2.2} />
               </Link>
@@ -108,41 +119,53 @@ export default function Navbar() {
         {/* Right side: auth */}
         <div className="hidden lg:flex items-center gap-2 xl:gap-3 shrink-0">
           {isLoading ? (
-            <div className="w-24 h-9 bg-gray-100 rounded-xl animate-pulse" />
+            <div className="w-24 h-9 rounded-xl animate-pulse" style={{ background: 'var(--sage-100)' }} />
           ) : user ? (
             <>
               <NotificationBell userId={user.id} />
 
-              <Link href="/messages" title="Messages" className="text-gray-400 hover:text-orange-500 p-2 rounded-lg hover:bg-orange-50 transition">
+              <Link href="/messages" title="Messages" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: 'var(--sage-500)' }}>
                 <MessageCircle size={17} strokeWidth={2.2} />
               </Link>
 
-              <div className="w-px h-5 bg-gray-200" />
+              <div className="w-px h-5" style={{ background: 'var(--sage-200)' }} />
 
               {isNGO ? (
-                <Link href="/ngo-dashboard" className="bg-purple-500 hover:bg-purple-600 text-white px-3 xl:px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap">
+                <Link
+                  href="/ngo-dashboard"
+                  className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
+                  style={{ background: 'var(--sage-600)' }}
+                >
                   <Building2 size={15} /> Dashboard
                 </Link>
               ) : (
-                <Link href="/report" className="bg-orange-500 hover:bg-orange-600 text-white px-3 xl:px-4 py-2 rounded-xl text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap">
+                <Link
+                  href="/report"
+                  className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
+                  style={{ background: 'var(--sage-500)' }}
+                >
                   <PlusCircle size={15} /> Report
                 </Link>
               )}
 
-              <Link href="/profile" title="Profile" className="text-gray-400 hover:text-orange-500 p-2 rounded-lg hover:bg-orange-50 transition">
+              <Link href="/profile" title="Profile" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: 'var(--sage-500)' }}>
                 <User size={17} strokeWidth={2.2} />
               </Link>
 
-              <button onClick={handleLogout} title="Logout" className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover:bg-red-50 transition">
+              <button onClick={handleLogout} title="Logout" className="p-2 rounded-lg transition text-red-400 hover:text-red-500 hover:bg-red-50">
                 <LogOut size={17} strokeWidth={2.2} />
               </button>
             </>
           ) : (
             <>
-              <Link href="/login" className="text-gray-600 hover:text-orange-500 text-sm font-medium transition px-2">
+              <Link href="/login" className="text-sm font-medium transition px-2 hover:opacity-80" style={{ color: 'var(--sage-700)' }}>
                 Login
               </Link>
-              <Link href="/signup" className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+              <Link
+                href="/signup"
+                className="px-4 py-2 rounded-full text-sm font-semibold transition text-white hover:opacity-90"
+                style={{ background: 'var(--sage-500)' }}
+              >
                 Sign Up
               </Link>
             </>
@@ -150,7 +173,7 @@ export default function Navbar() {
         </div>
 
         {/* Mobile hamburger */}
-        <button className="lg:hidden p-2 text-gray-600 hover:text-orange-500 transition" onClick={() => setMenuOpen(!menuOpen)}>
+        <button className="lg:hidden p-2 transition hover:opacity-80" style={{ color: 'var(--sage-700)' }} onClick={() => setMenuOpen(!menuOpen)}>
           {menuOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
@@ -163,7 +186,8 @@ export default function Navbar() {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden bg-white border-t border-orange-100 overflow-hidden"
+            className="lg:hidden border-t overflow-hidden"
+            style={{ background: 'var(--cream)', borderColor: 'var(--sage-200)' }}
           >
             <div className="px-4 sm:px-6 py-4 space-y-1">
               {[...primaryLinks, ...secondaryLinks].map((link) => {
@@ -174,46 +198,50 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     onClick={() => setMenuOpen(false)}
-                    className={`flex items-center gap-2.5 font-medium py-2.5 px-3 rounded-xl text-sm transition ${active ? 'bg-orange-50 text-orange-600' : 'text-gray-700 hover:text-orange-500 hover:bg-orange-50'}`}
+                    className="flex items-center gap-2.5 font-medium py-2.5 px-3 rounded-xl text-sm transition"
+                    style={{
+                      background: active ? 'var(--sage-100)' : 'transparent',
+                      color: active ? 'var(--sage-600)' : 'var(--sage-700)',
+                    }}
                   >
                     <Icon size={16} strokeWidth={2.2} /> {link.label}
                   </Link>
                 )
               })}
 
-              <div className="pt-3 mt-3 border-t border-gray-100 space-y-2">
+              <div className="pt-3 mt-3 border-t space-y-2" style={{ borderColor: 'var(--sage-200)' }}>
                 {isLoading ? (
-                  <div className="w-full h-10 bg-gray-100 rounded-xl animate-pulse" />
+                  <div className="w-full h-10 rounded-xl animate-pulse" style={{ background: 'var(--sage-100)' }} />
                 ) : user ? (
                   <>
                     {isNGO ? (
-                      <Link href="/ngo-dashboard" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 bg-purple-500 hover:bg-purple-600 text-white py-2.5 rounded-xl text-sm font-semibold transition">
+                      <Link href="/ngo-dashboard" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-600)' }}>
                         <Building2 size={15} /> NGO Dashboard
                       </Link>
                     ) : (
-                      <Link href="/report" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-semibold transition">
+                      <Link href="/report" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-500)' }}>
                         <PlusCircle size={15} /> Report a Cat
                       </Link>
                     )}
-                    <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
+                    <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
                       <User size={15} /> My Profile
                     </Link>
-                    <Link href="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
+                    <Link href="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
                       <Bell size={15} /> Notifications
                     </Link>
-                    <Link href="/messages" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
+                    <Link href="/messages" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-200)', color: 'var(--sage-700)' }}>
                       <MessageCircle size={15} /> Messages
                     </Link>
-                    <button onClick={handleLogout} className="flex items-center justify-center gap-2 w-full text-red-500 hover:bg-red-50 font-medium text-sm py-2.5 rounded-xl transition">
+                    <button onClick={handleLogout} className="flex items-center justify-center gap-2 w-full text-red-500 hover:bg-red-50 font-medium text-sm py-2.5 rounded-full transition">
                       <LogOut size={15} /> Logout
                     </button>
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center border border-orange-300 text-orange-500 hover:bg-orange-50 py-2.5 rounded-xl text-sm font-medium transition">
+                    <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'var(--sage-300)', color: 'var(--sage-600)' }}>
                       Login
                     </Link>
-                    <Link href="/signup" onClick={() => setMenuOpen(false)} className="block text-center bg-orange-500 hover:bg-orange-600 text-white py-2.5 rounded-xl text-sm font-semibold transition">
+                    <Link href="/signup" onClick={() => setMenuOpen(false)} className="block text-center text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: 'var(--sage-500)' }}>
                       Sign Up
                     </Link>
                   </>

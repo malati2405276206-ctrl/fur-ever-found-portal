@@ -1,28 +1,38 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdfcf7;
+  --foreground: #2d3b2d;
+  --sage-50: #f4f9f4;
+  --sage-100: #e8f3e8;
+  --sage-200: #c8dfc8;
+  --sage-300: #a3c9a3;
+  --sage-400: #7bb37b;
+  --sage-500: #5a9a5a;
+  --sage-600: #4a7f4a;
+  --sage-700: #3d663d;
+  --sage-800: #2d4d2d;
+  --sage-900: #1e331e;
+  --cream: #fdfcf7;
+  --cream-dark: #f5f0e3;
+  --gold: #c5963a;
+  --gold-light: #f5e6c8;
+  --blush: #f8e8e0;
+  --mint: #e0f5ec;
+  --sky: #e0eef5;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-background: #fdfcf7;
+  --color-foreground: #2d3b2d;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #fdfcf7 !important;
+  color: #2d3b2d !important;
+  font-family: 'Inter', Arial, Helvetica, sans-serif;
 }
 
 /* Normal cursor */
@@ -37,4 +47,134 @@ a,
 button,
 [role="button"] {
   cursor: url('/Paw--pointer.png'), pointer;
+}
+
+/* Organic blob shapes */
+.blob-shape {
+  border-radius: 60% 40% 50% 50% / 50% 60% 40% 50%;
+}
+
+.blob-shape-2 {
+  border-radius: 40% 60% 50% 50% / 60% 40% 50% 50%;
+}
+
+/* Wavy section divider */
+.wave-divider {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.wave-divider svg {
+  display: block;
+  width: 100%;
+  height: 60px;
+}
+
+@media (min-width: 768px) {
+  .wave-divider svg {
+    height: 100px;
+  }
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(2deg); }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+.animation-delay-200 {
+  animation-delay: 0.2s;
+}
+
+.animation-delay-400 {
+  animation-delay: 0.4s;
+}
+
+.animation-delay-600 {
+  animation-delay: 0.6s;
+}
+
+/* Organic card style */
+.organic-card {
+  background: white;
+  border-radius: 1.5rem;
+  border: 1px solid var(--sage-200);
+  box-shadow: 0 4px 20px rgba(90, 154, 90, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.organic-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(90, 154, 90, 0.12);
+}
+
+/* Serif heading style for artistic feel */
+.heading-artistic {
+  font-family: 'Georgia', 'Times New Roman', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Soft gradient backgrounds */
+.bg-organic-gradient {
+  background: linear-gradient(135deg, var(--sage-50) 0%, var(--cream) 50%, var(--mint) 100%);
+}
+
+/* Doodle-style circle icons */
+.icon-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  transition: transform 0.3s ease;
+}
+
+.icon-circle:hover {
+  transform: scale(1.1);
+}
+
+/* Review card style matching inspo */
+.review-card {
+  background: var(--sage-500);
+  color: white;
+  border-radius: 1.2rem;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.review-card::before {
+  content: '"';
+  position: absolute;
+  top: 0.5rem;
+  left: 1rem;
+  font-size: 3rem;
+  opacity: 0.3;
+  font-family: Georgia, serif;
 }
