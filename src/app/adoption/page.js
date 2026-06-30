@@ -4,6 +4,7 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import { useChatContext } from '@/context/ChatContext'
 
 export default function AdoptionPage() {
   const [cats,        setCats]        = useState([])
@@ -177,109 +178,70 @@ export default function AdoptionPage() {
 // ── Cat Card Component ────────────────────────────────────
 function CatCard({ cat }) {
   const [showStory, setShowStory] = useState(false)
+  const { openChat } = useChatContext()
 
-  const genderEmoji = {
-    male:    '♂',
-    female:  '♀',
-    unknown: '?',
+  const genderEmoji = { male: '♂', female: '♀', unknown: '?' }
+
+  const handleMessage = () => {
+    openChat({
+      catType: 'adoption',
+      catId: cat.id,
+      recipientId: cat.ngo_id,
+      catLabel: cat.name,
+    })
   }
 
   return (
-    <div className="bg-white rounded-3xl overflow-hidden border border-gray-100
-                    shadow-sm hover:shadow-md transition-shadow duration-300
-                    flex flex-col">
+    <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
 
-      {/* Cat image */}
       <div className="relative">
         {cat.image_url ? (
-          <img
-            src={cat.image_url}
-            alt={cat.name}
-            className="w-full h-52 object-cover"
-          />
+          <img src={cat.image_url} alt={cat.name} className="w-full h-52 object-cover" />
         ) : (
-          <div className="w-full h-52 bg-gradient-to-br from-purple-100
-                          to-indigo-100 flex items-center justify-center">
+          <div className="w-full h-52 bg-gradient-to-br from-purple-100 to-indigo-100 flex items-center justify-center">
             <span className="text-6xl">🐱</span>
           </div>
         )}
-
-        {/* Status badge */}
-        <div className="absolute top-3 left-3 bg-green-500 text-white
-                        text-xs font-bold px-3 py-1 rounded-full">
-          Available
-        </div>
-
-        {/* Gender badge */}
-        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm
-                        text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
+        <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">Available</div>
+        <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-bold px-3 py-1 rounded-full">
           {genderEmoji[cat.gender] || '?'} {cat.gender}
         </div>
       </div>
 
-      {/* Card body */}
       <div className="p-5 flex flex-col flex-1">
-
-        {/* Name + age */}
         <div className="flex items-start justify-between mb-1">
           <h3 className="text-xl font-bold text-gray-900">{cat.name}</h3>
-          {cat.age && (
-            <span className="text-xs text-gray-400 bg-gray-100
-                             px-2 py-1 rounded-full ml-2 shrink-0">
-              {cat.age}
-            </span>
-          )}
+          {cat.age && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full ml-2 shrink-0">{cat.age}</span>}
         </div>
 
-        {/* Breed + city */}
         <div className="flex items-center gap-2 text-xs text-gray-400 mb-3">
           {cat.breed && <span>🐾 {cat.breed}</span>}
           {cat.breed && <span>·</span>}
           <span>📍 {cat.city}</span>
         </div>
 
-        {/* Description */}
-        <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-3">
-          {cat.description}
-        </p>
+        <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-3">{cat.description}</p>
 
-        {/* NGO name */}
         {cat.ngo_profiles?.org_name && (
-          <p className="text-xs text-purple-400 font-medium mb-4">
-            🏢 {cat.ngo_profiles.org_name}
-          </p>
+          <p className="text-xs text-purple-400 font-medium mb-4">🏢 {cat.ngo_profiles.org_name}</p>
         )}
 
-        {/* Storyline toggle */}
         <div className="mt-auto">
-          <button
-            onClick={() => setShowStory(!showStory)}
-            className="w-full text-left bg-purple-50 hover:bg-purple-100
-                       rounded-xl px-4 py-3 text-sm text-purple-600
-                       font-medium transition flex items-center justify-between"
-          >
+          <button onClick={() => setShowStory(!showStory)} className="w-full text-left bg-purple-50 hover:bg-purple-100 rounded-xl px-4 py-3 text-sm text-purple-600 font-medium transition flex items-center justify-between">
             <span>✨ Read rescue story</span>
             <span>{showStory ? '▲' : '▼'}</span>
           </button>
 
-          {/* Expandable storyline */}
           {showStory && (
             <div className="bg-purple-50 rounded-b-xl px-4 pb-4 -mt-1">
-              <p className="text-sm text-gray-600 leading-relaxed italic pt-2 border-t border-purple-100">
-                &ldquo;{cat.storyline}&rdquo;
-              </p>
+              <p className="text-sm text-gray-600 leading-relaxed italic pt-2 border-t border-purple-100">&ldquo;{cat.storyline}&rdquo;</p>
             </div>
           )}
         </div>
 
-        {/* Contact button */}
-        <a
-          href={`mailto:?subject=Interested in adopting ${cat.name}&body=Hi, I saw ${cat.name} on Fur Ever Found and I am interested in adopting them.`}
-          className="mt-3 w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition text-center text-sm block"
-        >
+        <button onClick={handleMessage} className="mt-3 w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition text-center text-sm">
           🐱 I Want to Adopt
-        </a>
-
+        </button>
       </div>
     </div>
   )

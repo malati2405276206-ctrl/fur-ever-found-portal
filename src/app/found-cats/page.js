@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
+import { useChatContext } from '@/context/ChatContext'
 
 export default function FoundCatsPage() {
   const { user } = useAuth()
@@ -164,66 +165,56 @@ export default function FoundCatsPage() {
 
 // ── Found Cat Card ────────────────────────────────────────
 function FoundCatCard({ cat, currentUserId }) {
+  const { openChat } = useChatContext()
+  const isOwner = currentUserId && currentUserId === cat.user_id
+
+  const handleMessage = () => {
+    openChat({
+      catType: 'found',
+      catId: cat.id,
+      recipientId: cat.user_id,
+      catLabel: `a cat found near ${cat.location}`,
+    })
+  }
+
   return (
     <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col">
 
-      {/* Image */}
       <div className="relative">
         {cat.image_url ? (
-          <img
-            src={cat.image_url}
-            alt="Found cat"
-            className="w-full h-48 object-cover"
-          />
+          <img src={cat.image_url} alt="Found cat" className="w-full h-48 object-cover" />
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-green-100 to-emerald-100 flex items-center justify-center">
             <span className="text-6xl">🐱</span>
           </div>
         )}
-
-        {/* Badge */}
         <div className="absolute top-3 left-3 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
           😊 Found
         </div>
       </div>
 
-      {/* Body */}
       <div className="p-5 flex flex-col flex-1">
-
-        {/* Location */}
-        <p className="text-sm font-bold text-green-600 mb-2">
-          📍 {cat.location}
-        </p>
-
-        {/* Description */}
-        <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">
-          {cat.description}
-        </p>
-
-        {/* Date */}
+        <p className="text-sm font-bold text-green-600 mb-2">📍 {cat.location}</p>
+        <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">{cat.description}</p>
         <p className="text-xs text-gray-300 mb-4">
-          Found on{' '}
-          {new Date(cat.created_at).toLocaleDateString('en-IN', {
-            day: 'numeric',
-            month: 'short',
-            year: 'numeric',
-          })}
+          Found on {new Date(cat.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
         </p>
 
-        {/* Contact */}
         <div className="mt-auto space-y-2">
-          <a
-            href={`mailto:${cat.contact_email}?subject=Is this my cat?&body=Hi, I saw your post on Fur Ever Found about a cat you found. I think it might be mine!`}
-            className="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 rounded-xl transition text-sm"
-          >
-            📧 This Might Be Mine!
-          </a>
+          {!isOwner && currentUserId && (
+            <button onClick={handleMessage} className="w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+              💬 This Might Be Mine!
+            </button>
+          )}
+
+          {!currentUserId && (
+            <a href="/login" className="block w-full text-center bg-green-500 hover:bg-green-600 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+              Login to Message
+            </a>
+          )}
 
           {cat.contact_phone && (
-            <a
-              href={`tel:${cat.contact_phone}`}
-              className="block w-full text-center border border-green-300 text-green-600 hover:bg-green-50 font-semibold py-2.5 rounded-xl transition text-sm"
-            >
+            <a href={`tel:${cat.contact_phone}`} className="block w-full text-center border border-green-300 text-green-600 hover:bg-green-50 font-semibold py-2.5 rounded-xl transition text-sm">
               📞 Call {cat.contact_phone}
             </a>
           )}

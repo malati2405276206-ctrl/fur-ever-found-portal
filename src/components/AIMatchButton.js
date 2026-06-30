@@ -53,6 +53,22 @@ export default function AIMatchButton({ lostCat }) {
       setMatches(data.matches || [])
       setSearched(true)
 
+      const strongMatches = (data.matches || []).filter((m) => m.score >= 75)
+
+        if (strongMatches.length > 0) {
+          const { data: { user } } = await supabase.auth.getUser()
+          if (user) {
+            await supabase.from('notifications').insert({
+              user_id: user.id,
+              type: 'ai_match',
+              title: `Strong match found for ${lostCat.name}! 🤖`,
+              body: `${strongMatches[0].score}% match — ${strongMatches[0].reason}`,
+              link: '/lost-cats',
+            })
+          }
+        }
+
+
     } catch (err) {
       setError('Something went wrong. Please try again.')
       console.error(err)

@@ -5,8 +5,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
-// Add import at top of lost-cats/page.js
 import AIMatchButton from '@/components/AIMatchButton'
+import { useChatContext } from '@/context/ChatContext'
 
 export default function LostCatsPage() {
   const { user } = useAuth()
@@ -196,88 +196,68 @@ export default function LostCatsPage() {
 
 // ── Lost Cat Card ─────────────────────────────────────────
 function LostCatCard({ cat, currentUserId, onMarkReunited }) {
+  const { openChat } = useChatContext()
   const isOwner    = currentUserId && currentUserId === cat.user_id
   const isReunited = cat.status === 'reunited'
+
+  const handleMessage = () => {
+    openChat({
+      catType: 'lost',
+      catId: cat.id,
+      recipientId: cat.user_id,
+      catLabel: cat.name,
+    })
+  }
 
   return (
     <div className={`bg-white rounded-3xl overflow-hidden border shadow-sm hover:shadow-md transition-shadow duration-300 flex flex-col ${isReunited ? 'border-green-200' : 'border-gray-100'}`}>
 
-      {/* Image */}
       <div className="relative">
         {cat.image_url ? (
-          <img
-            src={cat.image_url}
-            alt={cat.name}
-            className={`w-full h-48 object-cover ${isReunited ? 'opacity-70 grayscale' : ''}`}
-          />
+          <img src={cat.image_url} alt={cat.name} className={`w-full h-48 object-cover ${isReunited ? 'opacity-70 grayscale' : ''}`} />
         ) : (
           <div className="w-full h-48 bg-gradient-to-br from-orange-100 to-amber-100 flex items-center justify-center">
             <span className="text-6xl">🐱</span>
           </div>
         )}
-
-        {/* Status badge */}
-        <div className={`absolute top-3 left-3 text-white text-xs
-                         font-bold px-3 py-1 rounded-full
-                         ${isReunited ? 'bg-green-500' : 'bg-red-500'}`}>
+        <div className={`absolute top-3 left-3 text-white text-xs font-bold px-3 py-1 rounded-full ${isReunited ? 'bg-green-500' : 'bg-red-500'}`}>
           {isReunited ? '🎉 Reunited' : '😿 Lost'}
         </div>
       </div>
 
-      {/* Body */}
       <div className="p-5 flex flex-col flex-1">
-
-        {/* Name */}
         <h3 className="text-xl font-bold text-gray-900 mb-1">{cat.name}</h3>
-
-        {/* Location */}
-        <p className="text-xs text-orange-500 font-medium mb-2">
-          📍 {cat.location}
-        </p>
-
-        {/* Description */}
-        <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">
-          {cat.description}
-        </p>
-
-        {/* Date */}
+        <p className="text-xs text-orange-500 font-medium mb-2">📍 {cat.location}</p>
+        <p className="text-gray-500 text-sm leading-relaxed line-clamp-3 mb-4">{cat.description}</p>
         <p className="text-xs text-gray-300 mb-4">
-          Reported {new Date(cat.created_at).toLocaleDateString('en-IN', {
-            day: 'numeric', month: 'short', year: 'numeric'
-          })}
+          Reported {new Date(cat.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
         </p>
 
         <div className="mt-auto space-y-2">
+          {!isReunited && !isOwner && currentUserId && (
+            <button onClick={handleMessage} className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+              💬 I Spotted This Cat!
+            </button>
+          )}
 
-          {/* Contact button */}
-          {!isReunited && (
-            <a 
-              href={"mailto:" + cat.contact_email + "?subject=I spotted " + cat.name + "!&body=Hi"} 
-              className="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition text-sm"
-            >
-              📧 I Spotted This Cat!
+          {!isReunited && !currentUserId && (
+            <a href="/login" className="block w-full text-center bg-orange-500 hover:bg-orange-600 text-white font-semibold py-2.5 rounded-xl transition text-sm">
+              Login to Message
             </a>
           )}
 
-          {/* Mark reunited — only visible to owner */}
           {isOwner && !isReunited && (
-            <button
-              onClick={() => onMarkReunited(cat.id)}
-              className="w-full border border-green-300 text-green-600
-                         hover:bg-green-50 font-semibold py-2.5 rounded-xl
-                         transition text-sm"
-            >
+            <button onClick={() => onMarkReunited(cat.id)} className="w-full border border-green-300 text-green-600 hover:bg-green-50 font-semibold py-2.5 rounded-xl transition text-sm">
               🎉 Mark as Reunited
             </button>
           )}
 
-          {/* Reunited message */}
           {isReunited && (
             <div className="text-center text-green-600 font-semibold text-sm py-2">
               🎉 This cat found their way home!
             </div>
           )}
-          {/* AI Matching */}
+
           {!isReunited && (
             <AIMatchButton lostCat={cat} />
           )}

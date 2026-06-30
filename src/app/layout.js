@@ -2,8 +2,7 @@
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Navbar from '@/components/Navbar'
-
-// Import Leaflet CSS globally — required for map to display correctly
+import { ChatProvider } from '@/context/ChatContext'
 import 'leaflet/dist/leaflet.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -17,8 +16,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Navbar />
-        <main>{children}</main>
+        <ChatProvider>
+          <Navbar />
+          <main>{children}</main>
+        </ChatProvider>
       </body>
     </html>
   )

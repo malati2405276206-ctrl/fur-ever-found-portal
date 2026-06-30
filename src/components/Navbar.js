@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import { useRole } from '@/hooks/useRole'
 import { logout } from '@/lib/auth'
+import NotificationBell from '@/components/NotificationBell'
 
 export default function Navbar() {
   const { user, loading: authLoading } = useAuth()
@@ -59,6 +60,7 @@ export default function Navbar() {
             <div className="w-24 h-9 bg-gray-100 rounded-xl animate-pulse" />
           ) : user ? (
             <>
+             <NotificationBell userId={user.id} />
               {isNGO ? (
                 <Link href="/ngo-dashboard" className="bg-purple-500 hover:bg-purple-600 text-white px-3 xl:px-4 py-2 rounded-xl text-sm font-semibold transition whitespace-nowrap">
                   🏢 Dashboard
@@ -118,6 +120,12 @@ export default function Navbar() {
                 )}
                 <Link href="/profile" onClick={() => setMenuOpen(false)} className="block text-center border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
                   👤 My Profile
+                </Link>
+                <Link href="/notifications" onClick={() => setMenuOpen(false)} className="block text-center border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
+                  🔔 Notifications
+                </Link>
+                <Link href="/messages" onClick={() => setMenuOpen(false)} className="block text-center border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl text-sm font-medium transition">
+                  💬 Messages
                 </Link>
                 <button onClick={handleLogout} className="block w-full text-center text-red-500 hover:bg-red-50 font-medium text-sm py-2.5 rounded-xl transition">
                   Logout
