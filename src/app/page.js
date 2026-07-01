@@ -138,35 +138,72 @@ export default function HomePage() {
           </h2>
           <p className="text-sm sm:text-base mb-12" style={{ color: 'var(--sage-600)' }}>Discover how you can help our furry friends</p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-12 sm:gap-16 items-end">
-            <Link href="/lost-cats" className="flex flex-col items-center gap-4 group">
-              <div className="h-56 sm:h-72 flex items-end justify-center transition-transform group-hover:scale-110 group-hover:rotate-1 drop-shadow-lg">
-                <img src="/lost-cat.png" alt="Lost" className="max-h-full w-auto object-contain" />
-              </div>
-              <span className="text-sm sm:text-base font-bold" style={{ color: '#2E4365' }}>Lost</span>
-            </Link>
+          {/* Negative horizontal margins to utilize the empty spaces on the left and right */}
+<div className="my-12 -mx-4 sm:-mx-16 md:-mx-24 lg:-mx-36 xl:-mx-48">
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 px-4 w-full">
+    
+    {/* Lost Cat Card */}
+    <Link href="/lost-cats" className="group flex flex-col justify-between bg-[#F2EAE1] border border-[#2E4365]/10 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 min-h-[380px] w-full">
+      <div className="w-full flex-1 flex items-center justify-center bg-white rounded-2xl p-6 min-h-[220px] shadow-sm">
+        <img 
+          src="/lost-cat.png" 
+          alt="Lost" 
+          className="h-48 sm:h-56 w-auto object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" 
+        />
+      </div>
+      <div className="mt-5 text-center">
+        <span className="text-xl font-extrabold block" style={{ color: '#2E4365' }}>Lost</span>
+        <p className="text-sm mt-1 font-medium opacity-80" style={{ color: '#2E4365' }}>Report or find missing pets</p>
+      </div>
+    </Link>
 
-            <Link href="/found-cats" className="flex flex-col items-center gap-4 group">
-              <div className="h-64 sm:h-72 flex items-end justify-center transition-transform group-hover:scale-110 group-hover:-rotate-1 drop-shadow-lg">
-                <img src="/found-cat.png" alt="Found" className="max-h-full w-auto object-contain" />
-              </div>
-              <span className="text-sm sm:text-base font-bold" style={{ color: '#2E4365' }}>Found</span>
-            </Link>
+    {/* Found Cat Card */}
+    <Link href="/found-cats" className="group flex flex-col justify-between bg-[#F2EAE1] border border-[#2E4365]/10 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 min-h-[380px] w-full">
+      <div className="w-full flex-1 flex items-center justify-center bg-white rounded-2xl p-6 min-h-[220px] shadow-sm">
+        <img 
+          src="/found-cat.png" 
+          alt="Found" 
+          className="h-48 sm:h-56 w-auto object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-3" 
+        />
+      </div>
+      <div className="mt-5 text-center">
+        <span className="text-xl font-extrabold block" style={{ color: '#2E4365' }}>Found</span>
+        <p className="text-sm mt-1 font-medium opacity-80" style={{ color: '#2E4365' }}>Sightings and secured strays</p>
+      </div>
+    </Link>
 
-            <Link href="/adoption" className="flex flex-col items-center gap-4 group">
-              <div className="h-72 sm:h-80 flex items-end justify-center transition-transform group-hover:scale-110 group-hover:rotate-1 drop-shadow-lg">
-                <img src="/adopt-me.png" alt="Adopt" className="max-h-full w-auto object-contain mb-4" />
-              </div>
-              <span className="text-sm sm:text-base font-bold" style={{ color: '#2E4365' }}>Adopt</span>
-            </Link>
+    {/* Adopt Card */}
+    <Link href="/adoption" className="group flex flex-col justify-between bg-[#F2EAE1] border border-[#2E4365]/10 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 min-h-[380px] w-full">
+      <div className="w-full flex-1 flex items-center justify-center bg-white rounded-2xl p-6 min-h-[220px] shadow-sm">
+        <img 
+          src="/adopt-me.png" 
+          alt="Adopt" 
+          className="h-48 sm:h-56 w-auto object-contain transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3" 
+        />
+      </div>
+      <div className="mt-5 text-center">
+        <span className="text-xl font-extrabold block" style={{ color: '#2E4365' }}>Adopt</span>
+        <p className="text-sm mt-1 font-medium opacity-80" style={{ color: '#2E4365' }}>Give a cat a forever home</p>
+      </div>
+    </Link>
 
-            <Link href="/stories" className="flex flex-col items-center gap-4 group">
-              <div className="h-72 sm:h-80 flex items-end justify-center transition-transform group-hover:scale-110 group-hover:-rotate-1 drop-shadow-lg">
-                <img src="/story-book.jpg" alt="Stories" className="max-h-full w-auto object-contain mb-4" />
-              </div>
-              <span className="text-sm sm:text-base font-bold" style={{ color: '#2E4365' }}>Stories</span>
-            </Link>
-          </div>
+    {/* Stories Card */}
+    <Link href="/stories" className="group flex flex-col justify-between bg-[#F2EAE1] border border-[#2E4365]/10 rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-2 min-h-[380px] w-full">
+      <div className="w-full flex-1 flex items-center justify-center bg-white rounded-2xl p-2 min-h-[220px] shadow-sm">
+        <img 
+          src="/story-book.png" 
+          alt="Stories" 
+          className="w-[92%] sm:w-[96%] max-h-60 object-contain transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-2" 
+        />
+      </div>
+      <div className="mt-5 text-center">
+        <span className="text-xl font-extrabold block" style={{ color: '#2E4365' }}>Stories</span>
+        <p className="text-sm mt-1 font-medium opacity-80" style={{ color: '#2E4365' }}>Happy tails & success journeys</p>
+      </div>
+    </Link>
+
+  </div>
+</div>
         </div>
       </section>
 

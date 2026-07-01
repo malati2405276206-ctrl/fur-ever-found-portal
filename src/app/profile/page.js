@@ -86,6 +86,17 @@ function ProfileContent() {
     setDeleting(false)
   }
 
+  const handleMarkResolved = async (id) => {
+    const { error } = await supabase
+      .from('found_cats')
+      .update({ status: 'resolved' })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (error) { setError('Failed to update.'); return }
+    setFoundCats((prev) => prev.map((c) => c.id === id ? { ...c, status: 'resolved' } : c))
+  }
+
   const handleMarkReunited = async (id) => {
     const { error } = await supabase
       .from('lost_cats')

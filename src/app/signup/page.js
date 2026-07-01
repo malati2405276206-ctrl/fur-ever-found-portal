@@ -1,66 +1,72 @@
 // src/app/signup/page.js
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { signUp } from '@/lib/auth'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
+import { useAuth } from '@/hooks/useAuth'
 
 export default function SignupPage() {
-  const [fullName, setFullName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [fullName,        setFullName]        = useState('')
+  const [email,           setEmail]           = useState('')
+  const [password,        setPassword]        = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [submitting,      setSubmitting]      = useState(false) // ← renamed from 'loading'
+  const [error,           setError]           = useState('')
+  const [success,         setSuccess]         = useState(false)
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [success, setSuccess] = useState(false) // Show confirmation screen
+  // useAuth's loading is separate — named authLoading to avoid conflict
+  const { user, loading: authLoading } = useAuth()
+  const router = useRouter()
 
-  // Replace just the handleSignup function inside src/app/signup/page.js
-
-const handleSignup = async (e) => {
-  e.preventDefault()
-  setError('')
-
-  if (password !== confirmPassword) {
-    setError('Passwords do not match.')
-    return
-  }
-  if (password.length < 6) {
-    setError('Password must be at least 6 characters.')
-    return
-  }
-
-  setLoading(true)
-
-  const { data, error: signUpError } = await supabase.auth.signUp({
-    email,
-    password,
-    options: {
-      data: { full_name: fullName }
-      // This metadata is what the trigger reads
-      // to fill in full_name in the profiles table
+  // Redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push('/')
     }
-  })
+  }, [user, authLoading])
 
-  if (signUpError) {
-    console.error("CRITICAL SIGNUP ERROR OBJ:", signUpError); // <-- ADD THIS
-    setError(signUpError.message || JSON.stringify(signUpError))
-    setLoading(false)
-    return
+  if (authLoading || user) return null
+
+  const handleSignup = async (e) => {
+    e.preventDefault()
+    setError('')
+
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.')
+      return
+    }
+
+    setSubmitting(true)
+
+    const { error: signUpError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName }
+      }
+    })
+
+    if (signUpError) {
+      setError(signUpError.message || 'Signup failed. Please try again.')
+      setSubmitting(false)
+      return
+    }
+
+    setSuccess(true)
+    setSubmitting(false)
   }
-
-  // The database trigger auto-creates the profile row.
-  // Role defaults to 'user' automatically.
-  setSuccess(true)
-  setLoading(false)
-}
 
   // ── Success screen ──
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-8 sm:py-12" style={{ background: '#EBDDC5' }}>
-        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md">
+        <div className="bg-white rounded-3xl shadow-xl p-6 sm:p-8 w-full max-w-md text-center">
           <div className="text-6xl mb-4">📬</div>
           <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--police-blue)' }}>
             Check your email!
@@ -83,13 +89,14 @@ const handleSignup = async (e) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
+    <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: '#EBDDC5' }}>
       <div className="bg-white rounded-3xl shadow-xl p-8 w-full max-w-md">
 
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="text-5xl mb-3">🐱</div>
-          <h1 className="text-2xl font-bold" style={{ color: 'var(--police-blue)' }}>Join Fur Ever Found</h1>
+          <h1 className="text-2xl font-bold" style={{ color: 'var(--police-blue)' }}>
+            Join Fur Ever Found
+          </h1>
           <p className="text-gray-500 text-sm mt-1">
             Help us reunite lost cats with their families
           </p>
@@ -103,11 +110,8 @@ const handleSignup = async (e) => {
 
         <form onSubmit={handleSignup} className="space-y-4">
 
-          {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Full Name
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
             <input
               type="text"
               value={fullName}
@@ -118,11 +122,8 @@ const handleSignup = async (e) => {
             />
           </div>
 
-          {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Email Address
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
             <input
               type="email"
               value={email}
@@ -133,11 +134,8 @@ const handleSignup = async (e) => {
             />
           </div>
 
-          {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
             <input
               type="password"
               value={password}
@@ -148,11 +146,8 @@ const handleSignup = async (e) => {
             />
           </div>
 
-          {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm Password
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
             <input
               type="password"
               value={confirmPassword}
@@ -165,11 +160,11 @@ const handleSignup = async (e) => {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={submitting}
             className="w-full text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
-            style={{ background: loading ? 'var(--buff)' : 'var(--marigold)' }}
+            style={{ background: submitting ? 'var(--buff)' : 'var(--marigold)' }}
           >
-            {loading ? (
+            {submitting ? (
               <>
                 <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
                 Creating account...
