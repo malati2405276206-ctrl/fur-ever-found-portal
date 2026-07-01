@@ -268,3 +268,115 @@ button,
 .sticky-note-pearl {
   background: #FFFFFF;
 }
+
+/* ── Recipe-Style Cards (Lost & Found) ── */
+.recipe-card {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.recipe-card:hover {
+  transform: translateY(-6px) rotate(-1deg);
+}
+
+.recipe-card-inner {
+  background: #ffffff;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+  position: relative;
+  /* Lined paper effect */
+  background-image:
+    repeating-linear-gradient(
+      transparent,
+      transparent 27px,
+      #f1eded 27px,
+      #f1eded 28px
+    );
+  background-position: 0 0;
+}
+
+.recipe-card:hover .recipe-card-inner {
+  box-shadow:
+    0 12px 32px rgba(0, 0, 0, 0.12),
+    0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* Top holes/perforations for spiral binding */
+.recipe-card-inner::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  z-index: 2;
+  background-image:
+    radial-gradient(circle 4px at 20% 50%, #d1d5db 4px, transparent 4px),
+    radial-gradient(circle 4px at 40% 50%, #d1d5db 4px, transparent 4px),
+    radial-gradient(circle 4px at 60% 50%, #d1d5db 4px, transparent 4px),
+    radial-gradient(circle 4px at 80% 50%, #d1d5db 4px, transparent 4px);
+}
+
+/* Paperclip */
+.recipe-card-clip {
+  position: absolute;
+  top: -4px;
+  right: 20px;
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.recipe-card:hover .recipe-card-clip {
+  opacity: 1;
+}
+
+/* Image container */
+.recipe-card-image {
+  position: relative;
+  height: 280px;
+  margin: 28px 12px 0 12px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: rotate(-1.5deg);
+  transition: transform 0.3s ease;
+}
+
+.recipe-card:hover .recipe-card-image {
+  transform: rotate(0deg) scale(1.02);
+}
+
+/* Card body */
+.recipe-card-body {
+  padding: 16px 16px 20px 16px;
+}
+
+/* Card body lined paper lines (visible in the text area) */
+.recipe-card-body::before {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 56px;
+  height: 1px;
+  background: #f1eded;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .recipe-card:hover {
+    transform: translateY(-3px) rotate(0deg);
+  }
+
+  .recipe-card-image {
+    height: 240px;
+    margin: 24px 8px 0 8px;
+  }
+}
