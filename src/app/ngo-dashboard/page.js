@@ -41,7 +41,7 @@ function DashboardContent() {
           return
         }
 
-        // Update local state instantly
+        // Update local state instantly without refetching
         setRecentCats((prev) =>
           prev.map((cat) =>
             cat.id === catId

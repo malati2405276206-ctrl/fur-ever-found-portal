@@ -5,24 +5,22 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { searchPlaces } from '@/lib/geocode'
 
 export default function LocationSearch({ location, lat, lng, onLocationChange }) {
-  const [query, setQuery] = useState(location || '')
-  const [suggestions, setSuggestions] = useState([])
+  const [query,           setQuery]           = useState(location || '')
+  const [suggestions,     setSuggestions]     = useState([])
   const [showSuggestions, setShowSuggestions] = useState(false)
-  const [searching, setSearching] = useState(false)
-  const debounceRef = useRef(null)
-  const mapRef = useRef(null)
-  const instanceRef = useRef(null)
-  const markerRef = useRef(null)
-  const leafletRef = useRef(null)
+  const [searching,       setSearching]       = useState(false)
 
-  // Debounced search — waits 400ms after user stops typing
+  const debounceRef  = useRef(null)
+  const mapRef       = useRef(null)
+  const instanceRef  = useRef(null)  // stores the Leaflet map instance
+  const markerRef    = useRef(null)
+  const leafletRef   = useRef(null)
+  const initializedRef = useRef(false) // guards against double init
+
+  // Debounced search
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current)
-
-    if (query.length < 3) {
-      setSuggestions([])
-      return
-    }
+    if (query.length < 3) { setSuggestions([]); return }
 
     debounceRef.current = setTimeout(async () => {
       setSearching(true)
@@ -35,40 +33,49 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
     return () => clearTimeout(debounceRef.current)
   }, [query])
 
-  // Init map
+  // Init map — ONLY once
   useEffect(() => {
     if (typeof window === 'undefined') return
-    if (instanceRef.current) return
+    if (!mapRef.current) return
+    if (initializedRef.current) return // ← prevents double initialization
 
     const initMap = async () => {
       const L = (await import('leaflet')).default
       leafletRef.current = L
 
+      // Extra safety: check if this DOM element already has a Leaflet map
+      if (mapRef.current._leaflet_id) return
+
       delete L.Icon.Default.prototype._getIconUrl
       L.Icon.Default.mergeOptions({
         iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+        iconUrl:       'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+        shadowUrl:     'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
       })
 
-      const defaultLat = lat || 20.5937
-      const defaultLng = lng || 78.9629
+      const defaultLat  = lat || 20.5937
+      const defaultLng  = lng || 78.9629
       const defaultZoom = lat ? 14 : 5
 
-      const map = L.map(mapRef.current).setView([defaultLat, defaultLng], defaultZoom)
-      instanceRef.current = map
+      const map = L.map(mapRef.current, {
+        // Disable double-click zoom to prevent accidental panning
+        doubleClickZoom: false,
+      }).setView([defaultLat, defaultLng], defaultZoom)
+
+      instanceRef.current  = map
+      initializedRef.current = true // mark as initialized
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '© OpenStreetMap contributors',
         maxZoom: 19,
       }).addTo(map)
 
-      // If coordinates already exist, show existing pin
+      // Show existing pin if coordinates already set
       if (lat && lng) {
         markerRef.current = L.marker([lat, lng]).addTo(map)
       }
 
-      // Manual click to override/refine pin position
+      // Manual click to drop/move pin
       map.on('click', (e) => {
         const { lat: clickLat, lng: clickLng } = e.latlng
         dropPin(clickLat, clickLng)
@@ -78,16 +85,18 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
 
     initMap()
 
+    // Cleanup on unmount — removes the map so it can reinitialize cleanly
     return () => {
       if (instanceRef.current) {
         instanceRef.current.remove()
-        instanceRef.current = null
+        instanceRef.current   = null
+        initializedRef.current = false
       }
     }
-  }, [])
+  }, []) // empty deps — run once only
 
   const dropPin = useCallback((pinLat, pinLng) => {
-    const L = leafletRef.current
+    const L   = leafletRef.current
     const map = instanceRef.current
     if (!L || !map) return
 
@@ -100,26 +109,18 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
     setQuery(place.shortName)
     setShowSuggestions(false)
     setSuggestions([])
-
-    // Drop pin AND fly map to selected location
     dropPin(place.lat, place.lng)
-
-    // Tell the parent form: here's the location text + coordinates
     onLocationChange(place.shortName, place.lat, place.lng)
   }
 
   const handleInputChange = (e) => {
     const val = e.target.value
     setQuery(val)
-    // If user clears/edits the text manually, keep whatever pin exists
-    // but update the location text
     onLocationChange(val, lat, lng)
   }
 
   return (
     <div className="space-y-2">
-
-      {/* Search input */}
       <div className="relative">
         <input
           type="text"
@@ -130,14 +131,12 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm pr-10"
         />
 
-        {/* Searching spinner */}
         {searching && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
             <div className="w-4 h-4 border-2 border-orange-400 border-t-transparent rounded-full animate-spin" />
           </div>
         )}
 
-        {/* Suggestions dropdown */}
         {showSuggestions && suggestions.length > 0 && (
           <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-xl shadow-lg z-30 mt-1 overflow-hidden">
             {suggestions.map((place, i) => (
@@ -158,14 +157,12 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
         )}
       </div>
 
-      {/* Map */}
       <p className="text-xs text-gray-400 flex items-center gap-1">
         🗺️ Select from suggestions above, or click the map to place a pin manually
       </p>
 
       <div ref={mapRef} className="w-full h-52 rounded-xl border border-gray-200 z-0" />
 
-      {/* Status */}
       {lat && lng ? (
         <p className="text-xs text-green-600 font-medium">✅ Location pinned — {query}</p>
       ) : (

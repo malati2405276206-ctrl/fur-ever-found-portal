@@ -181,6 +181,14 @@ export default function SignupPage() {
             Sign in
           </Link>
         </p>
+        <div className="text-center mt-3 pt-3 border-t border-gray-100">
+          <p className="text-gray-400 text-xs">
+            Registering a rescue organisation?{' '}
+            <Link href="/ngo-signup" className="font-semibold hover:underline" style={{ color: 'var(--marigold)' }}>
+              NGO Registration →
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   )

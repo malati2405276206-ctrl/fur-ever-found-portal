@@ -1,7 +1,7 @@
 // src/app/layout.js
 import { Inter } from 'next/font/google'
 import './globals.css'
-import Navbar from '@/components/Navbar'
+import NavbarWrapper from '@/components/NavbarWrapper'
 import LogoIntro from '@/components/LogoIntro'
 import { ChatProvider } from '@/context/ChatContext'
 import 'leaflet/dist/leaflet.css'
@@ -19,7 +19,7 @@ export default function RootLayout({ children }) {
       <body className={inter.className}>
         <LogoIntro />
         <ChatProvider>
-          <Navbar />
+          <NavbarWrapper />
           <main>{children}</main>
         </ChatProvider>
       </body>

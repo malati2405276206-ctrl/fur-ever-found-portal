@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import AIMatchButton from '@/components/AIMatchButton'
 import Link from 'next/link'
 
 function ProfileContent() {
@@ -21,6 +22,13 @@ function ProfileContent() {
   const [deleting,   setDeleting]   = useState(false)
   const [error,      setError]      = useState('')
 
+  // Edit profile states
+  const [editMode,     setEditMode]     = useState(false)
+  const [editName,     setEditName]     = useState('')
+  const [editPhone,    setEditPhone]    = useState('')
+  const [savingProfile, setSavingProfile] = useState(false)
+  const [profileMsg,   setProfileMsg]   = useState('')
+
   useEffect(() => {
     if (user) fetchData()
   }, [user])
@@ -28,7 +36,6 @@ function ProfileContent() {
   const fetchData = async () => {
     setLoading(true)
 
-    // Fetch profile
     const { data: profileData } = await supabase
       .from('profiles')
       .select('*')
@@ -36,25 +43,48 @@ function ProfileContent() {
       .maybeSingle()
 
     setProfile(profileData)
+    setEditName(profileData?.full_name || '')
+    setEditPhone(profileData?.phone || '')
 
-    // Fetch lost cat reports by this user
     const { data: lost } = await supabase
       .from('lost_cats')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
-    setLostCats(lost || [])
-
-    // Fetch found cat reports by this user
     const { data: found } = await supabase
       .from('found_cats')
       .select('*')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
 
+    setLostCats(lost || [])
     setFoundCats(found || [])
     setLoading(false)
+  }
+
+  const handleSaveProfile = async () => {
+    setSavingProfile(true)
+    setProfileMsg('')
+
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        full_name: editName.trim(),
+        phone:     editPhone.trim() || null,
+      })
+      .eq('id', user.id)
+
+    if (error) {
+      setProfileMsg('Failed to save. Please try again.')
+    } else {
+      setProfileMsg('✅ Profile updated!')
+      setProfile((prev) => ({ ...prev, full_name: editName, phone: editPhone }))
+      setEditMode(false)
+      setTimeout(() => setProfileMsg(''), 3000)
+    }
+
+    setSavingProfile(false)
   }
 
   const handleDelete = async (id, type) => {
@@ -67,7 +97,7 @@ function ProfileContent() {
       .from(table)
       .delete()
       .eq('id', id)
-      .eq('user_id', user.id) // extra safety — only delete own posts
+      .eq('user_id', user.id)
 
     if (delError) {
       setError('Failed to delete. Please try again.')
@@ -75,7 +105,6 @@ function ProfileContent() {
       return
     }
 
-    // Update local state instantly
     if (type === 'lost') {
       setLostCats((prev) => prev.filter((c) => c.id !== id))
     } else {
@@ -84,6 +113,17 @@ function ProfileContent() {
 
     setDeleteId(null)
     setDeleting(false)
+  }
+
+  const handleMarkReunited = async (id) => {
+    const { error } = await supabase
+      .from('lost_cats')
+      .update({ status: 'reunited' })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (error) { setError('Failed to update status.'); return }
+    setLostCats((prev) => prev.map((c) => c.id === id ? { ...c, status: 'reunited' } : c))
   }
 
   const handleMarkResolved = async (id) => {
@@ -97,22 +137,9 @@ function ProfileContent() {
     setFoundCats((prev) => prev.map((c) => c.id === id ? { ...c, status: 'resolved' } : c))
   }
 
-  const handleMarkReunited = async (id) => {
-    const { error } = await supabase
-      .from('lost_cats')
-      .update({ status: 'reunited' })
-      .eq('id', id)
-      .eq('user_id', user.id)
-
-    if (error) {
-      setError('Failed to update status.')
-      return
-    }
-
-    setLostCats((prev) => prev.map((c) => c.id === id ? { ...c, status: 'reunited' } : c))
-  }
-
-  const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-IN', {
+    day: 'numeric', month: 'short', year: 'numeric'
+  })
 
   if (loading) {
     return (
@@ -128,44 +155,125 @@ function ProfileContent() {
 
         {/* ── Profile Header ── */}
         <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 mb-6">
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center text-3xl">
-              🐾
+
+          {profileMsg && (
+            <div className="bg-green-50 border border-green-200 text-green-700 text-sm px-4 py-2 rounded-xl mb-4">
+              {profileMsg}
             </div>
+          )}
+
+          {!editMode ? (
+            /* ── View Mode ── */
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center text-3xl shrink-0">
+                  🐾
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">
+                    {profile?.full_name || 'Cat Lover'}
+                  </h1>
+                  <p className="text-gray-400 text-sm">{user?.email}</p>
+                  {profile?.phone && (
+                    <p className="text-gray-400 text-sm">📞 {profile.phone}</p>
+                  )}
+                  <p className="text-gray-300 text-xs mt-0.5">
+                    Member since {formatDate(user?.created_at)}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setEditMode(true)}
+                className="shrink-0 border border-gray-200 text-gray-600 hover:bg-gray-50 px-4 py-2 rounded-xl text-sm font-medium transition flex items-center gap-1.5"
+              >
+                ✏️ Edit Profile
+              </button>
+            </div>
+          ) : (
+            /* ── Edit Mode ── */
             <div>
-              <h1 className="text-xl font-bold text-gray-900">{profile?.full_name || 'Cat Lover'}</h1>
-              <p className="text-gray-400 text-sm">{user?.email}</p>
-              <p className="text-gray-300 text-xs mt-0.5">Member since {formatDate(user?.created_at)}</p>
+              <h2 className="font-bold text-gray-800 mb-4">Edit Profile</h2>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    placeholder="Your full name"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">
+                    Phone <span className="font-normal text-gray-400">(optional)</span>
+                  </label>
+                  <input
+                    type="tel"
+                    value={editPhone}
+                    onChange={(e) => setEditPhone(e.target.value)}
+                    placeholder="+91 98765 43210"
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-400 transition text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                  <input
+                    type="email"
+                    value={user?.email}
+                    disabled
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-100 bg-gray-50 text-gray-400 text-sm cursor-not-allowed"
+                  />
+                  <p className="text-xs text-gray-400 mt-0.5">Email cannot be changed</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-4">
+                <button
+                  onClick={() => { setEditMode(false); setEditName(profile?.full_name || ''); setEditPhone(profile?.phone || '') }}
+                  className="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 py-2.5 rounded-xl font-semibold text-sm transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveProfile}
+                  disabled={savingProfile}
+                  className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:bg-orange-300 text-white py-2.5 rounded-xl font-semibold text-sm transition"
+                >
+                  {savingProfile ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Stats row */}
           <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-6 pt-6 border-t border-gray-100">
-              <div className="text-center p-2 sm:p-0">
-                <div className="text-xl sm:text-2xl font-extrabold text-orange-500">{lostCats.length}</div>
-                <div className="text-xs text-gray-400 mt-0.5">Lost Reports</div>
+            <div className="text-center p-2 sm:p-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-orange-500">{lostCats.length}</div>
+              <div className="text-xs text-gray-400 mt-0.5">Lost Reports</div>
+            </div>
+            <div className="text-center p-2 sm:p-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-green-500">{foundCats.length}</div>
+              <div className="text-xs text-gray-400 mt-0.5">Found Reports</div>
+            </div>
+            <div className="text-center p-2 sm:p-0">
+              <div className="text-xl sm:text-2xl font-extrabold text-purple-500">
+                {lostCats.filter((c) => c.status === 'reunited').length}
               </div>
-              <div className="text-center p-2 sm:p-0">
-                <div className="text-xl sm:text-2xl font-extrabold text-green-500">{foundCats.length}</div>
-                <div className="text-xs text-gray-400 mt-0.5">Found Reports</div>
-              </div>
-              <div className="text-center p-2 sm:p-0">
-                <div className="text-xl sm:text-2xl font-extrabold text-purple-500">
-                  {lostCats.filter((c) => c.status === 'reunited').length}
-                </div>
-                <div className="text-xs text-gray-400 mt-0.5">Reunited</div>
+              <div className="text-xs text-gray-400 mt-0.5">Reunited</div>
             </div>
           </div>
         </div>
 
-        {/* ── Error ── */}
+        {/* Error */}
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">
             ⚠️ {error}
           </div>
         )}
 
-        {/* ── Tabs ── */}
+        {/* Tabs */}
         <div className="flex gap-3 mb-6">
           <button
             onClick={() => setActiveTab('lost')}
@@ -181,7 +289,7 @@ function ProfileContent() {
           </button>
         </div>
 
-        {/* ── Lost Cats Tab ── */}
+        {/* Lost Cats Tab */}
         {activeTab === 'lost' && (
           <div className="space-y-4">
             {lostCats.length === 0 ? (
@@ -192,56 +300,50 @@ function ProfileContent() {
                   Report a Lost Cat
                 </Link>
               </div>
-            ) : (
-              lostCats.map((cat) => (
-                <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                  <div className="flex gap-4">
-
-                    {/* Image */}
-                    {cat.image_url ? (
-                      <img src={cat.image_url} alt={cat.name} className="w-20 h-20 rounded-xl object-cover shrink-0" />
-                    ) : (
-                      <div className="w-20 h-20 rounded-xl bg-orange-100 flex items-center justify-center text-3xl shrink-0">🐱</div>
-                    )}
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-gray-900">{cat.name}</h3>
-                        <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${cat.status === 'reunited' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
-                          {cat.status === 'reunited' ? '🎉 Reunited' : '😿 Lost'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-orange-500 font-medium mt-0.5">📍 {cat.location}</p>
-                      <p className="text-gray-500 text-xs mt-1 line-clamp-2">{cat.description}</p>
-                      <p className="text-gray-300 text-xs mt-1">Reported {formatDate(cat.created_at)}</p>
+            ) : lostCats.map((cat) => (
+              <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex gap-4">
+                  {cat.image_url ? (
+                    <img src={cat.image_url} alt={cat.name} className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-orange-100 flex items-center justify-center text-3xl shrink-0">🐱</div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-gray-900">{cat.name}</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${cat.status === 'reunited' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-500'}`}>
+                        {cat.status === 'reunited' ? '🎉 Reunited' : '😿 Lost'}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                    {cat.status !== 'reunited' && (
-                      <button
-                        onClick={() => handleMarkReunited(cat.id)}
-                        className="flex-1 border border-green-300 text-green-600 hover:bg-green-50 text-xs font-semibold py-2 rounded-xl transition"
-                      >
-                        🎉 Mark Reunited
-                      </button>
-                    )}
-                    <button
-                      onClick={() => setDeleteId({ id: cat.id, type: 'lost', name: cat.name })}
-                      className="flex-1 border border-red-200 text-red-500 hover:bg-red-50 text-xs font-semibold py-2 rounded-xl transition"
-                    >
-                      🗑️ Delete
-                    </button>
+                    <p className="text-xs text-orange-500 font-medium mt-0.5">📍 {cat.location}</p>
+                    <p className="text-gray-500 text-xs mt-1 line-clamp-2">{cat.description}</p>
+                    <p className="text-gray-300 text-xs mt-1">Reported {formatDate(cat.created_at)}</p>
                   </div>
                 </div>
-              ))
-            )}
+
+                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100 flex-wrap">
+                  {cat.status !== 'reunited' && (
+                    <button onClick={() => handleMarkReunited(cat.id)} className="flex-1 border border-green-300 text-green-600 hover:bg-green-50 text-xs font-semibold py-2 rounded-xl transition">
+                      🎉 Mark Reunited
+                    </button>
+                  )}
+                  <button onClick={() => setDeleteId({ id: cat.id, type: 'lost', name: cat.name })} className="flex-1 border border-red-200 text-red-500 hover:bg-red-50 text-xs font-semibold py-2 rounded-xl transition">
+                    🗑️ Delete
+                  </button>
+                </div>
+
+                {/* AI Match — owner only */}
+                {cat.status !== 'reunited' && (
+                  <div className="mt-2">
+                    <AIMatchButton lostCat={cat} />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
 
-        {/* ── Found Cats Tab ── */}
+        {/* Found Cats Tab */}
         {activeTab === 'found' && (
           <div className="space-y-4">
             {foundCats.length === 0 ? (
@@ -252,50 +354,44 @@ function ProfileContent() {
                   Report a Found Cat
                 </Link>
               </div>
-            ) : (
-              foundCats.map((cat) => (
-                <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-                  <div className="flex gap-4">
-
-                    {/* Image */}
-                    {cat.image_url ? (
-                      <img src={cat.image_url} alt="Found cat" className="w-20 h-20 rounded-xl object-cover shrink-0" />
-                    ) : (
-                      <div className="w-20 h-20 rounded-xl bg-green-100 flex items-center justify-center text-3xl shrink-0">🐱</div>
-                    )}
-
-                    {/* Info */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <h3 className="font-bold text-gray-900">Found Cat</h3>
-                        <span className="text-xs px-2 py-1 rounded-full font-medium shrink-0 bg-green-100 text-green-600">
-                          😊 Found
-                        </span>
-                      </div>
-                      <p className="text-xs text-green-600 font-medium mt-0.5">📍 {cat.location}</p>
-                      <p className="text-gray-500 text-xs mt-1 line-clamp-2">{cat.description}</p>
-                      <p className="text-gray-300 text-xs mt-1">Reported {formatDate(cat.created_at)}</p>
+            ) : foundCats.map((cat) => (
+              <div key={cat.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+                <div className="flex gap-4">
+                  {cat.image_url ? (
+                    <img src={cat.image_url} alt="Found cat" className="w-20 h-20 rounded-xl object-cover shrink-0" />
+                  ) : (
+                    <div className="w-20 h-20 rounded-xl bg-green-100 flex items-center justify-center text-3xl shrink-0">🐱</div>
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between gap-2">
+                      <h3 className="font-bold text-gray-900">Found Cat</h3>
+                      <span className={`text-xs px-2 py-1 rounded-full font-medium shrink-0 ${cat.status === 'resolved' ? 'bg-blue-100 text-blue-600' : 'bg-green-100 text-green-600'}`}>
+                        {cat.status === 'resolved' ? '✅ Resolved' : '😊 Found'}
+                      </span>
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <button
-                      onClick={() => setDeleteId({ id: cat.id, type: 'found', name: 'this found cat' })}
-                      className="flex-1 border border-red-200 text-red-500 hover:bg-red-50 text-xs font-semibold py-2 rounded-xl transition"
-                    >
-                      🗑️ Delete Report
-                    </button>
+                    <p className="text-xs text-green-600 font-medium mt-0.5">📍 {cat.location}</p>
+                    <p className="text-gray-500 text-xs mt-1 line-clamp-2">{cat.description}</p>
+                    <p className="text-gray-300 text-xs mt-1">Reported {formatDate(cat.created_at)}</p>
                   </div>
                 </div>
-              ))
-            )}
+
+                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                  {cat.status !== 'resolved' && (
+                    <button onClick={() => handleMarkResolved(cat.id)} className="flex-1 border border-blue-200 text-blue-500 hover:bg-blue-50 text-xs font-semibold py-2 rounded-xl transition">
+                      ✅ Mark Resolved
+                    </button>
+                  )}
+                  <button onClick={() => setDeleteId({ id: cat.id, type: 'found', name: 'this found cat' })} className="flex-1 border border-red-200 text-red-500 hover:bg-red-50 text-xs font-semibold py-2 rounded-xl transition">
+                    🗑️ Delete
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
-
       </div>
 
-      {/* ── Delete Confirmation Modal ── */}
+      {/* Delete Confirmation Modal */}
       {deleteId && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
           <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full text-center">
@@ -305,25 +401,16 @@ function ProfileContent() {
               Are you sure you want to delete the report for <strong>{deleteId.name}</strong>? This cannot be undone.
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteId(null)}
-                disabled={deleting}
-                className="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 py-3 rounded-xl font-semibold transition text-sm"
-              >
+              <button onClick={() => setDeleteId(null)} disabled={deleting} className="flex-1 border border-gray-200 text-gray-600 hover:bg-gray-50 py-3 rounded-xl font-semibold transition text-sm">
                 Cancel
               </button>
-              <button
-                onClick={() => handleDelete(deleteId.id, deleteId.type)}
-                disabled={deleting}
-                className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white py-3 rounded-xl font-semibold transition text-sm"
-              >
+              <button onClick={() => handleDelete(deleteId.id, deleteId.type)} disabled={deleting} className="flex-1 bg-red-500 hover:bg-red-600 disabled:bg-red-300 text-white py-3 rounded-xl font-semibold transition text-sm">
                 {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
             </div>
           </div>
         </div>
       )}
-
     </div>
   )
 }
