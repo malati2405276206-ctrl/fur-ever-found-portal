@@ -12,45 +12,61 @@ export function useChat(currentUserId) {
   const channelRef = useRef(null)
   const subscribingRef = useRef(false) // guards against overlapping subscribe calls
 
-  const openConversation = async (catType, catId, recipientId) => {
-    setLoading(true)
+ const openConversation = async (catType, catId, recipientId) => {
+  setLoading(true)
 
-    const { data: existing } = await supabase
+  // Try to find existing conversation first
+  const { data: existing } = await supabase
+    .from('conversations')
+    .select('*')
+    .eq('cat_type', catType)
+    .eq('cat_id', catId)
+    .or(`and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`)
+    .maybeSingle()
+
+  let convoId = existing?.id
+
+  if (!convoId) {
+    // Try to create — if duplicate key error, fetch existing
+    const { data: created, error } = await supabase
       .from('conversations')
-      .select('*')
-      .eq('cat_type', catType)
-      .eq('cat_id', catId)
-      .or(`and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`)
+      .insert({
+        cat_type:     catType,
+        cat_id:       catId,
+        initiator_id: currentUserId,
+        recipient_id: recipientId,
+      })
+      .select()
       .maybeSingle()
 
-    let convoId = existing?.id
-
-    if (!convoId) {
-      const { data: created, error } = await supabase
+    if (error?.code === '23505') {
+      // Duplicate key — fetch the existing one
+      const { data: retry } = await supabase
         .from('conversations')
-        .insert({
-          cat_type: catType,
-          cat_id: catId,
-          initiator_id: currentUserId,
-          recipient_id: recipientId,
-        })
-        .select()
-        .single()
+        .select('*')
+        .eq('cat_type', catType)
+        .eq('cat_id', catId)
+        .or(`and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`)
+        .maybeSingle()
 
-      if (error) {
-        console.error('Error creating conversation:', error.message)
-        setLoading(false)
-        return null
-      }
-      convoId = created.id
+      convoId = retry?.id
+    } else if (error) {
+      console.error('Error creating conversation:', error.message)
+      setLoading(false)
+      return null
+    } else {
+      convoId = created?.id
     }
-
-    setConversationId(convoId)
-    await loadMessages(convoId)
-    await subscribeToMessages(convoId)
-    setLoading(false)
-    return convoId
   }
+
+  if (!convoId) { setLoading(false); return null }
+
+  setConversationId(convoId)
+  await loadMessages(convoId)
+  await subscribeToMessages(convoId)
+  setLoading(false)
+  return convoId
+}
 
   const loadMessages = async (convoId) => {
     const { data, error } = await supabase

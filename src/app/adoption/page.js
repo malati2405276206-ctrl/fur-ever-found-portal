@@ -3,52 +3,64 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import Link from 'next/link'
 import { useChatContext } from '@/context/ChatContext'
 import { getDirectionsUrl } from '@/lib/directions'
+import Link from 'next/link'
 
 export default function AdoptionPage() {
-  const [cats,        setCats]        = useState([])
-  const [loading,     setLoading]     = useState(true)
-  const [filter,      setFilter]      = useState('all')   // 'all' | 'male' | 'female'
-  const [searchCity,  setSearchCity]  = useState('')
+  const [cats,       setCats]       = useState([])
+  const [ngoNames,   setNgoNames]   = useState({}) // { user_id: org_name }
+  const [loading,    setLoading]    = useState(true)
+  const [filter,     setFilter]     = useState('all')
+  const [searchCity, setSearchCity] = useState('')
 
   useEffect(() => {
     fetchCats()
   }, [])
 
   const fetchCats = async () => {
-  setLoading(true)
+    setLoading(true)
 
-  const { data, error } = await supabase
-    .from('adoption_cats')
-    .select(`
-      *,
-      ngo_profiles (
-        org_name,
-        city,
-        contact_phone
-      )
-    `)
-    .eq('status', 'available')
-    .order('created_at', { ascending: false })
+    // Step 1: fetch adoption cats
+    const { data, error } = await supabase
+      .from('adoption_cats')
+      .select('*')
+      .neq('status', 'deleted')
+      .order('created_at', { ascending: false })
 
-  if (error) {
-    console.error('Error fetching cats:', error.message)
-  } else {
+    if (error) {
+      console.error('Error fetching cats:', error.message)
+      setLoading(false)
+      return
+    }
+
     setCats(data || [])
+
+    // Step 2: fetch NGO names separately using the ngo_ids
+    if (data && data.length > 0) {
+      const ngoIds = [...new Set(data.map((c) => c.ngo_id))]
+
+      const { data: ngoData } = await supabase
+        .from('ngo_profiles')
+        .select('user_id, org_name')
+        .in('user_id', ngoIds)
+
+      if (ngoData) {
+        const nameMap = {}
+        ngoData.forEach((n) => { nameMap[n.user_id] = n.org_name })
+        setNgoNames(nameMap)
+      }
+    }
+
+    setLoading(false)
   }
 
-  setLoading(false)
-}
-
-  // Filter cats by gender and city search
   const filteredCats = cats.filter((cat) => {
     const matchesGender = filter === 'all' || cat.gender === filter
-    const matchesCity   = searchCity === '' ||
-      cat.city.toLowerCase().includes(searchCity.toLowerCase())
+    const matchesCity   = searchCity === '' || cat.city.toLowerCase().includes(searchCity.toLowerCase())
     return matchesGender && matchesCity
   })
+
 
   return (
     <div className="min-h-screen" style={{ background: '#EBDDC5' }}>
@@ -104,15 +116,13 @@ export default function AdoptionPage() {
           {/* Loading skeleton */}
           {loading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-              {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="bg-white rounded-3xl overflow-hidden
-                                        border border-gray-100 animate-pulse">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse">
                   <div className="h-52 bg-gray-200" />
                   <div className="p-5 space-y-3">
                     <div className="h-4 bg-gray-200 rounded w-1/2" />
                     <div className="h-3 bg-gray-100 rounded w-3/4" />
-                    <div className="h-3 bg-gray-100 rounded w-full" />
-                    <div className="h-10 bg-gray-200 rounded-xl mt-2" />
+                    <div className="h-3 bg-gray-100 rounded-xl" />
                   </div>
                 </div>
               ))}
@@ -140,12 +150,12 @@ export default function AdoptionPage() {
               {/* Result count */}
               <p className="text-gray-400 text-sm mb-5">
                 Showing <strong className="text-gray-700">{filteredCats.length}</strong> cat
-                {filteredCats.length !== 1 ? 's' : ''} available for adoption
+                {filteredCats.length !== 1 ? 's' : ''} available
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                 {filteredCats.map((cat) => (
-                  <CatCard key={cat.id} cat={cat} />
+                  <CatCard key={cat.id} cat={cat} ngoName={ngoNames[cat.ngo_id]} />
                 ))}
               </div>
             </>
@@ -163,8 +173,7 @@ export default function AdoptionPage() {
           </p>
           <Link
             href="/ngo-signup"
-            className="inline-block bg-white text-purple-600 hover:bg-purple-50
-                       px-6 py-3 rounded-xl font-bold transition"
+            className="inline-block bg-white text-purple-600 hover:bg-purple-50 px-6 py-3 rounded-xl font-bold transition"
           >
             Register Your NGO →
           </Link>
@@ -176,7 +185,7 @@ export default function AdoptionPage() {
 }
 
 // ── Cat Card Component ────────────────────────────────────
-function CatCard({ cat }) {
+function CatCard({ cat, ngoName }) {
   const [showStory, setShowStory] = useState(false)
   const { openChat } = useChatContext()
 
@@ -222,8 +231,8 @@ function CatCard({ cat }) {
 
         <p className="text-gray-500 text-sm leading-relaxed line-clamp-2 mb-3">{cat.description}</p>
 
-        {cat.ngo_profiles?.org_name && (
-          <p className="text-xs text-purple-400 font-medium mb-4">🏢 {cat.ngo_profiles.org_name}</p>
+        {ngoName && (
+          <p className="text-xs text-purple-400 font-medium mb-4">🏢 {ngoName}</p>
         )}
 
         <div className="mt-auto">
@@ -239,9 +248,6 @@ function CatCard({ cat }) {
           )}
         </div>
 
-        <button onClick={handleMessage} className="mt-3 w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition text-center text-sm">
-          🐱 I Want to Adopt
-        </button>
         {cat.latitude && cat.longitude && (
           <a
             href={getDirectionsUrl(cat.latitude, cat.longitude)}
@@ -252,6 +258,12 @@ function CatCard({ cat }) {
             🧭 Get Directions
           </a>
         )}
+        <button
+          onClick={handleMessage}
+          className="mt-2 w-full bg-purple-500 hover:bg-purple-600 text-white font-semibold py-3 rounded-xl transition text-center text-sm"
+        >
+          🐱 I Want to Adopt
+        </button>
       </div>
     </div>
   )

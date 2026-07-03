@@ -27,6 +27,26 @@ function DashboardContent() {
 
       setNgoProfile(ngo)
 
+      const fetchDashboardData = async () => {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) return
+
+        console.log('Fetching cats for NGO user:', user.id) // ← add this
+
+        const { data: cats, count, error } = await supabase
+          .from('adoption_cats')
+          .select('*', { count: 'exact' })
+          .eq('ngo_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(5)
+
+        console.log('Cats found:', cats, 'Error:', error) // ← add this
+
+        setRecentCats(cats || [])
+        setCatCount(count || 0)
+        setLoading(false)
+      }
+
       const handleMarkAdopted = async (catId) => {
         const { error } = await supabase
           .from('adoption_cats')

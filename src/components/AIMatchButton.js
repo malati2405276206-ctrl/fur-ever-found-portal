@@ -53,6 +53,10 @@ export default function AIMatchButton({ lostCat }) {
       setMatches(data.matches || [])
       setSearched(true)
 
+      if (data.source === 'local') {
+          console.info('Using local matching algorithm')
+        }
+
       const strongMatches = (data.matches || []).filter((m) => m.score >= 75)
 
         if (strongMatches.length > 0) {
