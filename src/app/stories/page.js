@@ -205,12 +205,28 @@ export default function StoriesPage() {
           </AnimatePresence>
         </div>
 
-        <button onClick={goPrev} disabled={pageIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
-          <ChevronLeft size={20} />
-        </button>
-        <button onClick={goNext} disabled={pageIndex === totalPages - 1} className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
-          <ChevronRight size={20} />
-        </button>
+        // Left arrow — hide on small screens
+          <button
+            onClick={goPrev}
+            disabled={pageIndex === 0}
+            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          // Right arrow — hide on small screens
+          <button
+            onClick={goNext}
+            disabled={pageIndex === totalPages - 1}
+            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          {/* Show swipe hint on mobile only */}
+          <p className="sm:hidden text-xs text-center text-amber-500 mt-4">
+            ← Swipe to turn pages →
+          </p>
       </div>
 
       <p className="mt-6 text-sm text-amber-600 font-medium">

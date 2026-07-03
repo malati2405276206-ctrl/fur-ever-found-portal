@@ -89,7 +89,7 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
         </div>
 
         {/* Input */}
-        <form onSubmit={handleSend} className="flex items-center gap-2 px-4 py-3 border-t border-gray-100 bg-white">
+        <form onSubmit={handleSend} className="flex items-center gap-2 px-4 py-3 border-t border-gray-100 bg-white pb-safe">
           <input
             type="text"
             value={input}

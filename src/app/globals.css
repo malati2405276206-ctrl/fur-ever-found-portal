@@ -144,6 +144,10 @@ button,
   letter-spacing: -0.02em;
 }
 
+.pb-safe {
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+}
+
 /* Soft gradient backgrounds */
 .bg-organic-gradient {
   background: #EBDDC5;

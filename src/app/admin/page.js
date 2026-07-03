@@ -294,20 +294,20 @@ export default function AdminPage() {
                         <p className="text-gray-600 text-xs mt-2">Applied {formatDate(ngo.created_at)}</p>
                       </div>
 
-                      <div className="flex sm:flex-col gap-2 shrink-0">
+                        <div className="flex sm:flex-col gap-2 shrink-0 w-full sm:w-auto mt-4 sm:mt-0">
                         <button
-                          onClick={() => handleApproveNGO(ngo)}
-                          className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition"
+                            onClick={() => handleApproveNGO(ngo)}
+                            className="flex-1 sm:flex-none bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold text-sm transition"
                         >
-                          ✅ Approve
+                            ✅ Approve
                         </button>
                         <button
-                          onClick={() => handleRejectNGO(ngo)}
-                          className="flex-1 sm:flex-none bg-red-900/50 hover:bg-red-800 text-red-400 px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-red-800"
+                            onClick={() => handleRejectNGO(ngo)}
+                            className="flex-1 sm:flex-none bg-red-900/50 hover:bg-red-800 text-red-400 px-5 py-2.5 rounded-xl font-semibold text-sm transition border border-red-800"
                         >
-                          ❌ Reject
+                            ❌ Reject
                         </button>
-                      </div>
+                        </div>
                     </div>
                   </div>
                 ))}
