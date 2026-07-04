@@ -68,12 +68,12 @@ export default function MapPage() {
             </div>
 
             {/* Filter buttons */}
-            <div className="flex gap-2 flex-wrap">
+            <div className="flex gap-2 flex-wrap mt-3">
               {filters.map((f) => (
                 <button
                   key={f.value}
                   onClick={() => setFilter(f.value)}
-                  className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition ${filter === f.value ? f.color : f.inactive}`}
+                  className={`px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition whitespace-nowrap ${filter === f.value ? f.color : f.inactive}`}
                 >
                   {f.label}
                 </button>

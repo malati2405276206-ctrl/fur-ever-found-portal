@@ -509,7 +509,7 @@ function ProfileContent() {
                       <img
                         src={newImagePreview || editCat.image_url}
                         alt="Cat"
-                        className="w-full h-40 object-cover rounded-xl border border-gray-200"
+                        className="w-full h-28 sm:h-40 object-cover rounded-xl border border-gray-200"
                       />
                       <label className="absolute bottom-2 right-2 bg-white text-gray-700 text-xs px-3 py-1.5 rounded-full shadow cursor-pointer hover:bg-gray-50 transition border border-gray-200">
                         Change Photo

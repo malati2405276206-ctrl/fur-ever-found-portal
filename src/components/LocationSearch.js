@@ -120,7 +120,7 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
   }
 
   return (
-    <div className="space-y-2 relative">
+    <div className="space-y-2 relative z-10">
       <div className="relative">
         <input
           type="text"

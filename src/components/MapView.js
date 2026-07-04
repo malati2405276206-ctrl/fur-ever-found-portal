@@ -131,5 +131,5 @@ export default function MapView({ cats }) {
     initMap()
   }, [cats])
 
-  return <div ref={mapRef} className="w-full" style={{ height: 'calc(100vh - 180px)', minHeight: '400px' }} />
+return <div ref={mapRef} className="w-full" style={{ height: 'calc(100vh - 180px)', minHeight: '400px' }} />
 }

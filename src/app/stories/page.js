@@ -24,16 +24,45 @@ export default function StoriesPage() {
   }, [])
 
   const fetchStories = async () => {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('adoption_cats')
-      .select(`*, ngo_profiles ( org_name, city )`)
-      .eq('status', 'adopted')
-      .order('adopted_at', { ascending: false })
+  setLoading(true)
 
-    if (!error) setStories(data || [])
+  const { data, error } = await supabase
+    .from('adoption_cats')
+    .select('*')
+    .eq('status', 'adopted')
+    .order('adopted_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching stories:', error.message)
+    setStories([])
     setLoading(false)
+    return
   }
+
+  if (!data || data.length === 0) {
+    setStories([])
+    setLoading(false)
+    return
+  }
+
+  // Fetch NGO names separately — avoids the broken join
+  const ngoIds = [...new Set(data.map((c) => c.ngo_id))]
+  const { data: ngoData } = await supabase
+    .from('ngo_profiles')
+    .select('user_id, org_name, city')
+    .in('user_id', ngoIds)
+
+  const ngoMap = {}
+  if (ngoData) ngoData.forEach((n) => { ngoMap[n.user_id] = n })
+
+  const enriched = data.map((cat) => ({
+    ...cat,
+    ngo_profiles: ngoMap[cat.ngo_id] || null,
+  }))
+
+  setStories(enriched)
+  setLoading(false)
+}
 
   // Total "pages" = stories + 1 blank "add page" page (NGO only)
   const totalPages = stories.length + (isNGO ? 1 : 0)
@@ -205,21 +234,12 @@ export default function StoriesPage() {
           </AnimatePresence>
         </div>
 
-        // Left arrow — hide on small screens
-          <button
-            onClick={goPrev}
-            disabled={pageIndex === 0}
-            className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition"
-          >
+        {/* Left arrow — hidden on mobile */}
+          <button onClick={goPrev} disabled={pageIndex === 0} className="hidden sm:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 sm:-translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
             <ChevronLeft size={20} />
           </button>
 
-          // Right arrow — hide on small screens
-          <button
-            onClick={goNext}
-            disabled={pageIndex === totalPages - 1}
-            className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition"
-          >
+          <button onClick={goNext} disabled={pageIndex === totalPages - 1} className="hidden sm:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 sm:translate-x-12 bg-white shadow-lg rounded-full p-2.5 text-amber-600 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-amber-50 transition">
             <ChevronRight size={20} />
           </button>
 
@@ -229,10 +249,11 @@ export default function StoriesPage() {
           </p>
       </div>
 
-      <p className="mt-6 text-sm text-amber-600 font-medium">
-        Page {pageIndex + 1} of {totalPages}
-      </p>
-      <p className="text-xs text-gray-400 mt-1">Swipe or use arrows to turn the page</p>
+          <p className="mt-6 text-sm text-amber-600 font-medium">
+            Page {pageIndex + 1} of {totalPages}
+          </p>
+          <p className="text-xs text-gray-400 mt-1 hidden sm:block">Use arrows to turn the page</p>
+          <p className="text-xs text-gray-400 mt-1 sm:hidden">← Swipe left or right to turn pages →</p>
 
       {isNGO && (
         <AddStoryModal
