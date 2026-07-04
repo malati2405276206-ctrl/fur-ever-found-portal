@@ -2,6 +2,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import catInBox from './cat-in-the-box.png'
+import StoryWallGrid from '@/components/StoryWallGrid'
+
 
 export default function HomePage() {
   const stats = [
@@ -228,6 +230,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Grid Wall Decor - Story Polaroids */}
+      <StoryWallGrid />
 
       {/* Stats */}
       {/* <section className="py-12 sm:py-16 px-4" style={{ background: 'var(--cream)' }}>
