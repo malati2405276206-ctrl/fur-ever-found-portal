@@ -449,3 +449,18 @@ button,
 
 /* ── Page Flip Animations ── */
 /* Reserved for future use */
+
+/* ── Map Marker Pulse Animation ── */
+@keyframes pulse-marker {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.highlight-pulse-ring {
+  animation: pulse-ring 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 0.3; }
+}

@@ -43,7 +43,8 @@ function AdoptionApplicationForm() {
       .from('adoption_cats')
       .select('*')
       .eq('id', id)
-      .eq('status', 'available')
+      .neq('status', 'deleted')
+      .neq('status', 'adopted')
       .maybeSingle()
 
     if (!data) { router.push('/adoption'); return }
@@ -126,29 +127,34 @@ function AdoptionApplicationForm() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--background)' }}>
+        <div className="flex flex-col items-center gap-3 animate-fade-in">
+          <div className="w-12 h-12 border-4 border-[var(--gold)] border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-[var(--foreground)] opacity-70">Loading application...</p>
+        </div>
       </div>
     )
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-purple-50 flex items-center justify-center px-4">
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Application Submitted!</h2>
-          <p className="text-gray-500 text-sm mb-2">
+      <div className="min-h-screen flex items-center justify-center px-4 py-10" style={{ background: 'var(--background)' }}>
+        <div className="organic-card p-8 sm:p-10 max-w-md w-full text-center animate-slide-up">
+          <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center text-4xl" style={{ background: 'var(--gold-light)' }}>
+            🎉
+          </div>
+          <h2 className="heading-artistic text-2xl sm:text-3xl mb-2" style={{ color: 'var(--foreground)' }}>Application Submitted!</h2>
+          <p className="text-sm mb-2" style={{ color: 'var(--foreground)', opacity: 0.7 }}>
             Your adoption application for <strong>{cat?.name}</strong> has been sent to the NGO.
           </p>
-          <p className="text-gray-400 text-xs mb-6">
+          <p className="text-xs mb-8" style={{ color: 'var(--foreground)', opacity: 0.5 }}>
             They will review your application and contact you via the in-app chat within 24-48 hours.
           </p>
           <div className="space-y-3">
-            <Link href="/messages" className="block w-full bg-purple-500 hover:bg-purple-600 text-white py-3 rounded-xl font-semibold transition text-center text-sm">
+            <Link href="/messages" className="block w-full text-white py-3.5 rounded-xl font-semibold transition text-center text-sm hover:opacity-90" style={{ background: 'var(--gold)' }}>
               💬 Check Messages
             </Link>
-            <Link href="/adoption" className="block w-full border border-gray-200 text-gray-600 hover:bg-gray-50 py-3 rounded-xl font-semibold transition text-sm">
+            <Link href="/adoption" className="block w-full border py-3.5 rounded-xl font-semibold transition text-sm hover:opacity-80 text-center" style={{ borderColor: 'var(--cream-dark)', color: 'var(--foreground)' }}>
               Browse More Cats
             </Link>
           </div>
@@ -158,66 +164,91 @@ function AdoptionApplicationForm() {
   }
 
   return (
-    <div className="min-h-screen bg-purple-50 py-10 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen py-6 sm:py-10 px-4" style={{ background: 'var(--background)' }}>
+      <div className="max-w-6xl mx-auto">
 
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <Link href="/adoption" className="text-gray-400 hover:text-gray-600 transition text-xl">←</Link>
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Adoption Application</h1>
-            <p className="text-gray-500 text-sm mt-0.5">Applying to adopt <strong>{cat?.name}</strong></p>
-          </div>
+        {/* Back button */}
+        <div className="mb-6 animate-fade-in-up">
+          <Link href="/adoption" className="inline-flex items-center gap-2 text-sm font-medium transition hover:opacity-70" style={{ color: 'var(--foreground)' }}>
+            <span className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'white', border: '1px solid var(--cream-dark)' }}>←</span>
+            Back to Cats
+          </Link>
         </div>
 
-        {/* Cat preview */}
-        <div className="bg-white rounded-2xl border border-purple-100 p-4 mb-6 flex gap-4 items-center">
-          {cat?.image_url ? (
-            <img src={cat.image_url} alt={cat.name} className="w-16 h-16 rounded-xl object-cover shrink-0" />
-          ) : (
-            <div className="w-16 h-16 rounded-xl bg-purple-100 flex items-center justify-center text-2xl shrink-0">🐱</div>
-          )}
-          <div>
-            <p className="font-bold text-gray-900">{cat?.name}</p>
-            <p className="text-xs text-gray-400">{cat?.breed} · {cat?.age} · {cat?.city}</p>
-            <p className="text-xs text-gray-500 mt-1 line-clamp-2">{cat?.description}</p>
-          </div>
-        </div>
+        {/* Split layout card */}
+        <div className="organic-card overflow-hidden animate-slide-up" style={{ background: 'white' }}>
+          <div className="flex flex-col lg:flex-row">
 
-        <div className="bg-white rounded-3xl shadow-sm border border-purple-100 p-8">
+            {/* LEFT PANEL — Cat image & details */}
+            <div className="lg:w-[42%] relative flex flex-col" style={{ background: 'linear-gradient(160deg, var(--gold-light) 0%, var(--cream) 100%)' }}>
+              {/* Cat image */}
+              <div className="relative w-full aspect-square lg:aspect-auto lg:flex-1 min-h-[280px] lg:min-h-[500px]">
+                {cat?.image_url ? (
+                  <img src={cat.image_url} alt={cat.name} className="w-full h-full object-cover" />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-8xl" style={{ background: 'var(--gold-light)' }}>🐱</div>
+                )}
+                {/* Gradient overlay at bottom */}
+                <div className="absolute inset-x-0 bottom-0 h-40" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)' }} />
+              </div>
+
+              {/* Cat details overlay */}
+              <div className="absolute bottom-0 inset-x-0 p-6 text-white">
+                <h2 className="heading-artistic text-3xl sm:text-4xl mb-1">{cat?.name}</h2>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {cat?.breed && <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}>{cat.breed}</span>}
+                  {cat?.age && <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}>{cat.age}</span>}
+                  {cat?.city && <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(4px)' }}>📍 {cat.city}</span>}
+                </div>
+                {cat?.description && <p className="text-sm opacity-90 line-clamp-3">{cat.description}</p>}
+              </div>
+            </div>
+
+            {/* RIGHT PANEL — Application form */}
+            <div className="lg:w-[58%] p-6 sm:p-8 lg:p-10 overflow-y-auto lg:max-h-[85vh]">
+              {/* Form heading */}
+              <div className="mb-6">
+                <h1 className="heading-artistic text-2xl sm:text-3xl mb-1" style={{ color: 'var(--foreground)' }}>Adoption Application</h1>
+                <p className="text-sm" style={{ color: 'var(--foreground)', opacity: 0.6 }}>Fill in your details to adopt <strong>{cat?.name}</strong></p>
+              </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-6">⚠️ {error}</div>
+            <div className="border text-sm px-4 py-3 rounded-xl mb-6 flex items-center gap-2" style={{ background: '#fef2f2', borderColor: '#fecaca', color: '#dc2626' }}>
+              <span>⚠️</span> {error}
+            </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-8">
 
             {/* Personal Info */}
             <div>
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Personal Information</h2>
+              <div className="flex items-center gap-2 mb-5">
+                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--gold-light)', color: 'var(--foreground)' }}>1</span>
+                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>Personal Information</h2>
+              </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Full Name <span className="text-red-400">*</span></label>
-                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Your full name" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Full Name <span style={{ color: 'var(--gold)' }}>*</span></label>
+                    <input type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Your full name" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone <span className="text-red-400">*</span></label>
-                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="+91 98765 43210" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Phone <span style={{ color: 'var(--gold)' }}>*</span></label>
+                    <input type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} required placeholder="+91 98765 43210" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Home Address <span className="text-red-400">*</span></label>
-                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required placeholder="Your full address" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Home Address <span style={{ color: 'var(--gold)' }}>*</span></label>
+                  <input type="text" value={address} onChange={(e) => setAddress(e.target.value)} required placeholder="Your full address" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">City <span className="text-red-400">*</span></label>
-                    <input type="text" value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Mumbai" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>City <span style={{ color: 'var(--gold)' }}>*</span></label>
+                    <input type="text" value={city} onChange={(e) => setCity(e.target.value)} required placeholder="Mumbai" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Occupation</label>
-                    <input type="text" value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="e.g. Software Engineer" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Occupation</label>
+                    <input type="text" value={occupation} onChange={(e) => setOccupation(e.target.value)} placeholder="e.g. Software Engineer" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                   </div>
                 </div>
               </div>
@@ -225,14 +256,25 @@ function AdoptionApplicationForm() {
 
             {/* Living Situation */}
             <div>
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Living Situation</h2>
-              <div className="space-y-4">
+              <div className="flex items-center gap-2 mb-5">
+                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--gold-light)', color: 'var(--foreground)' }}>2</span>
+                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>Living Situation</h2>
+              </div>
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Type of Home <span className="text-red-400">*</span></label>
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  <label className="block text-sm font-medium mb-2.5" style={{ color: 'var(--foreground)' }}>Type of Home <span style={{ color: 'var(--gold)' }}>*</span></label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     {['apartment', 'house', 'villa', 'other'].map((type) => (
                       <button key={type} type="button" onClick={() => setHomeType(type)}
-                        className={`py-2.5 rounded-xl text-sm font-medium transition capitalize border ${homeType === type ? 'bg-purple-500 text-white border-purple-500' : 'bg-white text-gray-600 border-gray-200 hover:border-purple-300'}`}>
+                        className="py-3 rounded-xl text-sm font-medium transition capitalize border"
+                        style={homeType === type
+                          ? { background: 'var(--gold)', color: 'white', borderColor: 'var(--gold)' }
+                          : { background: 'var(--sage-50)', color: 'var(--foreground)', borderColor: 'var(--cream-dark)' }
+                        }>
+                        {type === 'apartment' && '🏢 '}
+                        {type === 'house' && '🏠 '}
+                        {type === 'villa' && '🏡 '}
+                        {type === 'other' && '🏘️ '}
                         {type}
                       </button>
                     ))}
@@ -241,23 +283,31 @@ function AdoptionApplicationForm() {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Children at home?</label>
-                    <div className="flex gap-2">
+                    <label className="block text-sm font-medium mb-2.5" style={{ color: 'var(--foreground)' }}>Children at home?</label>
+                    <div className="flex gap-2.5">
                       {['yes', 'no'].map((v) => (
                         <button key={v} type="button" onClick={() => setHasChildren(v)}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${hasChildren === v ? 'bg-purple-500 text-white border-purple-500' : 'bg-white text-gray-600 border-gray-200'}`}>
-                          {v === 'yes' ? 'Yes' : 'No'}
+                          className="flex-1 py-3 rounded-xl text-sm font-medium transition border"
+                          style={hasChildren === v
+                            ? { background: 'var(--gold)', color: 'white', borderColor: 'var(--gold)' }
+                            : { background: 'var(--sage-50)', color: 'var(--foreground)', borderColor: 'var(--cream-dark)' }
+                          }>
+                          {v === 'yes' ? '👶 Yes' : '🚫 No'}
                         </button>
                       ))}
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Other pets?</label>
-                    <div className="flex gap-2">
+                    <label className="block text-sm font-medium mb-2.5" style={{ color: 'var(--foreground)' }}>Other pets?</label>
+                    <div className="flex gap-2.5">
                       {['yes', 'no'].map((v) => (
                         <button key={v} type="button" onClick={() => setHasPets(v)}
-                          className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition border ${hasPets === v ? 'bg-purple-500 text-white border-purple-500' : 'bg-white text-gray-600 border-gray-200'}`}>
-                          {v === 'yes' ? 'Yes' : 'No'}
+                          className="flex-1 py-3 rounded-xl text-sm font-medium transition border"
+                          style={hasPets === v
+                            ? { background: 'var(--gold)', color: 'white', borderColor: 'var(--gold)' }
+                            : { background: 'var(--sage-50)', color: 'var(--foreground)', borderColor: 'var(--cream-dark)' }
+                          }>
+                          {v === 'yes' ? '🐾 Yes' : '🚫 No'}
                         </button>
                       ))}
                     </div>
@@ -265,9 +315,9 @@ function AdoptionApplicationForm() {
                 </div>
 
                 {hasPets === 'yes' && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Tell us about your other pets</label>
-                    <input type="text" value={petDetails} onChange={(e) => setPetDetails(e.target.value)} placeholder="e.g. 1 dog (labrador, 3 years, friendly)" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
+                  <div className="animate-fade-in">
+                    <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Tell us about your other pets</label>
+                    <input type="text" value={petDetails} onChange={(e) => setPetDetails(e.target.value)} placeholder="e.g. 1 dog (labrador, 3 years, friendly)" className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                   </div>
                 )}
               </div>
@@ -275,33 +325,45 @@ function AdoptionApplicationForm() {
 
             {/* Experience */}
             <div>
-              <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">Cat Experience</h2>
+              <div className="flex items-center gap-2 mb-5">
+                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm" style={{ background: 'var(--gold-light)', color: 'var(--foreground)' }}>3</span>
+                <h2 className="text-sm font-bold uppercase tracking-wider" style={{ color: 'var(--foreground)' }}>Cat Experience</h2>
+              </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Previous experience with cats</label>
-                  <textarea value={experience} onChange={(e) => setExperience(e.target.value)} placeholder="Have you owned cats before? Tell us about your experience caring for animals..." rows={3} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm resize-none" />
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>Previous experience with cats</label>
+                  <textarea value={experience} onChange={(e) => setExperience(e.target.value)} placeholder="Have you owned cats before? Tell us about your experience caring for animals..." rows={3} className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm resize-none" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Why do you want to adopt {cat?.name}? <span className="text-red-400">*</span>
+                  <label className="block text-sm font-medium mb-1.5" style={{ color: 'var(--foreground)' }}>
+                    Why do you want to adopt {cat?.name}? <span style={{ color: 'var(--gold)' }}>*</span>
                   </label>
-                  <textarea value={whyAdopt} onChange={(e) => setWhyAdopt(e.target.value)} required placeholder={`Tell us why ${cat?.name} is the right cat for you and your home...`} rows={4} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm resize-none" />
+                  <textarea value={whyAdopt} onChange={(e) => setWhyAdopt(e.target.value)} required placeholder={`Tell us why ${cat?.name} is the right cat for you and your home...`} rows={4} className="w-full px-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition text-sm resize-none" style={{ borderColor: 'var(--cream-dark)', background: 'var(--sage-50)', color: 'var(--foreground)', '--tw-ring-color': 'var(--gold-light)' }} />
                 </div>
               </div>
             </div>
 
             {/* Agreement */}
-            <div className="bg-purple-50 rounded-2xl p-4">
+            <div className="rounded-2xl p-5" style={{ background: 'var(--sage-50)', border: '1px solid var(--cream-dark)' }}>
               <label className="flex items-start gap-3 cursor-pointer">
-                <input type="checkbox" checked={agreement} onChange={(e) => setAgreement(e.target.checked)} className="mt-0.5 w-4 h-4 accent-purple-500" />
-                <p className="text-xs text-gray-600 leading-relaxed">
+                <input type="checkbox" checked={agreement} onChange={(e) => setAgreement(e.target.checked)} className="mt-0.5 w-5 h-5 rounded" style={{ accentColor: 'var(--gold)' }} />
+                <p className="text-xs leading-relaxed" style={{ color: 'var(--foreground)', opacity: 0.75 }}>
                   I confirm that the information provided is accurate. I understand the NGO will review my application and may contact me for a home visit before approval. I commit to providing a safe, loving, and permanent home for {cat?.name}.
                 </p>
               </label>
             </div>
 
+            {/* Progress indicator */}
+            <div className="flex items-center justify-center gap-1.5 py-2">
+              <div className="w-8 h-1 rounded-full" style={{ background: fullName && phone ? 'var(--gold)' : 'var(--cream-dark)' }}></div>
+              <div className="w-8 h-1 rounded-full" style={{ background: address && city ? 'var(--gold)' : 'var(--cream-dark)' }}></div>
+              <div className="w-8 h-1 rounded-full" style={{ background: whyAdopt ? 'var(--gold)' : 'var(--cream-dark)' }}></div>
+              <div className="w-8 h-1 rounded-full" style={{ background: agreement ? 'var(--gold)' : 'var(--cream-dark)' }}></div>
+            </div>
+
             <button type="submit" disabled={submitting || !agreement}
-              className="w-full bg-purple-500 hover:bg-purple-600 disabled:bg-purple-300 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 text-base">
+              className="w-full text-white font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 text-base shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-lg"
+              style={{ background: submitting || !agreement ? 'var(--cream-dark)' : 'var(--gold)', color: submitting || !agreement ? 'var(--foreground)' : 'white' }}>
               {submitting ? (
                 <>
                   <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin inline-block" />
@@ -312,7 +374,10 @@ function AdoptionApplicationForm() {
               )}
             </button>
           </form>
-        </div>
+            </div>{/* end right panel */}
+
+          </div>{/* end flex row */}
+        </div>{/* end organic-card */}
       </div>
     </div>
   )

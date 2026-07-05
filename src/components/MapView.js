@@ -5,16 +5,19 @@ import { useEffect, useRef } from 'react'
 import { getDirectionsUrl } from '@/lib/directions'
 import { fetchNearbyHelp } from '@/lib/nearbyPlaces'
 
-export default function MapView({ cats }) {
+export default function MapView({ cats, selectedCat }) {
   const mapRef = useRef(null)
   const instanceRef = useRef(null)
   const markersRef = useRef([])
+  const markerMapRef = useRef({})
+  const leafletRef = useRef(null)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     const initMap = async () => {
       const L = (await import('leaflet')).default
+      leafletRef.current = L
 
       delete L.Icon.Default.prototype._getIconUrl
       L.Icon.Default.mergeOptions({
@@ -33,6 +36,7 @@ export default function MapView({ cats }) {
 
       markersRef.current.forEach((m) => m.remove())
       markersRef.current = []
+      markerMapRef.current = {}
 
       if (cats.length === 0) return
 
@@ -93,6 +97,7 @@ export default function MapView({ cats }) {
           .bindPopup(popupContent, { maxWidth: 240 })
 
         markersRef.current.push(marker)
+        markerMapRef.current[`${cat._type}-${cat.id}`] = marker
       })
 
       // Global function the popup button calls (Leaflet popups are raw HTML,
@@ -130,6 +135,79 @@ export default function MapView({ cats }) {
 
     initMap()
   }, [cats])
+
+  // Fly to selected cat, highlight its marker, and open popup
+  useEffect(() => {
+    if (!selectedCat || !instanceRef.current || !leafletRef.current) return
+
+    const L = leafletRef.current
+    const key = `${selectedCat._type}-${selectedCat.id}`
+    const marker = markerMapRef.current[key]
+
+    if (marker) {
+      // Remove any previous highlight circle
+      if (window.__highlightCircle) {
+        window.__highlightCircle.remove()
+        window.__highlightCircle = null
+      }
+
+      const colors = { lost: '#ef4444', found: '#22c55e', adoption: '#a855f7' }
+      const color = colors[selectedCat._type] || '#6b7280'
+
+      // Swap icon to a bigger, pulsing version
+      const bigIcon = L.divIcon({
+        className: '',
+        html: `<div style="width:42px;height:42px;background:${color};border:4px solid white;border-radius:50%;box-shadow:0 0 0 6px ${color}44, 0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;animation:pulse-marker 1.5s ease-in-out infinite;transition:all 0.3s ease;">${selectedCat._type === 'lost' ? '😿' : selectedCat._type === 'found' ? '😊' : '🏠'}</div>`,
+        iconSize: [42, 42],
+        iconAnchor: [21, 21],
+      })
+      marker.setIcon(bigIcon)
+
+      // Add a pulsing ring circle on the map around the marker
+      window.__highlightCircle = L.circleMarker(
+        [selectedCat.latitude, selectedCat.longitude],
+        {
+          radius: 28,
+          color: color,
+          weight: 3,
+          opacity: 0.7,
+          fillColor: color,
+          fillOpacity: 0.12,
+          className: 'highlight-pulse-ring',
+        }
+      ).addTo(instanceRef.current)
+
+      // Fly to location
+      instanceRef.current.flyTo(
+        [selectedCat.latitude, selectedCat.longitude],
+        15,
+        { duration: 1.2 }
+      )
+
+      // Open popup after fly
+      setTimeout(() => {
+        marker.openPopup()
+      }, 1300)
+
+      // Reset marker back to normal size after 6 seconds
+      const resetTimeout = setTimeout(() => {
+        const normalIcon = L.divIcon({
+          className: '',
+          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;">${selectedCat._type === 'lost' ? '😿' : selectedCat._type === 'found' ? '😊' : '🏠'}</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        })
+        marker.setIcon(normalIcon)
+
+        if (window.__highlightCircle) {
+          window.__highlightCircle.remove()
+          window.__highlightCircle = null
+        }
+      }, 6000)
+
+      return () => clearTimeout(resetTimeout)
+    }
+  }, [selectedCat])
 
 return <div ref={mapRef} className="w-full" style={{ height: 'calc(100vh - 180px)', minHeight: '400px' }} />
 }

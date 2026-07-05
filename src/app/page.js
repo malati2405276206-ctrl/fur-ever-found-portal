@@ -7,16 +7,16 @@ import StoryWallGrid from '@/components/StoryWallGrid'
 
 export default function HomePage() {
   const stats = [
-    { number: '2,400+', label: 'Cats Reunited', emoji: '🐱' },
-    { number: '850+', label: 'Active Reports', emoji: '📋' },
-    { number: '120+', label: 'Cities Covered', emoji: '🌿' },
-    { number: '5,000+', label: 'Community Members', emoji: '🧡' },
+    { number: '2,400+', label: 'Cats Reunited', icon: '🐱' },
+    { number: '850+', label: 'Active Reports', icon: '📋' },
+    { number: '120+', label: 'Cities Covered', icon: '🌿' },
+    { number: '5,000+', label: 'Community Members', icon: '🧡' },
   ]
 
   const steps = [
-    { step: '01', emoji: '📝', title: 'Report', desc: 'Post details about your lost cat or one you found nearby. Add a photo and location.', bg: 'bg-[#F3D58D]' },
-    { step: '02', emoji: '🔔', title: 'Connect', desc: 'Our community gets notified. People near your location will see your report instantly.', bg: 'bg-[#d6e3f0]' },
-    { step: '03', emoji: '🏠', title: 'Reunite', desc: 'Get matched with people who spotted your cat. Bring them home safely.', bg: 'bg-[#EBDDC5]' },
+    { step: '01', title: '📝 Post details about your lost cat or one you found nearby. Add a photo and location.', bg: 'bg-[#F3D58D]' },
+    { step: '02', title: '🔔 Our community gets notified. People near your location will see your report instantly.', bg: 'bg-[#d6e3f0]' },
+    { step: '03', title: '🏠 Get matched with people who spotted your cat. Bring them home safely.', bg: 'bg-[#EBDDC5]' },
   ]
 
   const reviews = [
@@ -306,31 +306,7 @@ export default function HomePage() {
       </div>
 
       {/* CTA Banner */}
-      <section className="py-16 sm:py-20 px-4" style={{ background: 'var(--cream)' }}>
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="organic-card p-8 sm:p-12 relative overflow-hidden">
-            {/* Decorative elements */}
-            <div className="absolute top-4 left-6 text-2xl opacity-40 animate-float-slow">🌿</div>
-            <div className="absolute bottom-4 right-6 text-2xl opacity-40 animate-float">🐾</div>
-            <div className="absolute top-6 right-10 text-xl opacity-30 animate-float-slow" style={{ animationDelay: '1.5s' }}>🦋</div>
-
-            <div className="text-5xl sm:text-6xl mb-4">🐱</div>
-            <h2 className="heading-artistic text-2xl sm:text-3xl mb-4" style={{ color: 'var(--sage-900)' }}>
-              A family somewhere is waiting
-            </h2>
-            <p className="text-sm sm:text-base mb-8" style={{ color: 'var(--sage-600)' }}>
-              Every hour matters. Post your report now — it only takes 2 minutes.
-            </p>
-            <Link
-              href="/signup"
-              className="inline-flex items-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-full font-bold text-base sm:text-lg text-white transition-all hover:scale-105"
-              style={{ background: 'var(--sage-500)', boxShadow: '0 8px 24px rgba(46, 67, 101, 0.25)' }}
-            >
-              Join Free →
-            </Link>
-          </div>
-        </div>
-      </section>
+      
 
       {/* Footer */}
       

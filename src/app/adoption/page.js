@@ -88,62 +88,113 @@ export default function AdoptionPage() {
   return (
     <div className="min-h-screen" style={{ background: '#EBDDC5' }}>
 
-      {/* ── Header Section ── */}
-      <section className="pt-10 pb-6 px-4 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h1 className="text-3xl font-extrabold text-gray-900 mb-2">
-            Find Your <span className="text-purple-500">Fur Ever</span> Friend
+      {/* ── Hero Header Section ── */}
+      <section className="relative pt-14 pb-10 px-4 overflow-hidden">
+        {/* Decorative floating paws */}
+        <div className="absolute top-6 left-8 text-4xl opacity-15 animate-float-slow select-none" aria-hidden="true">🐾</div>
+        <div className="absolute top-12 right-12 text-3xl opacity-10 animate-float select-none" aria-hidden="true">🐾</div>
+        <div className="absolute bottom-4 left-1/4 text-2xl opacity-10 animate-float select-none" style={{ animationDelay: '1s' }} aria-hidden="true">🐾</div>
+
+        <div className="max-w-3xl mx-auto text-center relative z-10">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-4 animate-fade-in-up" style={{ background: '#2E4365', color: '#F3D58D' }}>
+            <span>🏠</span> Adopt, Don&apos;t Shop
+          </div>
+          <h1 className="heading-artistic text-4xl md:text-5xl mb-3 animate-fade-in-up" style={{ color: '#2E4365', animationDelay: '0.1s' }}>
+            Find Your <span style={{ color: '#E59D2C' }}>Fur-Ever</span> Friend
           </h1>
-          <p className="text-gray-500 text-sm">
+          <p className="text-base md:text-lg max-w-lg mx-auto animate-fade-in-up" style={{ color: '#2E4365', opacity: 0.7, animationDelay: '0.2s' }}>
             Every cat here has a rescue story. Give them their forever home.
           </p>
         </div>
       </section>
 
-      {/* ── Filter Pills ── */}
-      <section className="px-4 pb-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex items-center gap-3 flex-wrap justify-center mb-4">
+      {/* ── Search & Filters Section ── */}
+      <section className="px-4 pb-8">
+        <div className="max-w-4xl mx-auto">
+          {/* Search bar */}
+          <div className="relative max-w-xl mx-auto mb-6 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+              <svg className="w-5 h-5" style={{ color: '#E59D2C' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            <input
+              type="text"
+              value={searchCity}
+              onChange={(e) => setSearchCity(e.target.value)}
+              placeholder="Search by city..."
+              className="w-full pl-12 pr-4 py-3.5 rounded-2xl border-2 focus:outline-none transition-all duration-200 text-sm font-medium shadow-sm"
+              style={{
+                background: '#ffffff',
+                borderColor: searchCity ? '#E59D2C' : '#e5e7eb',
+                color: '#2E4365',
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#E59D2C'}
+              onBlur={(e) => { if (!searchCity) e.target.style.borderColor = '#e5e7eb' }}
+            />
+            {searchCity && (
+              <button
+                onClick={() => setSearchCity('')}
+                className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-gray-600 transition"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Gender filter pills */}
+          <div className="flex items-center gap-3 flex-wrap justify-center mb-5 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             {[
-              { value: 'all',    label: '🐱 All',     },
-              { value: 'male',   label: '♂ Male'   },
-              { value: 'female', label: '♀ Female' },
+              { value: 'all',    label: 'All Cats',  icon: '🐱' },
+              { value: 'male',   label: 'Male',      icon: '♂️' },
+              { value: 'female', label: 'Female',    icon: '♀️' },
             ].map((f) => (
               <button
                 key={f.value}
                 onClick={() => setFilter(f.value)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 ${
+                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border-2"
+                style={
                   filter === f.value
-                    ? 'bg-pink-400 text-white shadow-lg shadow-pink-200'
-                    : 'bg-white text-gray-600 border border-gray-200 hover:border-pink-300 hover:shadow-sm'
-                }`}
+                    ? { background: '#2E4365', color: '#F3D58D', borderColor: '#2E4365', boxShadow: '0 4px 12px rgba(46,67,101,0.25)' }
+                    : { background: '#ffffff', color: '#2E4365', borderColor: '#e5e7eb' }
+                }
+                onMouseEnter={(e) => {
+                  if (filter !== f.value) e.currentTarget.style.borderColor = '#E59D2C'
+                }}
+                onMouseLeave={(e) => {
+                  if (filter !== f.value) e.currentTarget.style.borderColor = '#e5e7eb'
+                }}
               >
-                {f.label}
+                <span className="mr-1.5">{f.icon}</span>{f.label}
               </button>
             ))}
           </div>
-          <input
-            type="text"
-            value={searchCity}
-            onChange={(e) => setSearchCity(e.target.value)}
-            placeholder="🔍 Search by city..."
-            className="w-full max-w-md mx-auto block px-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300 transition text-sm bg-white"
-          />
-          <div className="flex gap-2 overflow-x-auto pb-2 mt-4">
+
+          {/* City location pills */}
+          <div className="flex gap-2 overflow-x-auto pb-2 justify-center flex-wrap animate-fade-in-up" style={{ animationDelay: '0.5s' }}>
             {locations.map((location) => (
               <button
                 key={location}
                 onClick={() => setSelectedLocation(location)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
-                  selectedLocation === location
-                    ? 'text-white'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
-                }`}
+                className="px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all duration-200 border"
                 style={
                   selectedLocation === location
-                    ? { background: '#ec4899' }
-                    : {}
+                    ? { background: '#E59D2C', color: '#ffffff', borderColor: '#E59D2C', boxShadow: '0 2px 8px rgba(229,157,44,0.3)' }
+                    : { background: '#ffffff', color: '#2E4365', borderColor: '#e5e7eb' }
                 }
+                onMouseEnter={(e) => {
+                  if (selectedLocation !== location) {
+                    e.currentTarget.style.borderColor = '#F3D58D'
+                    e.currentTarget.style.background = '#FFF8E7'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedLocation !== location) {
+                    e.currentTarget.style.borderColor = '#e5e7eb'
+                    e.currentTarget.style.background = '#ffffff'
+                  }
+                }}
               >
                 {location === 'all'
                   ? '🌍 All Cities'
@@ -151,15 +202,21 @@ export default function AdoptionPage() {
               </button>
             ))}
           </div>
+
+          {/* View on Map button */}
+          <div className="text-center mt-6 animate-fade-in-up" style={{ animationDelay: '0.6s' }}>
+            <Link
+              href="/map?type=adoption"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full font-semibold transition-all duration-200 text-sm border-2"
+              style={{ borderColor: '#2E4365', color: '#2E4365' }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#2E4365'; e.currentTarget.style.color = '#F3D58D' }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#2E4365' }}
+            >
+              <span>🗺️</span> View on Map
+            </Link>
+          </div>
         </div>
       </section>
-
-      {/* ── View on Map Link ── */}
-      <div className="text-center mb-6">
-        <Link href="/map?type=adoption" className="inline-block border border-purple-300 text-purple-500 hover:bg-purple-50 px-5 py-2 rounded-full font-semibold transition text-sm">
-          🗺️ View on Map
-        </Link>
-      </div>
 
       {/* ── Cat Grid ── */}
       <section className="px-4 pb-16">
@@ -169,11 +226,11 @@ export default function AdoptionPage() {
           {loading && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <div key={i} className="animate-pulse bg-white p-3 pb-5 rounded-sm shadow-md">
-                  <div className="aspect-[4/3] bg-gray-200 mb-3" />
-                  <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
-                  <div className="h-3 bg-gray-100 rounded w-1/2 mb-1" />
-                  <div className="h-3 bg-gray-100 rounded w-3/4" />
+                <div key={i} className="animate-pulse bg-white p-3 pb-5 rounded-2xl shadow-sm" style={{ border: '1px solid #F3D58D' }}>
+                  <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-3" />
+                  <div className="h-4 bg-gray-200 rounded-full w-2/3 mb-2" />
+                  <div className="h-3 bg-gray-100 rounded-full w-1/2 mb-1" />
+                  <div className="h-3 bg-gray-100 rounded-full w-3/4" />
                 </div>
               ))}
             </div>
@@ -181,26 +238,40 @@ export default function AdoptionPage() {
 
           {/* Empty state */}
           {!loading && filteredCats.length === 0 && (
-            <div className="text-center py-20">
-              <div className="text-6xl mb-4">🐾</div>
-              <h3 className="text-xl font-bold text-gray-700 mb-2">
+            <div className="text-center py-20 animate-fade-in-up">
+              <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: '#FFF8E7' }}>
+                <span className="text-4xl">🐾</span>
+              </div>
+              <h3 className="text-xl font-bold mb-2 heading-artistic" style={{ color: '#2E4365' }}>
                 No cats found
               </h3>
-              <p className="text-gray-400 text-sm">
+              <p className="text-sm max-w-sm mx-auto" style={{ color: '#2E4365', opacity: 0.6 }}>
                 {searchCity
-                  ? `No cats available in "${searchCity}" right now.`
+                  ? `No cats available in "${searchCity}" right now. Try a different city.`
                   : 'No cats available for adoption right now. Check back soon!'}
               </p>
+              {searchCity && (
+                <button
+                  onClick={() => { setSearchCity(''); setSelectedLocation('all') }}
+                  className="mt-4 px-5 py-2 rounded-full text-sm font-semibold transition-all duration-200"
+                  style={{ background: '#2E4365', color: '#F3D58D' }}
+                >
+                  Clear Filters
+                </button>
+              )}
             </div>
           )}
 
           {/* Cat cards grid */}
           {!loading && filteredCats.length > 0 && (
             <>
-              <p className="text-gray-400 text-sm mb-5 text-center">
-                Showing <strong className="text-gray-700">{filteredCats.length}</strong> cat
-                {filteredCats.length !== 1 ? 's' : ''} available
-              </p>
+              <div className="flex items-center justify-center gap-2 mb-6">
+                <div className="h-px flex-1 max-w-[60px]" style={{ background: '#E59D2C', opacity: 0.3 }} />
+                <p className="text-sm font-medium" style={{ color: '#2E4365', opacity: 0.7 }}>
+                  Showing <strong style={{ color: '#2E4365', opacity: 1 }}>{filteredCats.length}</strong> cat{filteredCats.length !== 1 ? 's' : ''} available
+                </p>
+                <div className="h-px flex-1 max-w-[60px]" style={{ background: '#E59D2C', opacity: 0.3 }} />
+              </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
                 {filteredCats.map((cat) => (
@@ -221,18 +292,27 @@ export default function AdoptionPage() {
 
       {/* ── NGO CTA ── */}
       <section className="px-4 pb-16">
-        <div className="max-w-2xl mx-auto rounded-3xl p-8 text-center text-white" style={{ background: '#2E4365' }}>
-          <div className="text-4xl mb-3">🏢</div>
-          <h2 className="text-2xl font-bold mb-2">Are you a rescue organisation?</h2>
-          <p className="text-purple-100 text-sm mb-6">
-            Register your NGO to list cats for adoption and share their rescue stories.
-          </p>
-          <Link
-            href="/ngo-signup"
-            className="inline-block bg-white text-purple-600 hover:bg-purple-50 px-6 py-3 rounded-xl font-bold transition"
-          >
-            Register Your NGO →
-          </Link>
+        <div className="max-w-2xl mx-auto rounded-3xl p-10 text-center text-white relative overflow-hidden" style={{ background: '#2E4365' }}>
+          {/* Decorative background elements */}
+          <div className="absolute top-4 right-6 text-5xl opacity-10 select-none" aria-hidden="true">🐱</div>
+          <div className="absolute bottom-4 left-6 text-4xl opacity-10 select-none" aria-hidden="true">🐾</div>
+
+          <div className="relative z-10">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'rgba(243,213,141,0.2)' }}>
+              <span className="text-3xl">🏢</span>
+            </div>
+            <h2 className="text-2xl font-bold mb-2 heading-artistic">Are you a rescue organisation?</h2>
+            <p className="text-sm mb-6" style={{ color: '#F3D58D', opacity: 0.9 }}>
+              Register your NGO to list cats for adoption and share their rescue stories.
+            </p>
+            <Link
+              href="/ngo-signup"
+              className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold transition-all duration-200 text-sm hover:scale-105"
+              style={{ background: '#F3D58D', color: '#2E4365' }}
+            >
+              Register Your NGO <span>→</span>
+            </Link>
+          </div>
         </div>
       </section>
 
