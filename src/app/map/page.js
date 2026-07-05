@@ -17,7 +17,6 @@ export default function MapPage() {
   const [filter,      setFilter]      = useState(defaultType)
   const [lostCats,    setLostCats]    = useState([])
   const [foundCats,   setFoundCats]   = useState([])
-  const [adoptCats,   setAdoptCats]   = useState([])
   const [loading,     setLoading]     = useState(true)
 
   useEffect(() => {
@@ -25,32 +24,43 @@ export default function MapPage() {
   }, [])
 
   const fetchAllCats = async () => {
-    setLoading(true)
+  setLoading(true)
 
-    const [lostRes, foundRes, adoptRes] = await Promise.all([
-      supabase.from('lost_cats').select('*').not('latitude', 'is', null),
-      supabase.from('found_cats').select('*').not('latitude', 'is', null),
-      supabase.from('adoption_cats').select('*, ngo_profiles(org_name)').not('latitude', 'is', null).eq('status', 'available'),
+  try {
+    const [lostRes, foundRes] = await Promise.all([
+      supabase
+        .from('lost_cats')
+        .select('*')
+        .not('latitude', 'is', null),
+
+      supabase
+        .from('found_cats')
+        .select('*')
+        .not('latitude', 'is', null),
     ])
 
-    setLostCats(lostRes.data  || [])
+    if (lostRes.error) console.error('Lost Cats:', lostRes.error)
+    if (foundRes.error) console.error('Found Cats:', foundRes.error)
+
+    setLostCats(lostRes.data || [])
     setFoundCats(foundRes.data || [])
-    setAdoptCats(adoptRes.data || [])
-    setLoading(false)
+  } catch (err) {
+    console.error('Map Fetch Error:', err)
   }
+
+  setLoading(false)
+}
 
   // Combine cats based on active filter
   const visibleCats = [
     ...(filter === 'all' || filter === 'lost'     ? lostCats.map((c)  => ({ ...c, _type: 'lost'     })) : []),
     ...(filter === 'all' || filter === 'found'    ? foundCats.map((c) => ({ ...c, _type: 'found'    })) : []),
-    ...(filter === 'all' || filter === 'adoption' ? adoptCats.map((c) => ({ ...c, _type: 'adoption' })) : []),
   ]
 
   const filters = [
     { value: 'all',      label: 'All Cats',  color: 'bg-gray-700 text-white',    inactive: 'bg-white text-gray-600 border border-gray-200' },
     { value: 'lost',     label: '😿 Lost',   color: 'bg-red-500 text-white',     inactive: 'bg-white text-gray-600 border border-gray-200' },
     { value: 'found',    label: '😊 Found',  color: 'bg-green-500 text-white',   inactive: 'bg-white text-gray-600 border border-gray-200' },
-    { value: 'adoption', label: '🏠 Adopt',  color: 'bg-purple-500 text-white',  inactive: 'bg-white text-gray-600 border border-gray-200' },
   ]
 
   return (
@@ -85,7 +95,6 @@ export default function MapPage() {
           <div className="flex gap-4 mt-3 text-xs text-gray-500 flex-wrap">
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-red-500 inline-block" /> Lost</span>
             <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-green-500 inline-block" /> Found</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full bg-purple-500 inline-block" /> Adoption</span>
           </div>
         </div>
       </div>

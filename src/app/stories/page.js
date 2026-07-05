@@ -7,21 +7,27 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { useRole } from '@/hooks/useRole'
 import { useSearchParams } from 'next/navigation'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3 } from 'lucide-react'
 
 export default function StoriesPage() {
   const { user } = useAuth()
-  const { isNGO } = useRole()
+  const { isNGO, isUser } = useRole()
   const searchParams = useSearchParams()
 
-  const [stories, setStories] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [pageIndex, setPageIndex] = useState(0)
-  const [direction, setDirection] = useState(1)
+  const [stories,    setStories]    = useState([])
+  const [loading,    setLoading]    = useState(true)
+  const [pageIndex,  setPageIndex]  = useState(0)
+  const [direction,  setDirection]  = useState(1)
+  const [actionMsg,  setActionMsg]  = useState('')
 
-  useEffect(() => {
-    fetchStories()
-  }, [])
+  // Add story modal (NGO only)
+  const [showAddModal,   setShowAddModal]   = useState(false)
+  const [addForm,        setAddForm]        = useState({ cat_name: '', breed: '', age: '', location: '', storyline: '' })
+  const [addImage,       setAddImage]       = useState(null)
+  const [addImagePreview, setAddImagePreview] = useState(null)
+  const [addSubmitting,  setAddSubmitting]  = useState(false)
+
+  useEffect(() => { fetchStories() }, [])
 
   const fetchStories = async () => {
     setLoading(true)
@@ -33,7 +39,7 @@ export default function StoriesPage() {
       .order('adopted_at', { ascending: false })
 
     if (error) {
-      console.error('Error fetching stories:', error.message)
+      console.error('Error:', error.message)
       setStories([])
       setLoading(false)
       return
@@ -45,14 +51,16 @@ export default function StoriesPage() {
       return
     }
 
-    const ngoIds = [...new Set(data.map((c) => c.ngo_id))]
-    const { data: ngoData } = await supabase
-      .from('ngo_profiles')
-      .select('user_id, org_name, city')
-      .in('user_id', ngoIds)
+    const ngoIds = [...new Set(data.map((c) => c.ngo_id).filter(Boolean))]
+    let ngoMap = {}
 
-    const ngoMap = {}
-    if (ngoData) ngoData.forEach((n) => { ngoMap[n.user_id] = n })
+    if (ngoIds.length > 0) {
+      const { data: ngoData } = await supabase
+        .from('ngo_profiles')
+        .select('user_id, org_name, city')
+        .in('user_id', ngoIds)
+      if (ngoData) ngoData.forEach((n) => { ngoMap[n.user_id] = n })
+    }
 
     const enriched = data.map((cat) => ({
       ...cat,
@@ -69,22 +77,16 @@ export default function StoriesPage() {
     }
   }
 
-  const totalPages = stories.length
+  const totalPages = stories.length + (isNGO ? 1 : 0)
+  const isAddPage  = isNGO && pageIndex === stories.length
+  const cat        = !isAddPage && stories[pageIndex] ? stories[pageIndex] : null
 
   const goNext = () => {
-    if (pageIndex < totalPages - 1) {
-      setDirection(1)
-      setPageIndex((p) => p + 1)
-    }
+    if (pageIndex < totalPages - 1) { setDirection(1); setPageIndex((p) => p + 1) }
   }
-
   const goPrev = () => {
-    if (pageIndex > 0) {
-      setDirection(-1)
-      setPageIndex((p) => p - 1)
-    }
+    if (pageIndex > 0) { setDirection(-1); setPageIndex((p) => p - 1) }
   }
-
   const handleDragEnd = (e, info) => {
     if (info.offset.x < -80) goNext()
     else if (info.offset.x > 80) goPrev()
@@ -92,23 +94,94 @@ export default function StoriesPage() {
 
   const timeAgo = (dateStr) => {
     if (!dateStr) return ''
-    const diff = Date.now() - new Date(dateStr).getTime()
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+    const diff  = Date.now() - new Date(dateStr).getTime()
+    const days  = Math.floor(diff / (1000 * 60 * 60 * 24))
     if (days === 0) return 'Today'
     if (days === 1) return 'Yesterday'
-    if (days < 30) return `${days} days ago`
+    if (days < 30)  return `${days} days ago`
     const months = Math.floor(days / 30)
     if (months < 12) return `${months} month${months > 1 ? 's' : ''} ago`
     return `${Math.floor(months / 12)} year${Math.floor(months / 12) > 1 ? 's' : ''} ago`
   }
 
+  // ── NGO: Delete their own story ──────────────────────
+  const handleDeleteStory = async (catId) => {
+    if (!confirm('Remove this story from the storybook? The cat listing will remain.')) return
+
+    const { error } = await supabase
+      .from('adoption_cats')
+      .update({ status: 'available', adopted_at: null })
+      .eq('id', catId)
+      .eq('ngo_id', user.id)
+
+    if (error) { setActionMsg('❌ Failed to remove story.'); return }
+
+    setActionMsg('✅ Story removed.')
+    setTimeout(() => setActionMsg(''), 3000)
+    setPageIndex(0)
+    fetchStories()
+  }
+
+  // ── NGO: Add manual story ────────────────────────────
+  const handleAddStory = async (e) => {
+    e.preventDefault()
+    if (!addForm.cat_name || !addForm.storyline) {
+      setActionMsg('⚠️ Cat name and story are required.')
+      return
+    }
+
+    setAddSubmitting(true)
+
+    let imageUrl = null
+    if (addImage) {
+      const fileExt  = addImage.name.split('.').pop().toLowerCase()
+      const fileName = `story_${user.id}_${Date.now()}.${fileExt}`
+      const { error: uploadError } = await supabase.storage.from('cat-images').upload(fileName, addImage)
+      if (!uploadError) {
+        const { data: urlData } = supabase.storage.from('cat-images').getPublicUrl(fileName)
+        imageUrl = urlData.publicUrl
+      }
+    }
+
+    // Insert as an adopted cat (shows in stories)
+    const { error } = await supabase
+      .from('adoption_cats')
+      .insert({
+        ngo_id:      user.id,
+        name:        addForm.cat_name,
+        breed:       addForm.breed    || null,
+        age:         addForm.age      || null,
+        city:        addForm.location || 'Unknown',
+        description: addForm.storyline,
+        storyline:   addForm.storyline,
+        image_url:   imageUrl,
+        status:      'adopted',
+        adopted_at:  new Date().toISOString(),
+        gender:      'unknown',
+      })
+
+    if (error) {
+      setActionMsg('❌ Failed to add story: ' + error.message)
+      setAddSubmitting(false)
+      return
+    }
+
+    setActionMsg('✅ Story added to the storybook!')
+    setShowAddModal(false)
+    setAddForm({ cat_name: '', breed: '', age: '', location: '', storyline: '' })
+    setAddImage(null)
+    setAddImagePreview(null)
+    setAddSubmitting(false)
+    setTimeout(() => setActionMsg(''), 3000)
+    fetchStories()
+  }
+
   const decorStickers = ['🌸', '🦋', '🌿', '🐾', '💛', '✨', '🌼', '🍃']
 
-  // Simple fade transition
   const fadeVariants = {
-    enter: { opacity: 0 },
+    enter:  { opacity: 0 },
     center: { opacity: 1 },
-    exit: { opacity: 0 },
+    exit:   { opacity: 0 },
   }
 
   if (loading) {
@@ -122,23 +195,34 @@ export default function StoriesPage() {
     )
   }
 
-  if (stories.length === 0) {
+  if (stories.length === 0 && !isNGO) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
         <div className="scrapbook-case p-8 text-center max-w-md">
           <div className="text-5xl mb-4">📖</div>
-          <h3 className="text-xl font-bold text-amber-100 mb-2">The storybook is empty</h3>
-          <p className="text-amber-200/60 text-sm">Success stories will appear here when NGOs mark cats as adopted.</p>
+          <h3 className="text-xl font-bold text-amber-900 mb-2">The storybook is empty</h3>
+          <p className="text-amber-800/60 text-sm">Success stories will appear here when cats find their forever homes.</p>
         </div>
       </div>
     )
   }
 
-  const cat = stories[pageIndex]
-
   return (
     <div className="min-h-screen py-6 sm:py-10 px-4 flex flex-col items-center" style={{ background: '#EBDDC5' }}>
       <div className="w-full max-w-5xl">
+
+        {/* Page title */}
+        <div className="text-center mb-6">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-900">📖 Story Book</h1>
+          <p className="text-amber-800/60 text-sm mt-1">Every rescued cat has a tale to tell</p>
+        </div>
+
+        {/* Action message */}
+        {actionMsg && (
+          <div className="mb-4 text-center text-sm font-medium text-amber-900 bg-amber-100 border border-amber-300 px-4 py-2 rounded-xl">
+            {actionMsg}
+          </div>
+        )}
 
         <div className="scrapbook-case relative">
           {/* Leather stitching */}
@@ -176,7 +260,7 @@ export default function StoriesPage() {
 
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
-                  key={`left-${cat.id}`}
+                  key={isAddPage ? 'add-left' : `left-${cat?.id}`}
                   custom={direction}
                   variants={fadeVariants}
                   initial="enter"
@@ -189,53 +273,79 @@ export default function StoriesPage() {
                   onDragEnd={handleDragEnd}
                   className="relative z-[5] h-full flex flex-col cursor-grab active:cursor-grabbing"
                 >
-                  {/* Name + details card */}
-                  <div className="bg-white p-4 sm:p-5 mb-4 shadow-md"
-                    style={{ borderRadius: '4px', transform: 'rotate(-1.5deg)' }}
-                  >
-                    <h2 className="text-xl sm:text-2xl font-black text-gray-900 uppercase tracking-wide mb-3">
-                      {cat.name}
-                    </h2>
-                    <div className="space-y-1 text-sm text-gray-700"
-                      style={{ fontFamily: "'Courier New', monospace" }}
-                    >
-                      {cat.breed && <p>// Breed: <span className="font-bold">{cat.breed}</span></p>}
-                      {cat.age && <p>// Age: <span className="font-bold">{cat.age}</span></p>}
-                      <p>// Location: <span className="font-bold">{cat.city}</span></p>
-                      {cat.ngo_profiles?.org_name && (
-                        <p>// Rescued by: <span className="font-bold">{cat.ngo_profiles.org_name}</span></p>
-                      )}
-                      {cat.adopted_at && (
-                        <p>// Adopted: <span className="font-bold">{timeAgo(cat.adopted_at)}</span></p>
-                      )}
+                  {isAddPage ? (
+                    /* ── ADD PAGE (NGO only) ── */
+                    <div className="flex flex-col items-center justify-center h-full text-center">
+                      <button
+                        onClick={() => setShowAddModal(true)}
+                        className="w-20 h-20 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition mb-4 hover:scale-105"
+                      >
+                        <Plus size={36} />
+                      </button>
+                      <h3 className="text-white font-bold text-lg mb-1">Add a New Story</h3>
+                      <p className="text-teal-200 text-xs max-w-[180px]">
+                        Share a rescue story from your NGO
+                      </p>
                     </div>
-                  </div>
-
-                  {/* Polaroid */}
-                  <div className="flex justify-center mt-auto">
-                    <div className="relative">
-                      <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 rounded-sm z-10"
-                        style={{ background: 'linear-gradient(135deg, #d4a056, #c4903e)', boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
-                      />
-                      <div className="bg-white p-2 pb-6 shadow-xl" style={{ transform: 'rotate(-2deg)' }}>
-                        {cat.image_url ? (
-                          <img src={cat.image_url} alt={cat.name} className="w-36 h-36 sm:w-44 sm:h-44 object-cover" />
-                        ) : (
-                          <div className="w-36 h-36 sm:w-44 sm:h-44 bg-amber-50 flex items-center justify-center text-5xl">🐱</div>
-                        )}
-                        <p className="text-center text-[10px] text-gray-500 mt-1"
-                          style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}
-                        >{cat.name} 💛</p>
+                  ) : cat ? (
+                    <>
+                      {/* Cat info card */}
+                      <div className="bg-white p-4 sm:p-5 mb-4 shadow-md" style={{ borderRadius: '4px', transform: 'rotate(-1.5deg)' }}>
+                        <div className="flex items-start justify-between">
+                          <h2 className="text-xl sm:text-2xl font-black text-gray-900 uppercase tracking-wide mb-3">
+                            {cat.name}
+                          </h2>
+                          {/* NGO can delete their own stories */}
+                          {isNGO && cat.ngo_id === user?.id && (
+                            <button
+                              onClick={() => handleDeleteStory(cat.id)}
+                              className="text-red-400 hover:text-red-600 transition p-1"
+                              title="Remove from storybook"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                        <div className="space-y-1 text-sm text-gray-700" style={{ fontFamily: "'Courier New', monospace" }}>
+                          {cat.breed && <p>// Breed: <span className="font-bold">{cat.breed}</span></p>}
+                          {cat.age && <p>// Age: <span className="font-bold">{cat.age}</span></p>}
+                          <p>// Location: <span className="font-bold">{cat.city}</span></p>
+                          {cat.ngo_profiles?.org_name && (
+                            <p>// Rescued by: <span className="font-bold">{cat.ngo_profiles.org_name}</span></p>
+                          )}
+                          {cat.adopted_at && (
+                            <p>// Adopted: <span className="font-bold">{timeAgo(cat.adopted_at)}</span></p>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  </div>
 
-                  <div className="absolute bottom-6 left-4 text-lg opacity-50" style={{ transform: 'rotate(-15deg)' }}>
-                    {decorStickers[pageIndex % decorStickers.length]}
-                  </div>
-                  <div className="absolute top-20 right-6 text-sm opacity-40" style={{ transform: 'rotate(10deg)' }}>
-                    {decorStickers[(pageIndex + 3) % decorStickers.length]}
-                  </div>
+                      {/* Polaroid photo */}
+                      <div className="flex justify-center mt-auto">
+                        <div className="relative">
+                          <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-3 rounded-sm z-10"
+                            style={{ background: 'linear-gradient(135deg, #d4a056, #c4903e)', boxShadow: '0 2px 4px rgba(0,0,0,0.3)' }}
+                          />
+                          <div className="bg-white p-2 pb-6 shadow-xl" style={{ transform: 'rotate(-2deg)' }}>
+                            {cat.image_url ? (
+                              <img src={cat.image_url} alt={cat.name} className="w-36 h-36 sm:w-44 sm:h-44 object-cover" />
+                            ) : (
+                              <div className="w-36 h-36 sm:w-44 sm:h-44 bg-amber-50 flex items-center justify-center text-5xl">🐱</div>
+                            )}
+                            <p className="text-center text-[10px] text-gray-500 mt-1" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
+                              {cat.name} 💛
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="absolute bottom-6 left-4 text-lg opacity-50" style={{ transform: 'rotate(-15deg)' }}>
+                        {decorStickers[pageIndex % decorStickers.length]}
+                      </div>
+                      <div className="absolute top-20 right-6 text-sm opacity-40" style={{ transform: 'rotate(10deg)' }}>
+                        {decorStickers[(pageIndex + 3) % decorStickers.length]}
+                      </div>
+                    </>
+                  ) : null}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -259,7 +369,7 @@ export default function StoriesPage() {
                 borderLeft: '3px solid #3d2b1a',
               }}
             >
-              {/* Static decorations */}
+              {/* Static decorations — keep exactly as your teammate built */}
               <div className="absolute inset-0 opacity-20 pointer-events-none"
                 style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%23000' fill-opacity='.15'/%3E%3Ccircle cx='10' cy='10' r='0.5' fill='%23000' fill-opacity='.1'/%3E%3Ccircle cx='50' cy='50' r='0.8' fill='%23000' fill-opacity='.12'/%3E%3C/svg%3E")` }}
               />
@@ -290,10 +400,9 @@ export default function StoriesPage() {
                 </div>
               </div>
 
-              {/* Animated content */}
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
-                  key={`right-${cat.id}`}
+                  key={isAddPage ? 'add-right' : `right-${cat?.id}`}
                   custom={direction}
                   variants={fadeVariants}
                   initial="enter"
@@ -302,35 +411,48 @@ export default function StoriesPage() {
                   transition={{ duration: 0.5 }}
                   className="relative z-[5] h-full flex flex-col"
                 >
-                  {/* Stories header */}
-                  <div className="mb-4">
-                    <div className="inline-block bg-white/90 px-4 py-2 shadow-md"
-                      style={{ transform: 'rotate(1deg)', backgroundImage: 'repeating-linear-gradient(transparent, transparent 19px, #e0e0e0 19px, #e0e0e0 20px)', borderRadius: '2px' }}
-                    >
-                      <h2 className="text-xl sm:text-2xl font-bold text-gray-800"
-                        style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}
-                      >Stories</h2>
+                  {isAddPage ? (
+                    <div className="flex flex-col items-center justify-center h-full text-center px-4">
+                      <div className="text-4xl mb-3">✍️</div>
+                      <p className="text-amber-900 font-medium text-sm" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                        As an NGO, you can add rescued cat stories that didn&apos;t go through the adoption flow — street rescues, rare finds, or special cases.
+                      </p>
+                      <button
+                        onClick={() => setShowAddModal(true)}
+                        className="mt-4 bg-amber-800 hover:bg-amber-900 text-white px-5 py-2 rounded-xl text-sm font-semibold transition"
+                      >
+                        + Write a Story
+                      </button>
                     </div>
-                  </div>
+                  ) : cat ? (
+                    <>
+                      <div className="mb-4">
+                        <div className="inline-block bg-white/90 px-4 py-2 shadow-md"
+                          style={{ transform: 'rotate(1deg)', backgroundImage: 'repeating-linear-gradient(transparent, transparent 19px, #e0e0e0 19px, #e0e0e0 20px)', borderRadius: '2px' }}
+                        >
+                          <h2 className="text-xl sm:text-2xl font-bold text-gray-800" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
+                            Stories
+                          </h2>
+                        </div>
+                      </div>
 
-                  {/* Story note */}
-                  <div className="relative bg-white/90 p-4 sm:p-5 shadow-lg mt-2 overflow-y-auto"
-                    style={{ transform: 'rotate(0.5deg)', borderRadius: '2px', backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #f0e8e0 27px, #f0e8e0 28px)', maxHeight: '340px' }}
-                  >
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-4 opacity-60 z-10"
-                      style={{ background: 'linear-gradient(135deg, #f0e68c, #daa520)', borderRadius: '2px' }}
-                    />
-                    <p className="text-gray-700 text-base sm:text-lg leading-relaxed pt-2"
-                      style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}
-                    >
-                      {cat.storyline || 'This cat found their forever home! A beautiful story of rescue, love, and hope. 🐾'}
-                    </p>
-                    <div className="mt-6 flex justify-end">
-                      <div className="inline-block border-3 border-green-600 text-green-700 px-4 py-2 uppercase font-black text-xs tracking-widest"
-                        style={{ transform: 'rotate(-4deg)', borderWidth: '3px', borderRadius: '4px', opacity: 0.8 }}
-                      >🎉 Adopted!</div>
-                    </div>
-                  </div>
+                      <div className="relative bg-white/90 p-4 sm:p-5 shadow-lg mt-2 overflow-y-auto"
+                        style={{ transform: 'rotate(0.5deg)', borderRadius: '2px', backgroundImage: 'repeating-linear-gradient(transparent, transparent 27px, #f0e8e0 27px, #f0e8e0 28px)', maxHeight: '340px' }}
+                      >
+                        <div className="absolute -top-2 left-1/2 -translate-x-1/2 w-12 h-4 opacity-60 z-10"
+                          style={{ background: 'linear-gradient(135deg, #f0e68c, #daa520)', borderRadius: '2px' }}
+                        />
+                        <p className="text-gray-700 text-base sm:text-lg leading-relaxed pt-2" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
+                          {cat.storyline || 'This cat found their forever home — a beautiful story of rescue and love. 🐾'}
+                        </p>
+                        <div className="mt-6 flex justify-end">
+                          <div className="inline-block border-green-600 text-green-700 px-4 py-2 uppercase font-black text-xs tracking-widest"
+                            style={{ transform: 'rotate(-4deg)', borderWidth: '3px', borderStyle: 'solid', borderRadius: '4px', opacity: 0.8 }}
+                          >🎉 Adopted {timeAgo(cat.adopted_at)}</div>
+                        </div>
+                      </div>
+                    </>
+                  ) : null}
                 </motion.div>
               </AnimatePresence>
             </div>
@@ -339,9 +461,7 @@ export default function StoriesPage() {
 
         {/* Navigation */}
         <div className="flex items-center justify-center gap-4 mt-6">
-          <button
-            onClick={goPrev}
-            disabled={pageIndex === 0}
+          <button onClick={goPrev} disabled={pageIndex === 0}
             className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             style={{ background: '#3d2b1a', color: '#F3D58D' }}
           >
@@ -357,9 +477,7 @@ export default function StoriesPage() {
             </p>
           </div>
 
-          <button
-            onClick={goNext}
-            disabled={pageIndex === totalPages - 1}
+          <button onClick={goNext} disabled={pageIndex === totalPages - 1}
             className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             style={{ background: '#3d2b1a', color: '#F3D58D' }}
           >
@@ -367,10 +485,88 @@ export default function StoriesPage() {
           </button>
         </div>
 
-        <p className="sm:hidden text-xs text-center text-[#2E4365]/50 mt-2">
-          ← Swipe left or right →
-        </p>
+        <p className="sm:hidden text-xs text-center text-[#2E4365]/50 mt-2">← Swipe left or right →</p>
       </div>
+
+      {/* ── Add Story Modal (NGO only) ── */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-3xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col overflow-hidden">
+
+            <div className="flex items-center justify-between px-6 py-4 border-b border-amber-100 bg-amber-50">
+              <h3 className="font-bold text-amber-900">✍️ Add a Rescue Story</h3>
+              <button onClick={() => setShowAddModal(false)} className="text-gray-400 hover:text-gray-600 text-xl">✕</button>
+            </div>
+
+            <form onSubmit={handleAddStory} className="flex-1 overflow-y-auto px-6 py-5 space-y-4">
+
+              {/* Photo */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Cat Photo</label>
+                {addImagePreview ? (
+                  <div className="relative">
+                    <img src={addImagePreview} alt="Preview" className="w-full h-36 object-cover rounded-xl" />
+                    <button type="button" onClick={() => { setAddImage(null); setAddImagePreview(null) }}
+                      className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full">
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-amber-300 rounded-xl cursor-pointer bg-amber-50 hover:bg-amber-100 transition">
+                    <span className="text-2xl mb-1">📷</span>
+                    <span className="text-xs text-amber-600 font-medium">Upload photo</span>
+                    <input type="file" accept="image/*" className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0]
+                        if (!f) return
+                        setAddImage(f)
+                        setAddImagePreview(URL.createObjectURL(f))
+                      }}
+                    />
+                  </label>
+                )}
+              </div>
+
+              {/* Fields */}
+              {[
+                { label: "Cat's Name *",   key: 'cat_name',  placeholder: 'e.g. Luna',           required: true  },
+                { label: 'Breed',          key: 'breed',     placeholder: 'e.g. Tabby, Persian',  required: false },
+                { label: 'Age',            key: 'age',       placeholder: 'e.g. 2 years',         required: false },
+                { label: 'Rescue Location',key: 'location',  placeholder: 'Where was cat found?', required: false },
+              ].map((f) => (
+                <div key={f.key}>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">{f.label}</label>
+                  <input
+                    type="text"
+                    value={addForm[f.key]}
+                    onChange={(e) => setAddForm((p) => ({ ...p, [f.key]: e.target.value }))}
+                    placeholder={f.placeholder}
+                    required={f.required}
+                    className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm"
+                  />
+                </div>
+              ))}
+
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-widest mb-1">Rescue Story *</label>
+                <textarea
+                  value={addForm.storyline}
+                  onChange={(e) => setAddForm((p) => ({ ...p, storyline: e.target.value }))}
+                  placeholder="Tell the story of how this cat was rescued, their recovery, and how they found their home..."
+                  required
+                  rows={5}
+                  className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-amber-400 transition text-sm resize-none"
+                />
+              </div>
+
+              <button type="submit" disabled={addSubmitting}
+                className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white font-bold py-3 rounded-xl transition">
+                {addSubmitting ? 'Adding story...' : '📖 Add to Storybook'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

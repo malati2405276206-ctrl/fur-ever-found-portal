@@ -6,6 +6,8 @@ import { supabase } from '@/lib/supabase'
 import { useChatContext } from '@/context/ChatContext'
 import { getDirectionsUrl } from '@/lib/directions'
 import Link from 'next/link'
+import { useAuth } from '@/hooks/useAuth'
+import { useRole } from '@/hooks/useRole'
 
 export default function AdoptionPage() {
   const [cats,       setCats]       = useState([])
@@ -14,6 +16,8 @@ export default function AdoptionPage() {
   const [filter,     setFilter]     = useState('all')
   const [searchCity, setSearchCity] = useState('')
   const [selectedCat, setSelectedCat] = useState(null)
+  const { user } = useAuth()
+  const { isNGO } = useRole()
 
   useEffect(() => {
     fetchCats()
@@ -157,13 +161,15 @@ export default function AdoptionPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10">
                 {filteredCats.map((cat) => (
-                  <AdoptionCard
-                    key={cat.id}
-                    cat={cat}
-                    ngoName={ngoNames[cat.ngo_id]}
-                    onClick={() => setSelectedCat(cat)}
-                  />
-                ))}
+                    <AdoptionCard
+                      key={cat.id}
+                      cat={cat}
+                      ngoName={ngoNames[cat.ngo_id]}
+                      currentUserId={user?.id}
+                      isNGO={isNGO}
+                      onClick={() => setSelectedCat(cat)}
+                    />
+                  ))}
               </div>
             </>
           )}
@@ -192,6 +198,8 @@ export default function AdoptionPage() {
         <CatDetailModal
           cat={selectedCat}
           ngoName={ngoNames[selectedCat.ngo_id]}
+          currentUserId={user?.id}
+          isNGO={isNGO}
           onClose={() => setSelectedCat(null)}
         />
       )}
@@ -200,9 +208,11 @@ export default function AdoptionPage() {
 }
 
 // ── Adoption Card (Polaroid Style) ────────────────────────────────────
-function AdoptionCard({ cat, ngoName, onClick }) {
+function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, }) 
+{
   const genderEmoji = { male: '♂', female: '♀', unknown: '?' }
   const { openChat } = useChatContext()
+  const isOwnCat = currentUserId === cat.ngo_id
 
   const handleAdopt = (e) => {
     e.stopPropagation()
@@ -263,16 +273,27 @@ function AdoptionCard({ cat, ngoName, onClick }) {
             <p className="text-[11px] text-purple-400 font-medium truncate">🏢 {ngoName}</p>
           )}
 
-          {/* Adopt button */}
-          <button
-            onClick={handleAdopt}
-            className="w-full mt-2 py-2 rounded-lg font-semibold text-xs transition-all duration-200 text-white shadow-sm hover:shadow-md"
-            style={{ fontFamily: "sans-serif", background: '#e8837c', }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#d9706a'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#e8837c'}
-          >
-            🐱 I Want to Adopt
-          </button>
+          <div className="mt-2 space-y-2">
+            {isOwnCat ? (
+              <Link
+                href="/ngo-dashboard"
+                onClick={(e) => e.stopPropagation()}
+                className="block w-full text-center py-2 rounded-lg font-semibold text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 transition"
+              >
+                ✏️ Manage in Dashboard
+              </Link>
+            ) : !isNGO ? (
+              <button
+                onClick={handleAdopt}
+                className="w-full py-2 rounded-lg font-semibold text-xs transition-all duration-200 text-white shadow-sm hover:shadow-md"
+                style={{ fontFamily: 'sans-serif', background: '#e8837c' }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = '#d9706a')}
+                onMouseLeave={(e) => (e.currentTarget.style.background = '#e8837c')}
+              >
+                🐱 I Want to Adopt
+              </button>
+            ) : null}
+          </div>
         </div>
       </div>
     </div>
@@ -280,8 +301,10 @@ function AdoptionCard({ cat, ngoName, onClick }) {
 }
 
 // ── Cat Detail (Full Screen Overlay) ────────────────────────────
-function CatDetailModal({ cat, ngoName, onClose }) {
+function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose }) 
+{
   const { openChat } = useChatContext()
+  const isOwnCat = currentUserId === cat.ngo_id
 
   const handleMessage = () => {
     openChat({
@@ -402,12 +425,21 @@ function CatDetailModal({ cat, ngoName, onClose }) {
 
             {/* Actions */}
             <div className="space-y-3">
-              <button
-                onClick={handleMessage}
-                className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 bg-pink-400 hover:bg-pink-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300"
-              >
-                🐱 I Want to Adopt
-              </button>
+              {isOwnCat ? (
+                <Link
+                  href="/ngo-dashboard"
+                  className="block w-full text-center py-4 rounded-2xl font-semibold text-base bg-purple-100 hover:bg-purple-200 text-purple-700 transition"
+                >
+                  ✏️ Manage in Dashboard
+                </Link>
+              ) : !isNGO ? (
+                <button
+                  onClick={handleMessage}
+                  className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 bg-pink-400 hover:bg-pink-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300"
+                >
+                  🐱 I Want to Adopt
+                </button>
+              ) : null}
 
               {cat.latitude && cat.longitude && (
                 <a
