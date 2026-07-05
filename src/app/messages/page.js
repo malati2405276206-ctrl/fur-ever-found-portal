@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
 import { useChat } from '@/hooks/useChat'
@@ -11,6 +11,7 @@ import ProtectedRoute from '@/components/ProtectedRoute'
 function MessagesContent() {
   const { user } = useAuth()
   const searchParams = useSearchParams()
+  const router = useRouter()
   const targetConvoId = searchParams.get('conversation')
 
   const [conversations, setConversations] = useState([])
@@ -33,10 +34,22 @@ function MessagesContent() {
     setLoadingList(true)
 
     const { data, error } = await supabase
-      .from('conversations')
-      .select('*')
-      .or(`initiator_id.eq.${user.id},recipient_id.eq.${user.id}`)
-      .order('last_message_at', { ascending: false })
+    .from('conversations')
+    .select(`
+      *,
+      initiator:profiles!conversations_initiator_id_fkey (
+        id,
+        full_name,
+        role
+      ),
+      recipient:profiles!conversations_recipient_id_fkey (
+        id,
+        full_name,
+        role
+      )
+    `)
+    .or(`initiator_id.eq.${user.id},recipient_id.eq.${user.id}`)
+    .order('last_message_at', { ascending: false })
 
     if (!error) {
       setConversations(data || [])
@@ -68,6 +81,13 @@ function MessagesContent() {
 
   const typeLabel = { lost: '😿 Lost Cat', found: '😊 Found Cat', adoption: '🏠 Adoption' }
   const typeColor = { lost: 'bg-red-50 text-red-600', found: 'bg-emerald-50 text-emerald-600', adoption: 'bg-amber-50 text-amber-700' }
+  const getOtherUser = (convo) => {
+    if (!convo || !user) return null
+
+    return convo.initiator_id === user.id
+      ? convo.recipient
+      : convo.initiator
+  }
 
   return (
     <div className="min-h-screen py-6 px-4" style={{ background: 'var(--background)' }}>
@@ -161,12 +181,34 @@ function MessagesContent() {
                         </div>
 
                         <div className="flex-1 min-w-0">
-                          {/* Type badge */}
-                          <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold ${typeColor[convo.cat_type]}`}>
-                            {convo.cat_type === 'lost' ? 'Lost' : convo.cat_type === 'found' ? 'Found' : 'Adoption'}
-                          </span>
-                          {/* Time */}
-                          <p className="text-[11px] text-gray-400 mt-1">{formatTime(convo.last_message_at)}</p>
+                          <div className="flex items-center justify-between gap-2">
+                            <p
+                              className="font-semibold text-sm truncate"
+                              style={{ color: 'var(--foreground)' }}
+                            >
+                              {getOtherUser(convo)?.full_name || 'Unknown User'}
+                            </p>
+
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${typeColor[convo.cat_type]}`}>
+                              {convo.cat_type === 'lost'
+                                ? 'Lost'
+                                : convo.cat_type === 'found'
+                                ? 'Found'
+                                : 'Adoption'}
+                            </span>
+                          </div>
+
+                          <p className="text-[11px] text-gray-500 mt-1 capitalize">
+                            {getOtherUser(convo)?.role || 'user'}
+                          </p>
+
+                          <p className="text-sm font-semibold mt-1" style={{ color: 'var(--foreground)' }}>
+                            {getOtherUser(convo)?.full_name || 'Unknown User'}
+                          </p>
+
+                          <p className="text-[11px] text-gray-400">
+                            {formatTime(convo.last_message_at)}
+                          </p>
                         </div>
                       </div>
 
@@ -216,10 +258,14 @@ function MessagesContent() {
 
                     <div className="flex-1">
                       <p className="font-semibold text-sm" style={{ color: 'var(--foreground)' }}>
+                        {getOtherUser(activeConvo)?.full_name || 'Unknown User'}
+                      </p>
+
+                      <p className="text-[11px] text-gray-400">
                         {typeLabel[activeConvo.cat_type]}
                       </p>
-                      <p className="text-[11px] text-gray-400">Active conversation</p>
                     </div>
+                    <button onClick={() => router.push(`/profile/${getOtherUser(activeConvo)?.id}`)} className="text-xs px-3 py-1.5 rounded-full border transition hover:bg-gray-50" style={{ borderColor: 'var(--buff)' }}> View Profile </button>
 
                     {/* Optional status dot */}
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-100" />

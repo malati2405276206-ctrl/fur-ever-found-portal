@@ -14,6 +14,7 @@ export default function LostCatsPage() {
   const [cats, setCats] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
+  const [selectedLocation, setSelectedLocation] = useState('all')
   const [filterStatus, setFilterStatus] = useState('lost')
   const [selectedCat, setSelectedCat] = useState(null)
 
@@ -59,7 +60,15 @@ export default function LostCatsPage() {
       setSelectedCat((prev) => ({ ...prev, status: 'reunited' }))
     }
   }
-
+  const locations = [
+    'all',
+    ...new Set(
+      cats
+        .map((cat) => cat.location)
+        .filter(Boolean)
+    ),
+  ]
+  
   const filteredCats = cats.filter((cat) => {
     const matchesStatus = filterStatus === 'all' || cat.status === filterStatus
     const matchesSearch =
@@ -67,7 +76,10 @@ export default function LostCatsPage() {
       cat.name.toLowerCase().includes(search.toLowerCase()) ||
       cat.location.toLowerCase().includes(search.toLowerCase()) ||
       cat.description.toLowerCase().includes(search.toLowerCase())
-    return matchesStatus && matchesSearch
+    const matchesLocation =
+      selectedLocation === 'all' ||
+      cat.location === selectedLocation
+    return matchesStatus && matchesSearch && matchesLocation
   })
 
   return (
@@ -135,6 +147,30 @@ export default function LostCatsPage() {
             >
               🗺️ Map
             </Link>
+          </div>
+        </div>
+        <div className="max-w-5xl mx-auto mt-4">
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {locations.map((location) => (
+              <button
+                key={location}
+                onClick={() => setSelectedLocation(location)}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
+                  selectedLocation === location
+                    ? 'text-white'
+                    : 'bg-white border border-gray-200 text-gray-600 hover:border-[#E59D2C]'
+                }`}
+                style={
+                  selectedLocation === location
+                    ? { background: '#E59D2C' }
+                    : {}
+                }
+              >
+                {location === 'all'
+                  ? '🌍 All Locations'
+                  : `📍 ${location}`}
+              </button>
+            ))}
           </div>
         </div>
       </section>

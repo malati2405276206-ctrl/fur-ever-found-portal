@@ -23,11 +23,12 @@ function ReportForm() {
   const [description,   setDescription]   = useFormPersist('report_desc',    '')
   const [contactEmail,  setContactEmail]  = useFormPersist('report_email',   '')
   const [contactPhone,  setContactPhone]  = useFormPersist('report_phone',   '')
+  const [location, setLocation]           = useFormPersist('report_location', '')
+  const [latitude, setLatitude]           = useFormPersist('report_latitude', null)
+  const [longitude, setLongitude]         = useFormPersist('report_longitude', null)
 
   // Non-persisted states
-  const [location,     setLocation]     = useState('')
-  const [latitude,     setLatitude]     = useState(null)
-  const [longitude,    setLongitude]    = useState(null)
+
   const [imageFile,    setImageFile]    = useState(null)
   const [imagePreview, setImagePreview] = useState(null)
   const [loading,      setLoading]      = useState(false)
@@ -53,7 +54,16 @@ function ReportForm() {
   const handleRemoveImage = () => { setImageFile(null); setImagePreview(null) }
 
   const clearForm = () => {
-    clearPersistedForm(['report_type', 'report_name', 'report_desc', 'report_email', 'report_phone'])
+    clearPersistedForm([
+  'report_type',
+  'report_name',
+  'report_desc',
+  'report_email',
+  'report_phone',
+  'report_location',
+  'report_latitude',
+  'report_longitude'
+])
     setCatName('')
     setDescription('')
     setContactPhone('')
@@ -297,7 +307,7 @@ function ReportForm() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form id="report-form" onSubmit={handleSubmit} className="space-y-6">
 
               {/* Report type toggle */}
               <div>

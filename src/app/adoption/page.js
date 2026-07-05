@@ -8,6 +8,7 @@ import { getDirectionsUrl } from '@/lib/directions'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useRole } from '@/hooks/useRole'
+import { useRouter } from 'next/navigation'
 
 export default function AdoptionPage() {
   const [cats,       setCats]       = useState([])
@@ -15,9 +16,11 @@ export default function AdoptionPage() {
   const [loading,    setLoading]    = useState(true)
   const [filter,     setFilter]     = useState('all')
   const [searchCity, setSearchCity] = useState('')
+  const [selectedLocation, setSelectedLocation] = useState('all')
   const [selectedCat, setSelectedCat] = useState(null)
   const { user } = useAuth()
   const { isNGO } = useRole()
+  const router = useRouter()
 
   useEffect(() => {
     fetchCats()
@@ -58,10 +61,28 @@ export default function AdoptionPage() {
     setLoading(false)
   }
 
+  const locations = [
+    'all',
+    ...new Set(
+      cats
+        .map((cat) => cat.city)
+        .filter(Boolean)
+    ),
+  ]
+
   const filteredCats = cats.filter((cat) => {
-    const matchesGender = filter === 'all' || cat.gender === filter
-    const matchesCity   = searchCity === '' || cat.city.toLowerCase().includes(searchCity.toLowerCase())
-    return matchesGender && matchesCity
+    const matchesGender =
+      filter === 'all' || cat.gender === filter
+
+    const matchesSearch =
+      searchCity === '' ||
+      cat.city?.toLowerCase().includes(searchCity.toLowerCase())
+
+    const matchesLocation =
+      selectedLocation === 'all' ||
+      cat.city === selectedLocation
+
+    return matchesGender && matchesSearch && matchesLocation
   })
 
   return (
@@ -108,6 +129,28 @@ export default function AdoptionPage() {
             placeholder="🔍 Search by city..."
             className="w-full max-w-md mx-auto block px-4 py-2.5 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-pink-300 transition text-sm bg-white"
           />
+          <div className="flex gap-2 overflow-x-auto pb-2 mt-4">
+            {locations.map((location) => (
+              <button
+                key={location}
+                onClick={() => setSelectedLocation(location)}
+                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
+                  selectedLocation === location
+                    ? 'text-white'
+                    : 'bg-white border border-gray-200 text-gray-600 hover:border-pink-300'
+                }`}
+                style={
+                  selectedLocation === location
+                    ? { background: '#ec4899' }
+                    : {}
+                }
+              >
+                {location === 'all'
+                  ? '🌍 All Cities'
+                  : `📍 ${location}`}
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -211,17 +254,18 @@ export default function AdoptionPage() {
 function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, }) 
 {
   const genderEmoji = { male: '♂', female: '♀', unknown: '?' }
-  const { openChat } = useChatContext()
+  const router = useRouter()
   const isOwnCat = currentUserId === cat.ngo_id
 
   const handleAdopt = (e) => {
     e.stopPropagation()
-    openChat({
-      catType: 'adoption',
-      catId: cat.id,
-      recipientId: cat.ngo_id,
-      catLabel: cat.name,
-    })
+
+    if (!currentUserId) {
+      router.push('/login')
+      return
+    }
+
+    router.push(`/adoption/${cat.id}/apply`)
   }
 
   return (
@@ -305,14 +349,15 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
 {
   const { openChat } = useChatContext()
   const isOwnCat = currentUserId === cat.ngo_id
+  const router = useRouter()
 
   const handleMessage = () => {
-    openChat({
-      catType: 'adoption',
-      catId: cat.id,
-      recipientId: cat.ngo_id,
-      catLabel: cat.name,
-    })
+    if (!currentUserId) {
+      router.push('/login')
+      return
+    }
+
+    router.push(`/adoption/${cat.id}/apply`)
   }
 
   // Close on escape key
@@ -389,12 +434,12 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
               )}
               {cat.breed && (
                 <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-600 border border-green-100">
-                  � {cat.breed}
+                  🐾 {cat.breed}
                 </span>
               )}
               {cat.city && (
                 <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-100">
-                  � {cat.city}
+                  📍 {cat.city}
                 </span>
               )}
             </div>

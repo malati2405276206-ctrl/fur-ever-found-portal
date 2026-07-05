@@ -4,12 +4,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { useChat } from '@/hooks/useChat'
 import { supabase } from '@/lib/supabase'
+import { useRouter } from 'next/navigation'
 
 export default function ChatPanel({ isOpen, onClose, currentUserId, catType, catId, recipientId, catLabel }) {
   const { conversationId, messages, loading, sending, openConversation, sendMessage, closeConversation } = useChat(currentUserId)
   const [input, setInput] = useState('')
   const [recipientName, setRecipientName] = useState('')
   const messagesEndRef = useRef(null)
+  const router = useRouter()
 
   useEffect(() => {
     if (isOpen && currentUserId && recipientId) {
@@ -17,7 +19,7 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
       fetchRecipientName()
     }
     return () => {
-      if (!isOpen) closeConversation()
+      closeConversation()
     }
   }, [isOpen])
 
@@ -53,8 +55,16 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100" style={{ background: 'var(--buff)' }}>
           <div>
-            <p className="font-bold text-gray-900 text-sm">{recipientName}</p>
-            <p className="text-xs text-gray-400">About: {catLabel}</p>
+            <button
+              onClick={() => router.push('/profile')}
+              className="font-bold text-gray-900 text-sm hover:underline text-left"
+            >
+              {recipientName}
+            </button>
+
+            <p className="text-xs text-gray-400">
+              About: {catLabel}
+            </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl transition">✕</button>
         </div>

@@ -25,11 +25,13 @@ function ProfileContent() {
   const [error,      setError]      = useState('')
 
   // Edit profile states
-  const [editMode,     setEditMode]     = useState(false)
-  const [editName,     setEditName]     = useState('')
-  const [editPhone,    setEditPhone]    = useState('')
-  const [savingProfile, setSavingProfile] = useState(false)
-  const [profileMsg,   setProfileMsg]   = useState('')
+  const [editMode,     setEditMode]               = useState(false)
+  const [editName,     setEditName]               = useState('')
+  const [editPhone,    setEditPhone]              = useState('')
+  const [savingProfile, setSavingProfile]         = useState(false)
+  const [profileMsg,   setProfileMsg]             = useState('')
+  const [editAvatar,        setEditAvatar]        = useState(null)
+  const [editAvatarPreview, setEditAvatarPreview] = useState(null)
 
   // Edit cat states
   const [editCat,      setEditCat]      = useState(null)
@@ -145,28 +147,50 @@ function ProfileContent() {
   }
 
   const handleSaveProfile = async () => {
-    setSavingProfile(true)
-    setProfileMsg('')
+  setSavingProfile(true)
+  setProfileMsg('')
 
-    const { error } = await supabase
-      .from('profiles')
-      .update({
-        full_name: editName.trim(),
-        phone:     editPhone.trim() || null,
-      })
-      .eq('id', user.id)
+  let avatarUrl = profile?.avatar_url || null
 
-    if (error) {
-      setProfileMsg('Failed to save. Please try again.')
-    } else {
-      setProfileMsg('✅ Profile updated!')
-      setProfile((prev) => ({ ...prev, full_name: editName, phone: editPhone }))
-      setEditMode(false)
-      setTimeout(() => setProfileMsg(''), 3000)
+  // Upload new avatar if selected
+  if (editAvatar) {
+    const fileExt  = editAvatar.name.split('.').pop().toLowerCase()
+    const fileName = `avatar_${user.id}_${Date.now()}.${fileExt}`
+
+    const { error: uploadError } = await supabase.storage
+      .from('cat-images')
+      .upload(fileName, editAvatar)
+
+    if (!uploadError) {
+      const { data: urlData } = supabase.storage
+        .from('cat-images')
+        .getPublicUrl(fileName)
+      avatarUrl = urlData.publicUrl
     }
-
-    setSavingProfile(false)
   }
+
+  const { error } = await supabase
+    .from('profiles')
+    .update({
+      full_name:  editName.trim(),
+      phone:      editPhone.trim() || null,
+      avatar_url: avatarUrl,
+    })
+    .eq('id', user.id)
+
+  if (error) {
+    setProfileMsg('Failed to save. Please try again.')
+  } else {
+    setProfileMsg('✅ Profile updated!')
+    setProfile((prev) => ({ ...prev, full_name: editName, phone: editPhone, avatar_url: avatarUrl }))
+    setEditMode(false)
+    setEditAvatar(null)
+    setEditAvatarPreview(null)
+    setTimeout(() => setProfileMsg(''), 3000)
+  }
+
+  setSavingProfile(false)
+}
 
   const handleDelete = async (id, type) => {
     setDeleting(true)
@@ -269,9 +293,13 @@ function ProfileContent() {
             <div className="relative z-10">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5">
                 <div className="flex items-center gap-4">
-                  <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full flex items-center justify-center text-4xl shrink-0 shadow-lg blob-shape" style={{ background: 'var(--gold-light)' }}>
-                    🐾
-                  </div>
+                    <div className="w-16 h-16 rounded-2xl bg-orange-100 flex items-center justify-center text-3xl shrink-0 overflow-hidden">
+                      {profile?.avatar_url ? (
+                        <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span>🐾</span>
+                      )}
+                    </div>
                   <div>
                     <h1 className="heading-artistic text-2xl sm:text-3xl" style={{ color: 'var(--police-blue)' }}>
                       {profile?.full_name || 'Cat Lover'}
@@ -327,6 +355,30 @@ function ProfileContent() {
             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10">
               <h2 className="heading-artistic text-xl mb-5" style={{ color: 'var(--police-blue)' }}>Edit Profile</h2>
               <div className="space-y-4">
+                {/* Photo upload — add at top of edit form */}
+                  <div>
+                    <label className="block text-xs font-medium text-gray-500 mb-2">Profile Photo</label>
+                    <div className="flex items-center gap-4">
+                      <div className="w-16 h-16 rounded-2xl overflow-hidden bg-orange-100 flex items-center justify-center shrink-0">
+                        {(editAvatarPreview || profile?.avatar_url) ? (
+                          <img src={editAvatarPreview || profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-3xl">🐾</span>
+                        )}
+                      </div>
+                      <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium transition">
+                        Upload Photo
+                        <input type="file" accept="image/*" className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0]
+                            if (!f) return
+                            setEditAvatar(f)
+                            setEditAvatarPreview(URL.createObjectURL(f))
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider mb-1.5" style={{ color: 'var(--police-blue)', opacity: 0.6 }}>Full Name</label>
                   <input
