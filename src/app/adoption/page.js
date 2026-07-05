@@ -373,6 +373,27 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
 
   const genderEmoji = { male: '♂', female: '♀', unknown: '?' }
 
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      `Delete ${cat.name}'s adoption listing?`
+    )
+
+    if (!confirmed) return
+
+    const { error } = await supabase
+      .from('adoption_cats')
+      .update({ status: 'deleted' })
+      .eq('id', cat.id)
+
+    if (error) {
+      console.error(error)
+      alert(error.message)
+      return
+    }
+
+    window.location.reload()
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-white overflow-y-auto animate-fade-in">
       {/* Top navigation bar */}
@@ -471,13 +492,26 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
             {/* Actions */}
             <div className="space-y-3">
               {isOwnCat ? (
-                <Link
-                  href="/ngo-dashboard"
-                  className="block w-full text-center py-4 rounded-2xl font-semibold text-base bg-purple-100 hover:bg-purple-200 text-purple-700 transition"
-                >
-                  ✏️ Manage in Dashboard
-                </Link>
-              ) : !isNGO ? (
+                  <div className="space-y-2">
+                    <Link
+                      href="/ngo-dashboard"
+                      onClick={(e) => e.stopPropagation()}
+                      className="block w-full text-center py-2 rounded-lg font-semibold text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 transition"
+                    >
+                      ✏️ Manage in Dashboard
+                    </Link>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDelete()
+                      }}
+                      className="w-full py-2 rounded-lg font-semibold text-xs bg-red-100 hover:bg-red-200 text-red-600 transition"
+                    >
+                      🗑 Delete Listing
+                    </button>
+                  </div>
+                ) : !isNGO ? (
                 <button
                   onClick={handleMessage}
                   className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 bg-pink-400 hover:bg-pink-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300"
