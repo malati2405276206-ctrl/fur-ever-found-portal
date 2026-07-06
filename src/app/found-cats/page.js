@@ -62,93 +62,98 @@ export default function FoundCatsPage() {
   return (
     <div className="min-h-screen" style={{ background: '#EBDDC5' }}>
 
-      {/* ── Hero ── */}
-      <section className="pt-14 pb-6 px-4">
-        <div className="max-w-5xl mx-auto">
-          <h1 className="text-5xl sm:text-6xl font-black text-gray-900 mb-3 tracking-tight uppercase">
-            FOUND CATS
+      {/* ── Page Header ── */}
+      <section className="pt-10 pb-4 px-4">
+        <div className="max-w-6xl mx-auto text-center">
+          <div className="inline-flex items-center gap-2 mb-3 px-4 py-1.5 rounded-full bg-white/70 border border-[#2E4365]/30">
+            <img src="/icon-emoji/found-cat.png" alt="" width={22} height={22} />
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: '#2E4365' }}>Spotted & Safe</span>
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight" style={{ color: '#2E4365' }}>
+            Found Cats
           </h1>
-          <p className="text-gray-600 text-base mb-5">
+          <p className="text-gray-500 text-sm mt-2 max-w-md mx-auto">
             Someone found these cats. Is one of them yours? Click a card for details.
           </p>
-
-          {/* Filter pills */}
-          <div className="flex items-center gap-3 flex-wrap">
-            <span className="text-sm font-bold text-gray-800">Quick filters:</span>
-            <button
-              className="px-4 py-1.5 rounded-full text-sm font-medium border border-transparent text-white"
-              style={{ background: '#2E4365' }}
-            >
-              All
-            </button>
-            <button
-              className="px-4 py-1.5 rounded-full text-sm font-medium bg-white border border-gray-300 hover:border-[#E59D2C] transition"
-              style={{ color: '#2E4365' }}
-            >
-              Recent
-            </button>
-          </div>
         </div>
       </section>
 
-      {/* ── Search + Actions ── */}
+      {/* ── Search Bar + Actions ── */}
       <section className="px-4 pb-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row gap-3">
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by location or description..."
-            className="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#E59D2C] transition text-sm bg-white"
-          />
-          <div className="flex gap-2">
-            {user && (
+        <div className="max-w-6xl mx-auto">
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2">
+                <img src="/icon-emoji/search-icon.png" alt="" width={28} height={28} />
+              </span>
+              <input
+                type="text"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by location or description..."
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2E4365] focus:border-transparent transition text-sm bg-white shadow-sm"
+              />
+            </div>
+            <div className="flex gap-2 shrink-0">
+              {user && (
+                <Link
+                  href="/report"
+                  className="inline-flex items-center text-white px-5 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
+                  style={{ background: '#2E4365' }}
+                >
+                  + Report Found
+                </Link>
+              )}
               <Link
-                href="/report"
-                className="inline-flex items-center text-white px-5 py-3 rounded-full font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
-                style={{ background: '#2E4365' }}
+                href="/map?type=found"
+                className="inline-flex items-center border px-4 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
+                style={{ borderColor: '#2E4365', color: '#2E4365' }}
               >
-                + Report Found
+                <img src="/icon-emoji/map.png" alt="" width={18} height={18} className="inline-block mr-1.5" /> Map
               </Link>
-            )}
-            <Link
-              href="/map?type=found"
-              className="inline-flex items-center border px-5 py-3 rounded-full font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
-              style={{ borderColor: '#2E4365', color: '#2E4365' }}
-            >
-              <img src="/icon-emoji/map.png" alt="" width={30} height={30} className="inline-block mr-1" /> Map
-            </Link>
-          </div>
-        </div>
-        <div className="max-w-5xl mx-auto mt-4">
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {locations.map((location) => (
-              <button
-                key={location}
-                onClick={() => setSelectedLocation(location)}
-                className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition ${
-                  selectedLocation === location
-                    ? 'text-white'
-                    : 'bg-white border border-gray-200 text-gray-600 hover:border-[#E59D2C]'
-                }`}
-                style={
-                  selectedLocation === location
-                    ? { background: '#E59D2C' }
-                    : {}
-                }
-              >
-                {location === 'all'
-                  ? '🌍 All Locations'
-                  : location}
-              </button>
-            ))}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ── Cards Grid ── */}
+      {/* ── Main Content: Sidebar Filters + Cards ── */}
       <section className="px-4 pb-16">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
+
+          {/* Filter Sidebar */}
+          <aside className="w-full lg:w-56 shrink-0">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 lg:sticky lg:top-4">
+              <h3 className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-3">Filters</h3>
+
+              {/* Location */}
+              <div>
+                <p className="text-xs font-semibold text-gray-600 mb-2">Location</p>
+                <div className="flex flex-col gap-1 max-h-48 overflow-y-auto">
+                  {locations.map((location) => (
+                    <button
+                      key={location}
+                      onClick={() => setSelectedLocation(location)}
+                      className={`px-3 py-2 rounded-lg text-xs font-medium text-left transition-all ${
+                        selectedLocation === location
+                          ? 'text-white shadow-sm'
+                          : 'text-gray-500 hover:bg-gray-50'
+                      }`}
+                      style={
+                        selectedLocation === location
+                          ? { background: '#2E4365' }
+                          : {}
+                      }
+                    >
+                      {location === 'all' ? 'All Locations' : location}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </aside>
+
+          {/* Cards Area */}
+          <div className="flex-1 min-w-0">
 
           {/* Loading skeleton */}
           {loading && (
@@ -211,6 +216,7 @@ export default function FoundCatsPage() {
               </div>
             </>
           )}
+          </div>
         </div>
       </section>
 

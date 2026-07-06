@@ -45,23 +45,18 @@ export function useChat(currentUserId) {
 
     try {
       // Try to find existing conversation (check both directions)
-      const { data: existingList, error: findError } = await supabase
+      const { data: existing, error: findError } = await supabase
         .from('conversations')
-        .select('*')
-        .eq('cat_type', catType)
-        .eq('cat_id', catId)
+        .select('id')
         .or(
           `and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`
         )
-        .order('last_message_at', { ascending: false })
         .limit(1)
-        .single()
+        .maybeSingle()
 
-      const existing = existingList?.[0]
-
-      if (findError) {
-        console.error('Error finding conversation:', findError.message)
-      }
+      // if (findError) {
+      //   console.error('Error finding conversation:', findError.message)
+      // }
 
       let convoId = existing?.id
 
@@ -81,19 +76,16 @@ export function useChat(currentUserId) {
 
         if (createError?.code === '23505') {
           // Duplicate key race condition — fetch existing
-          const { data: retryList } = await supabase
-              .from('conversations')
-              .select('*')
-              .eq('cat_type', catType)
-              .eq('cat_id', catId)
-              .or(
-                `and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`
-              )
-              .order('last_message_at', { ascending: false })
-              .limit(1)
-              .single()
+          const { data: retry } = await supabase
+            .from('conversations')
+            .select('id')
+            .or(
+              `and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`
+            )
+            .limit(1)
+            .single()
 
-            convoId = retryList?.[0]?.id
+            convoId = retry?.id
 
         } else if (createError) {
           console.error('Error creating conversation:', createError.message)

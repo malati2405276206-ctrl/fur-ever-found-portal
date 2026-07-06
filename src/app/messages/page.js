@@ -127,7 +127,26 @@ function MessagesContent() {
 
     setConversations(uniqueConversations)
 
-    setConversations(enriched)
+    const grouped = Object.values(
+      enriched.reduce((acc, convo) => {
+        const otherUserId =
+          convo.initiator_id === user.id
+            ? convo.recipient_id
+            : convo.initiator_id
+
+        if (
+          !acc[otherUserId] ||
+          new Date(convo.last_message_at || 0) >
+            new Date(acc[otherUserId].last_message_at || 0)
+        ) {
+          acc[otherUserId] = convo
+        }
+
+        return acc
+      }, {})
+    )
+
+    setConversations(grouped)
     setLoadingList(false)
   }
 

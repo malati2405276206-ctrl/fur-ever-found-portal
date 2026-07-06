@@ -19,6 +19,7 @@ export default function Navbar() {
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [avatarUrl, setAvatarUrl] = useState(null)
 
   const isLoading = authLoading || roleLoading
 
@@ -28,6 +29,21 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Fetch user avatar
+  useEffect(() => {
+    if (!user) { setAvatarUrl(null); return }
+    const fetchAvatar = async () => {
+      const { supabase } = await import('@/lib/supabase')
+      const { data } = await supabase
+        .from('profiles')
+        .select('avatar_url')
+        .eq('id', user.id)
+        .maybeSingle()
+      if (data?.avatar_url) setAvatarUrl(data.avatar_url)
+    }
+    fetchAvatar()
+  }, [user])
 
   const handleLogout = async () => {
     await logout()
@@ -149,8 +165,12 @@ export default function Navbar() {
                 </Link>
               )}
 
-              <Link href="/profile" title="Profile" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: '#F3D58D' }}>
-                <User size={17} strokeWidth={2.2} />
+              <Link href="/profile" title="Profile" className="p-1.5 rounded-full transition hover:opacity-80 overflow-hidden" style={{ color: '#F3D58D' }}>
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: '#F3D58D' }} />
+                ) : (
+                  <User size={17} strokeWidth={2.2} />
+                )}
               </Link>
 
               <button onClick={handleLogout} title="Logout" className="p-2 rounded-lg transition text-red-400 hover:text-red-500 hover:bg-red-50">
@@ -214,7 +234,12 @@ export default function Navbar() {
                       </Link>
                     )}
                     <Link href="/profile" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.3)', color: '#F3D58D' }}>
-                      <User size={15} /> My Profile
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt="Profile" className="w-5 h-5 rounded-full object-cover" />
+                      ) : (
+                        <User size={15} />
+                      )}
+                      My Profile
                     </Link>
                     <Link href="/notifications" onClick={() => setMenuOpen(false)} className="flex items-center justify-center gap-2 border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.3)', color: '#F3D58D' }}>
                       <Bell size={15} /> Notifications
