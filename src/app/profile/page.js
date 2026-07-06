@@ -1,4 +1,4 @@
-// src/app/profile/page.js
+ // src/app/profile/page.js
 'use client'
 
 import { useState, useEffect } from 'react'
@@ -262,9 +262,9 @@ function ProfileContent() {
   return (
     <div className="min-h-screen py-8 px-4 sm:px-6" style={{ background: 'var(--cream)' }}>
       {/* Decorative floating elements */}
-      <div className="fixed top-32 right-8 text-2xl animate-float opacity-40 pointer-events-none hidden md:block">🐾</div>
-      <div className="fixed bottom-40 left-8 text-xl animate-float-slow opacity-30 pointer-events-none hidden md:block" style={{ animationDelay: '1.5s' }}>✿</div>
-      <div className="fixed top-60 left-12 text-lg animate-float opacity-25 pointer-events-none hidden lg:block" style={{ animationDelay: '0.8s' }}>🐱</div>
+      <div className="fixed top-32 right-8 animate-float opacity-40 pointer-events-none hidden md:block"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
+      <div className="fixed bottom-40 left-8 animate-float-slow opacity-30 pointer-events-none hidden md:block" style={{ animationDelay: '1.5s' }}><img src="/icon-emoji/sparkle.png" alt="" width={60} height={60} /></div>
+      <div className="fixed top-60 left-12 animate-float opacity-25 pointer-events-none hidden lg:block" style={{ animationDelay: '0.8s' }}><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
 
       <div className="max-w-4xl mx-auto">
         {/* ── Profile Header Card ── */}
@@ -297,7 +297,7 @@ function ProfileContent() {
                       {profile?.avatar_url ? (
                         <img src={profile.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                       ) : (
-                        <span>🐾</span>
+                        <span><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></span>
                       )}
                     </div>
                   <div>
@@ -345,7 +345,7 @@ function ProfileContent() {
                   <div className="text-2xl sm:text-3xl font-extrabold" style={{ color: '#9333ea' }}>
                     {lostCats.filter((c) => c.status === 'reunited').length}
                   </div>
-                  <div className="text-xs mt-1 font-medium opacity-70" style={{ color: 'var(--police-blue)' }}>Reunited 🎉</div>
+                  <div className="text-xs mt-1 font-medium opacity-70" style={{ color: 'var(--police-blue)' }}>Reunited</div>
                 </motion.div>
               </div>
             </div>
@@ -363,7 +363,7 @@ function ProfileContent() {
                         {(editAvatarPreview || profile?.avatar_url) ? (
                           <img src={editAvatarPreview || profile?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-3xl">🐾</span>
+                          <span className="text-3xl"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></span>
                         )}
                       </div>
                       <label className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-600 px-4 py-2 rounded-xl text-sm font-medium transition">
@@ -467,7 +467,7 @@ function ProfileContent() {
               : { background: 'white', color: 'var(--police-blue)', border: '2px solid var(--gold-light)' }
             }
           >
-            😿 Lost Cats ({lostCats.length})
+            <img src="/icon-emoji/lost-cat.png" alt="" width={30} height={30} className="inline-block mr-1" /> Lost Cats ({lostCats.length})
           </button>
           <button
             onClick={() => setActiveTab('found')}
@@ -477,7 +477,7 @@ function ProfileContent() {
               : { background: 'white', color: 'var(--police-blue)', border: '2px solid #bbf7d0' }
             }
           >
-            😊 Found Cats ({foundCats.length})
+            <img src="/icon-emoji/found-cat.png" alt="" width={30} height={30} className="inline-block mr-1" /> Found Cats ({foundCats.length})
           </button>
         </motion.div>
 
@@ -491,7 +491,7 @@ function ProfileContent() {
           >
             {lostCats.length === 0 ? (
               <div className="organic-card text-center py-16 px-6">
-                <div className="text-6xl mb-4 animate-float">🐾</div>
+                <div className="mb-4 animate-float"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></div>
                 <p className="heading-artistic text-lg mb-2" style={{ color: 'var(--police-blue)' }}>No lost cat reports yet</p>
                 <p className="text-sm mb-6 opacity-60" style={{ color: 'var(--police-blue)' }}>We hope you never need to use this!</p>
                 <Link
@@ -514,7 +514,7 @@ function ProfileContent() {
                   {cat.image_url ? (
                     <img src={cat.image_url} alt={cat.name} className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shrink-0 shadow-md" />
                   ) : (
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center text-4xl shrink-0 shadow-inner" style={{ background: 'var(--gold-light)' }}>🐱</div>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center shrink-0 shadow-inner" style={{ background: 'var(--gold-light)' }}><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -526,7 +526,7 @@ function ProfileContent() {
                           : { background: '#fef3c7', color: '#d97706' }
                         }
                       >
-                        {cat.status === 'reunited' ? '🎉 Reunited' : '😿 Lost'}
+                        {cat.status === 'reunited' ? <><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-0.5" />Reunited</> : <><img src="/icon-emoji/lost-cat.png" alt="" width={60} height={60} className="inline-block mr-0.5" />Lost</>}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 mt-1.5">
@@ -584,7 +584,7 @@ function ProfileContent() {
           >
             {foundCats.length === 0 ? (
               <div className="organic-card text-center py-16 px-6">
-                <div className="text-6xl mb-4 animate-float">🐾</div>
+                <div className="mb-4 animate-float"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></div>
                 <p className="heading-artistic text-lg mb-2" style={{ color: 'var(--police-blue)' }}>No found cat reports yet</p>
                 <p className="text-sm mb-6 opacity-60" style={{ color: 'var(--police-blue)' }}>Spotted a stray? Help them find home.</p>
                 <Link
@@ -607,7 +607,7 @@ function ProfileContent() {
                   {cat.image_url ? (
                     <img src={cat.image_url} alt="Found cat" className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover shrink-0 shadow-md" />
                   ) : (
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center text-4xl shrink-0 shadow-inner" style={{ background: '#dcfce7' }}>🐱</div>
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl flex items-center justify-center shrink-0 shadow-inner" style={{ background: '#dcfce7' }}><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
@@ -619,7 +619,7 @@ function ProfileContent() {
                           : { background: '#dcfce7', color: '#16a34a' }
                         }
                       >
-                        {cat.status === 'resolved' ? '✅ Resolved' : '😊 Found'}
+                        {cat.status === 'resolved' ? '✅ Resolved' : <><img src="/icon-emoji/found-cat.png" alt="" width={60} height={60} className="inline-block mr-0.5" />Found</>}
                       </span>
                     </div>
                     <div className="flex items-center gap-1 mt-1.5">

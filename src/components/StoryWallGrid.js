@@ -5,19 +5,26 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 const cuteMessages = [
-  'Every cat deserves love 💛',
-  'Rescued & loved 🐾',
-  'Home is where the cat is 🏠',
-  'Purrfect endings ✨',
-  'Whiskers & wishes 🌟',
-  'Fur-ever grateful 🧡',
-  'Meow & forever 💕',
-  'Tiny paws, big hearts 🐱',
-  'Saved with love 🌸',
-  'A tail of hope 🌈',
+  'Every cat deserves love',
+  'Rescued & loved',
+  'Home is where the cat is',
+  'Purrfect endings',
+  'Whiskers & wishes',
+  'Fur-ever grateful',
+  'Meow & forever',
+  'Tiny paws, big hearts',
+  'Saved with love',
+  'A tail of hope',
 ]
 
-const stickerEmojis = ['🐾', '🌸', '🦋', '🌿', '💛', '✨', '🐱', '🧡', '🌼', '🍃', '💕', '🌺']
+const stickerImages = [
+  '/icon-emoji/cat-paw.png',
+  '/icon-emoji/sparkle.png',
+  '/icon-emoji/cat-face.png',
+  '/icon-emoji/paw-heart.png',
+  '/icon-emoji/yellow-yarn.png',
+  '/icon-emoji/blue-yarn.png',
+]
 
 export default function StoryWallGrid() {
   const [stories, setStories] = useState([])
@@ -86,7 +93,7 @@ export default function StoryWallGrid() {
           {/* Section Header */}
           <div className="text-center mb-10">
             <h2 className="heading-artistic text-3xl sm:text-4xl mb-3" style={{ color: '#2E4365' }}>
-              🐾 Wall of Happy Tails
+              <img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block mr-2" />Wall of Happy Tails
             </h2>
             <p className="text-sm sm:text-base" style={{ color: 'var(--sage-600)' }}>
               Every polaroid here is a cat that found their forever home
@@ -108,7 +115,7 @@ export default function StoryWallGrid() {
             >
               {/* Sticky note placeholder */}
               <div className="bg-yellow-200 p-5 shadow-[2px_3px_8px_rgba(0,0,0,0.15)] text-center" style={{ transform: 'rotate(-2deg)', borderRadius: '2px' }}>
-                <p className="text-lg mb-1">🐱</p>
+                <p className="mb-1"><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} className="inline-block" /></p>
                 <p className="text-sm text-gray-700" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
                   No stories yet...<br/>Check back soon!
                 </p>
@@ -117,8 +124,8 @@ export default function StoryWallGrid() {
               {/* Decorative clips */}
               <div className="absolute top-4 left-6 w-3 h-5 rounded-sm" style={{ background: 'linear-gradient(135deg, #d4a056, #a07030)' }} />
               <div className="absolute top-4 right-8 w-3 h-5 rounded-sm" style={{ background: 'linear-gradient(135deg, #888, #555)' }} />
-              <div className="absolute text-xl opacity-60 top-6 right-20">🐾</div>
-              <div className="absolute text-xl opacity-60 bottom-6 left-10">🌸</div>
+              <div className="absolute opacity-60 top-6 right-20"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
+              <div className="absolute opacity-60 bottom-6 left-10"><img src="/icon-emoji/sparkle.png" alt="" width={60} height={60} /></div>
             </div>
           </div>
         </div>
@@ -132,7 +139,7 @@ export default function StoryWallGrid() {
         {/* Section Header */}
         <div className="text-center mb-10">
           <h2 className="heading-artistic text-3xl sm:text-4xl mb-3" style={{ color: '#2E4365' }}>
-            🐾 Wall of Happy Tails
+            <img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block mr-2" />Wall of Happy Tails
           </h2>
           <p className="text-sm sm:text-base" style={{ color: 'var(--sage-600)' }}>
             Every polaroid here is a cat that found their forever home
@@ -180,14 +187,14 @@ export default function StoryWallGrid() {
                         className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] object-cover block"
                       />
                     ) : (
-                      <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] flex items-center justify-center bg-amber-50 text-4xl">
-                        🐱
+                      <div className="w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] flex items-center justify-center bg-amber-50">
+                        <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
                       </div>
                     )}
                     <p className="text-center text-[10px] sm:text-[11px] text-gray-600 mt-2 font-medium truncate max-w-[100px] sm:max-w-[120px]"
                       style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}
                     >
-                      {cat.name} 💛
+                      {cat.name} <img src="/icon-emoji/paw-heart.png" alt="" width={20} height={20} className="inline-block" />
                     </p>
                   </div>
                 </div>
@@ -240,23 +247,23 @@ export default function StoryWallGrid() {
             </div>
 
             {/* Scattered stickers */}
-            <div className="absolute text-2xl opacity-70 z-[4]" style={{ top: '18%', left: '52%', transform: 'rotate(15deg)' }}>
-              {stickerEmojis[0]}
+            <div className="absolute opacity-70 z-[4]" style={{ top: '18%', left: '52%', transform: 'rotate(15deg)' }}>
+              <img src={stickerImages[0]} alt="" width={24} height={24} />
             </div>
-            <div className="absolute text-xl opacity-60 z-[4]" style={{ top: '42%', left: '48%', transform: 'rotate(-10deg)' }}>
-              {stickerEmojis[1]}
+            <div className="absolute opacity-60 z-[4]" style={{ top: '42%', left: '48%', transform: 'rotate(-10deg)' }}>
+              <img src={stickerImages[1]} alt="" width={20} height={20} />
             </div>
-            <div className="absolute text-2xl opacity-70 z-[4]" style={{ top: '68%', left: '72%', transform: 'rotate(8deg)' }}>
-              {stickerEmojis[2]}
+            <div className="absolute opacity-70 z-[4]" style={{ top: '68%', left: '72%', transform: 'rotate(8deg)' }}>
+              <img src={stickerImages[2]} alt="" width={24} height={24} />
             </div>
-            <div className="absolute text-lg opacity-60 z-[4]" style={{ top: '85%', left: '88%', transform: 'rotate(-5deg)' }}>
-              {stickerEmojis[3]}
+            <div className="absolute opacity-60 z-[4]" style={{ top: '85%', left: '88%', transform: 'rotate(-5deg)' }}>
+              <img src={stickerImages[3]} alt="" width={18} height={18} />
             </div>
-            <div className="absolute text-2xl opacity-60 z-[4]" style={{ top: '90%', left: '58%', transform: 'rotate(12deg)' }}>
-              {stickerEmojis[4]}
+            <div className="absolute opacity-60 z-[4]" style={{ top: '90%', left: '58%', transform: 'rotate(12deg)' }}>
+              <img src={stickerImages[4]} alt="" width={24} height={24} />
             </div>
-            <div className="absolute text-lg opacity-70 z-[4]" style={{ top: '25%', left: '90%', transform: 'rotate(-8deg)' }}>
-              {stickerEmojis[5]}
+            <div className="absolute opacity-70 z-[4]" style={{ top: '25%', left: '90%', transform: 'rotate(-8deg)' }}>
+              <img src={stickerImages[5]} alt="" width={18} height={18} />
             </div>
 
             {/* Extra clips on grid wires */}
@@ -273,7 +280,7 @@ export default function StoryWallGrid() {
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm transition-all hover:scale-105"
             style={{ background: '#2E4365', color: '#F3D58D' }}
           >
-            📖 Read All Stories
+            <img src="/icon-emoji/open-book.png" alt="" width={40} height={40} className="inline-block" /> Read All Stories
           </a>
         </div>
       </div>

@@ -23,9 +23,9 @@ function formatDistance(meters) {
 }
 
 const typeConfig = {
-  veterinary:      { label: 'Vet Clinic',        icon: '🏥' },
-  animal_shelter:  { label: 'Animal Shelter',    icon: '🏠' },
-  police:          { label: 'Police Station',    icon: '🚓' },
+  veterinary:      { label: 'Vet Clinic',        icon: '<img src="/icon-emoji/paw-heart.png" width="60" height="60" style="display:inline;vertical-align:middle;" />' },
+  animal_shelter:  { label: 'Animal Shelter',    icon: '<img src="/icon-emoji/house.png" width="60" height="60" style="display:inline;vertical-align:middle;" />' },
+  police:          { label: 'Police Station',    icon: '<img src="/icon-emoji/direction.png" width="60" height="60" style="display:inline;vertical-align:middle;" />' },
 }
 
 export async function fetchNearbyHelp(lat, lng, radiusMeters = 2000) {

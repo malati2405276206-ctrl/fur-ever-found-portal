@@ -50,8 +50,8 @@ export default function MapView({ cats, selectedCat }) {
         const lng = cat.longitude
 
         const icon = L.divIcon({
-          className: '',
-          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;">${cat._type === 'lost' ? '😿' : cat._type === 'found' ? '😊' : '🏠'}</div>`,
+          className: 'custom-map-pin',
+          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${cat._type === 'lost' ? '/icon-emoji/lost-cat.png' : cat._type === 'found' ? '/icon-emoji/found-cat.png' : '/icon-emoji/house.png'}" style="width:14px;height:14px;object-fit:contain;" /></div>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         })
@@ -64,29 +64,29 @@ export default function MapView({ cats, selectedCat }) {
           <div style="min-width: 220px; font-family: sans-serif;">
             ${cat.image_url
               ? `<img src="${cat.image_url}" style="width:100%;height:100px;object-fit:cover;border-radius:8px;margin-bottom:8px;" />`
-              : `<div style="width:100%;height:60px;background:#f3f4f6;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-size:24px;">🐱</div>`
+              : `<div style="width:100%;height:60px;background:#f3f4f6;border-radius:8px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;"><img src="/icon-emoji/cat-face.png" width="60" height="60" /></div>`
             }
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:${color};margin-bottom:4px;">
-              ${cat._type === 'lost' ? '😿 Lost Cat' : cat._type === 'found' ? '😊 Found Cat' : '🏠 For Adoption'}
+              ${cat._type === 'lost' ? '<img src="/icon-emoji/lost-cat.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:3px;" />Lost Cat' : cat._type === 'found' ? '<img src="/icon-emoji/found-cat.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:3px;" />Found Cat' : '<img src="/icon-emoji/house.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:3px;" />For Adoption'}
             </div>
             <div style="font-weight:700;font-size:15px;color:#111;margin-bottom:2px;">
               ${cat.name || 'Unknown Cat'}
             </div>
-            <div style="font-size:12px;color:#6b7280;margin-bottom:6px;">📍 ${cat.location || cat.city || ''}</div>
+            <div style="font-size:12px;color:#6b7280;margin-bottom:6px;"><img src="/icon-emoji/paw-shaped location pin.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:2px;" />${cat.location || cat.city || ''}</div>
             <div style="font-size:12px;color:#374151;margin-bottom:10px;line-height:1.4;">
               ${(cat.description || '').slice(0, 100)}${(cat.description || '').length > 100 ? '...' : ''}
             </div>
 
             <a href="${directionsUrl}" target="_blank" rel="noopener noreferrer" style="display:block;background:${color};color:white;text-align:center;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:6px;">
-              🧭 Get Directions
+              <img src="/icon-emoji/direction.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:3px;" />Get Directions
             </a>
 
             <a href="mailto:${cat.contact_email || ''}" style="display:block;border:1px solid ${color};color:${color};text-align:center;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;margin-bottom:8px;">
-              📧 Contact
+              Contact
             </a>
 
             <button onclick="window.__loadNearbyHelp('${popupId}', ${lat}, ${lng})" style="width:100%;background:#f9fafb;border:1px solid #e5e7eb;color:#374151;padding:6px 12px;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;">
-              📍 Show Nearby Help
+              <img src="/icon-emoji/paw-shaped location pin.png" width="60" height="60" style="display:inline;vertical-align:middle;margin-right:2px;" />Show Nearby Help
             </button>
             <div id="${popupId}" style="margin-top:8px;"></div>
           </div>
@@ -156,8 +156,8 @@ export default function MapView({ cats, selectedCat }) {
 
       // Swap icon to a bigger, pulsing version
       const bigIcon = L.divIcon({
-        className: '',
-        html: `<div style="width:42px;height:42px;background:${color};border:4px solid white;border-radius:50%;box-shadow:0 0 0 6px ${color}44, 0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;font-size:18px;animation:pulse-marker 1.5s ease-in-out infinite;transition:all 0.3s ease;">${selectedCat._type === 'lost' ? '😿' : selectedCat._type === 'found' ? '😊' : '🏠'}</div>`,
+        className: 'custom-map-pin',
+        html: `<div style="width:42px;height:42px;background:${color};border:4px solid white;border-radius:50%;box-shadow:0 0 0 6px ${color}44, 0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;overflow:hidden;animation:pulse-marker 1.5s ease-in-out infinite;transition:all 0.3s ease;"><img src="${selectedCat._type === 'lost' ? '/icon-emoji/lost-cat.png' : selectedCat._type === 'found' ? '/icon-emoji/found-cat.png' : '/icon-emoji/house.png'}" style="width:20px;height:20px;object-fit:contain;" /></div>`,
         iconSize: [42, 42],
         iconAnchor: [21, 21],
       })
@@ -192,8 +192,8 @@ export default function MapView({ cats, selectedCat }) {
       // Reset marker back to normal size after 6 seconds
       const resetTimeout = setTimeout(() => {
         const normalIcon = L.divIcon({
-          className: '',
-          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:12px;">${selectedCat._type === 'lost' ? '😿' : selectedCat._type === 'found' ? '😊' : '🏠'}</div>`,
+          className: 'custom-map-pin',
+          html: `<div style="width:28px;height:28px;background:${color};border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;overflow:hidden;"><img src="${selectedCat._type === 'lost' ? '/icon-emoji/lost-cat.png' : selectedCat._type === 'found' ? '/icon-emoji/found-cat.png' : '/icon-emoji/house.png'}" style="width:14px;height:14px;object-fit:contain;" /></div>`,
           iconSize: [28, 28],
           iconAnchor: [14, 14],
         })

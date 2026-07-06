@@ -89,7 +89,7 @@ export default function SignupPage() {
               className="inline-block px-6 py-3 rounded-full font-bold text-sm transition shadow-md hover:scale-105"
               style={{ background: 'var(--police-blue)', color: '#F3D58D' }}
             >
-              Go to Login 🐾
+              Go to Login
             </Link>
           </div>
         </motion.div>
@@ -145,10 +145,10 @@ export default function SignupPage() {
           {/* Greeting */}
           <div className="mb-7">
             <h1 className="heading-artistic text-3xl sm:text-4xl mb-2" style={{ color: 'var(--police-blue)' }}>
-              Hello! Welcome Aboard
+              Join Our Family!
             </h1>
             <p className="text-base" style={{ color: 'var(--police-blue)', opacity: 0.7 }}>
-              We are glad to see you 😊
+              We are glad to see you 
             </p>
           </div>
 
@@ -315,7 +315,7 @@ export default function SignupPage() {
                   Creating account...
                 </>
               ) : (
-                'Sign Up 🐾'
+                'Sign Up'
               )}
             </motion.button>
           </form>

@@ -91,13 +91,13 @@ export default function AdoptionPage() {
       {/* ── Hero Header Section ── */}
       <section className="relative pt-14 pb-10 px-4 overflow-hidden">
         {/* Decorative floating paws */}
-        <div className="absolute top-6 left-8 text-4xl opacity-15 animate-float-slow select-none" aria-hidden="true">🐾</div>
-        <div className="absolute top-12 right-12 text-3xl opacity-10 animate-float select-none" aria-hidden="true">🐾</div>
-        <div className="absolute bottom-4 left-1/4 text-2xl opacity-10 animate-float select-none" style={{ animationDelay: '1s' }} aria-hidden="true">🐾</div>
+        <div className="absolute top-6 left-8 text-4xl opacity-15 animate-float-slow select-none" aria-hidden="true"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} /></div>
+        <div className="absolute top-12 right-12 text-3xl opacity-10 animate-float select-none" aria-hidden="true"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} /></div>
+        <div className="absolute bottom-4 left-1/4 text-2xl opacity-10 animate-float select-none" style={{ animationDelay: '1s' }} aria-hidden="true"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} /></div>
 
         <div className="max-w-3xl mx-auto text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-semibold mb-4 animate-fade-in-up" style={{ background: '#2E4365', color: '#F3D58D' }}>
-            <span>🏠</span> Adopt, Don&apos;t Shop
+            <img src="/icon-emoji/house.png" alt="" width={30} height={30} className="inline-block" /> Adopt, Don&apos;t Shop
           </div>
           <h1 className="heading-artistic text-4xl md:text-5xl mb-3 animate-fade-in-up" style={{ color: '#2E4365', animationDelay: '0.1s' }}>
             Find Your <span style={{ color: '#E59D2C' }}>Fur-Ever</span> Friend
@@ -146,14 +146,14 @@ export default function AdoptionPage() {
           {/* Gender filter pills */}
           <div className="flex items-center gap-3 flex-wrap justify-center mb-5 animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             {[
-              { value: 'all',    label: 'All Cats',  icon: '🐱' },
-              { value: 'male',   label: 'Male',      icon: '♂️' },
-              { value: 'female', label: 'Female',    icon: '♀️' },
+              { value: 'all',    label: 'All Cats',  icon: '/icon-emoji/cat-face.png' },
+              { value: 'male',   label: 'Male',      icon: null },
+              { value: 'female', label: 'Female',    icon: null },
             ].map((f) => (
               <button
                 key={f.value}
                 onClick={() => setFilter(f.value)}
-                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border-2"
+                className="px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 border-2 flex items-center gap-1.5"
                 style={
                   filter === f.value
                     ? { background: '#2E4365', color: '#F3D58D', borderColor: '#2E4365', boxShadow: '0 4px 12px rgba(46,67,101,0.25)' }
@@ -166,7 +166,7 @@ export default function AdoptionPage() {
                   if (filter !== f.value) e.currentTarget.style.borderColor = '#e5e7eb'
                 }}
               >
-                <span className="mr-1.5">{f.icon}</span>{f.label}
+                {f.icon && <img src={f.icon} alt="" width={16} height={16} className="inline-block" />}{f.label}
               </button>
             ))}
           </div>
@@ -198,7 +198,7 @@ export default function AdoptionPage() {
               >
                 {location === 'all'
                   ? '🌍 All Cities'
-                  : `📍 ${location}`}
+                  : location}
               </button>
             ))}
           </div>
@@ -212,7 +212,7 @@ export default function AdoptionPage() {
               onMouseEnter={(e) => { e.currentTarget.style.background = '#2E4365'; e.currentTarget.style.color = '#F3D58D' }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#2E4365' }}
             >
-              <span>🗺️</span> View on Map
+              <img src="/icon-emoji/map.png" alt="" width={30} height={30} className="inline-block" /> View on Map
             </Link>
           </div>
         </div>
@@ -240,7 +240,7 @@ export default function AdoptionPage() {
           {!loading && filteredCats.length === 0 && (
             <div className="text-center py-20 animate-fade-in-up">
               <div className="w-20 h-20 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ background: '#FFF8E7' }}>
-                <span className="text-4xl">🐾</span>
+                <img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} />
               </div>
               <h3 className="text-xl font-bold mb-2 heading-artistic" style={{ color: '#2E4365' }}>
                 No cats found
@@ -294,12 +294,12 @@ export default function AdoptionPage() {
       <section className="px-4 pb-16">
         <div className="max-w-2xl mx-auto rounded-3xl p-10 text-center text-white relative overflow-hidden" style={{ background: '#2E4365' }}>
           {/* Decorative background elements */}
-          <div className="absolute top-4 right-6 text-5xl opacity-10 select-none" aria-hidden="true">🐱</div>
-          <div className="absolute bottom-4 left-6 text-4xl opacity-10 select-none" aria-hidden="true">🐾</div>
+          <div className="absolute top-4 right-6 text-5xl opacity-10 select-none" aria-hidden="true"><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
+          <div className="absolute bottom-4 left-6 text-4xl opacity-10 select-none" aria-hidden="true"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} /></div>
 
           <div className="relative z-10">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'rgba(243,213,141,0.2)' }}>
-              <span className="text-3xl">🏢</span>
+              <img src="/icon-emoji/house.png" alt="" width={30} height={30} />
             </div>
             <h2 className="text-2xl font-bold mb-2 heading-artistic">Are you a rescue organisation?</h2>
             <p className="text-sm mb-6" style={{ color: '#F3D58D', opacity: 0.9 }}>
@@ -365,7 +365,7 @@ function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, })
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-pink-50">
-              <span className="text-5xl">🐱</span>
+              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
             </div>
           )}
           {/* Status badge */}
@@ -387,14 +387,14 @@ function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, })
             {cat.age && <span className="text-xs text-gray-400 whitespace-nowrap italic">{cat.age}</span>}
           </div>
           {cat.breed && (
-            <p className="text-xs text-gray-500 truncate">🐾 {cat.breed}</p>
+            <p className="text-xs text-gray-500 truncate flex items-center gap-1"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} className="inline-block" /> {cat.breed}</p>
           )}
-          <p className="text-xs text-gray-400 truncate">📍 {cat.city}</p>
+          <p className="text-xs text-gray-400 truncate flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.city}</p>
           {cat.description && (
             <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed italic">{cat.description}</p>
           )}
           {ngoName && (
-            <p className="text-[11px] text-purple-400 font-medium truncate">🏢 {ngoName}</p>
+            <p className="text-[11px] text-purple-400 font-medium truncate flex items-center gap-1"><img src="/icon-emoji/house.png" alt="" width={30} height={30} className="inline-block" /> {ngoName}</p>
           )}
 
           <div className="mt-2 space-y-2">
@@ -409,12 +409,12 @@ function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, })
             ) : !isNGO ? (
               <button
                 onClick={handleAdopt}
-                className="w-full py-2 rounded-lg font-semibold text-xs transition-all duration-200 text-white shadow-sm hover:shadow-md"
+                className="w-full py-2 rounded-lg font-semibold text-xs transition-all duration-200 text-white shadow-sm hover:shadow-md flex items-center justify-center gap-1"
                 style={{ fontFamily: 'sans-serif', background: '#e8837c' }}
                 onMouseEnter={(e) => (e.currentTarget.style.background = '#d9706a')}
                 onMouseLeave={(e) => (e.currentTarget.style.background = '#e8837c')}
               >
-                🐱 I Want to Adopt
+                <img src="/icon-emoji/house.png" alt="" width={30} height={30} className="inline-block" /> I Want to Adopt
               </button>
             ) : null}
           </div>
@@ -503,13 +503,13 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <span className="text-9xl">🐱</span>
+                <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
               </div>
             )}
             {/* NGO badge on image */}
             {ngoName && (
               <div className="absolute bottom-4 left-4 flex items-center gap-2 bg-black/40 backdrop-blur-sm rounded-full px-4 py-2">
-                <span className="text-white text-sm font-medium">🏢 {ngoName}</span>
+                <span className="text-white text-sm font-medium flex items-center gap-1"><img src="/icon-emoji/house.png" alt="" width={30} height={30} className="inline-block" /> {ngoName}</span>
               </div>
             )}
           </div>
@@ -534,13 +534,13 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
                 </span>
               )}
               {cat.breed && (
-                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-600 border border-green-100">
-                  🐾 {cat.breed}
+                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-600 border border-green-100 flex items-center gap-1">
+                  <img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} className="inline-block" /> {cat.breed}
                 </span>
               )}
               {cat.city && (
-                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-100">
-                  📍 {cat.city}
+                <span className="px-4 py-1.5 rounded-full text-sm font-medium bg-yellow-50 text-yellow-700 border border-yellow-100 flex items-center gap-1">
+                  <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.city}
                 </span>
               )}
             </div>
@@ -555,7 +555,7 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
             {/* Rescue story */}
             {cat.storyline && (
               <div className="bg-purple-50 rounded-xl p-5 mb-6">
-                <p className="text-sm font-semibold text-purple-500 mb-2">✨ Rescue Story</p>
+                <p className="text-sm font-semibold text-purple-500 mb-2 flex items-center gap-1"><img src="/icon-emoji/sparkle.png" alt="" width={30} height={30} className="inline-block" /> Rescue Story</p>
                 <p className="text-gray-600 italic leading-relaxed">
                   &ldquo;{cat.storyline}&rdquo;
                 </p>
@@ -594,9 +594,9 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
                 ) : !isNGO ? (
                 <button
                   onClick={handleMessage}
-                  className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 bg-pink-400 hover:bg-pink-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300"
+                  className="w-full py-4 rounded-2xl font-semibold text-base transition-all duration-200 bg-pink-400 hover:bg-pink-500 text-white shadow-lg shadow-pink-200 hover:shadow-pink-300 flex items-center justify-center gap-2"
                 >
-                  🐱 I Want to Adopt
+                  <img src="/icon-emoji/cat-face.png" alt="" width={30} height={30} className="inline-block" /> I Want to Adopt
                 </button>
               ) : null}
 
@@ -605,9 +605,9 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
                   href={getDirectionsUrl(cat.latitude, cat.longitude)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full text-center py-3.5 rounded-2xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition"
+                  className="block w-full text-center py-3.5 rounded-2xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1"
                 >
-                  🧭 Get Directions
+                  <img src="/icon-emoji/direction.png" alt="" width={30} height={30} className="inline-block" /> Get Directions
                 </a>
               )}
             </div>

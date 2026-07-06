@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: #EBDDC5;
   --foreground: #2E4365;
@@ -454,6 +458,12 @@ button,
 @keyframes pulse-marker {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.15); }
+}
+
+/* Override Leaflet default div-icon styles for custom map pins */
+.custom-map-pin {
+  background: transparent !important;
+  border: none !important;
 }
 
 .highlight-pulse-ring {

@@ -127,7 +127,7 @@ export default function LostCatsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 Search by name, location or description..."
+            placeholder="Search by name, location or description..."
             className="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#E59D2C] transition text-sm bg-white"
           />
           <div className="flex gap-2">
@@ -145,7 +145,7 @@ export default function LostCatsPage() {
               className="inline-flex items-center border px-5 py-3 rounded-full font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
               style={{ borderColor: '#2E4365', color: '#2E4365' }}
             >
-              🗺️ Map
+              <img src="/icon-emoji/map.png" alt="" width={30} height={30} className="inline-block mr-1" /> Map
             </Link>
           </div>
         </div>
@@ -168,7 +168,7 @@ export default function LostCatsPage() {
               >
                 {location === 'all'
                   ? '🌍 All Locations'
-                  : `📍 ${location}`}
+                  : location}
               </button>
             ))}
           </div>
@@ -199,7 +199,7 @@ export default function LostCatsPage() {
           {/* Empty state */}
           {!loading && filteredCats.length === 0 && (
             <div className="text-center py-20">
-              <div className="text-6xl mb-4">🐾</div>
+              <div className="mb-4"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></div>
               <h3 className="text-xl font-bold text-gray-700 mb-2">
                 No cats found
               </h3>
@@ -300,7 +300,7 @@ function RecipeStyleCard({ cat, onClick, type }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">🐱</span>
+              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
             </div>
           )}
 
@@ -308,7 +308,7 @@ function RecipeStyleCard({ cat, onClick, type }) {
           <div className={`absolute top-3 left-3 text-xs font-bold px-3 py-1 rounded-full shadow-md ${
             isReunited ? 'bg-green-200 text-green-800' : 'bg-rose-200 text-rose-800'
           }`}>
-            {isReunited ? '🎉 Reunited' : '😿 Lost'}
+            {isReunited ? <><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-0" />Reunited</> : <><img src="/icon-emoji/lost-cat.png" alt="" width={30} height={30} className="inline-block mr-0" />Lost</>}
           </div>
         </div>
 
@@ -319,7 +319,7 @@ function RecipeStyleCard({ cat, onClick, type }) {
           </h3>
           <div className="flex items-center gap-2 mt-2">
             <div className="w-6 h-6 rounded-full bg-red-100 flex items-center justify-center text-xs">
-              📍
+              <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={60} height={60} />
             </div>
             <span className="text-xs text-gray-500 truncate">{cat.location}</span>
           </div>
@@ -373,20 +373,20 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
             />
           ) : (
             <div className="w-full h-80 flex items-center justify-center rounded-t-3xl" style={{ background: '#F3D58D' }}>
-              <span className="text-7xl">🐱</span>
+              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
             </div>
           )}
           <div className={`absolute top-4 left-4 text-sm font-bold px-4 py-1.5 rounded-full ${
             isReunited ? 'bg-green-200 text-green-800' : 'bg-rose-200 text-rose-800'
           }`}>
-            {isReunited ? '🎉 Reunited' : '😿 Lost'}
+            {isReunited ? <><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-1" />Reunited</> : <><img src="/icon-emoji/lost-cat.png" alt="" width={60} height={60} className="inline-block mr-1" />Lost</>}
           </div>
         </div>
 
         {/* Details */}
         <div className="p-6">
           <h2 className="text-2xl font-black text-gray-900 mb-1">{cat.name}</h2>
-          <p className="text-sm text-orange-500 font-semibold mb-4">📍 {cat.location}</p>
+          <p className="text-sm text-orange-500 font-semibold mb-4 flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.location}</p>
 
           <p className="text-gray-600 text-sm leading-relaxed mb-4">{cat.description}</p>
 
@@ -402,7 +402,7 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
                 className="w-full text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
                 style={{ background: '#E59D2C' }}
               >
-                💬 I Spotted This Cat!
+                <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block mr-1" /> I Spotted This Cat!
               </button>
             )}
 
@@ -433,13 +433,13 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
                 onClick={() => onMarkReunited(cat.id)}
                 className="w-full border border-green-300 text-green-600 hover:bg-green-50 font-semibold py-3 rounded-xl transition text-sm"
               >
-                🎉 Mark as Reunited
+                <img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-1" /> Mark as Reunited
               </button>
             )}
 
             {isReunited && (
-              <div className="text-center text-green-600 font-semibold text-sm py-3">
-                🎉 This cat found their way home!
+              <div className="text-center text-green-600 font-semibold text-sm py-3 flex items-center justify-center gap-1">
+                <img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block" /> This cat found their way home!
               </div>
             )}
             {!isOwner && currentUserId && !isReunited && (
@@ -448,14 +448,14 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
                   href={`/profile/${cat.user_id}`}
                   className="flex items-center gap-2 text-xs text-gray-400 hover:text-orange-500 transition"
                 >
-                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-xs">🐾</div>
+                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
                   <span>View reporter</span>
                 </Link>
                 <button
                   onClick={handleMessage}
-                  className="text-xs text-orange-500 hover:text-orange-600 font-medium transition"
+                  className="text-xs text-orange-500 hover:text-orange-600 font-medium transition flex items-center gap-1"
                 >
-                  💬 Message
+                  <img src="/icon-emoji/message-chat.png" alt="" width={40} height={40} className="inline-block" /> Message
                 </button>
               </div>
             )}

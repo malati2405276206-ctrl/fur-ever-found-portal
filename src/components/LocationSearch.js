@@ -146,7 +146,7 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
                 onClick={() => handleSelectSuggestion(place)}
                 className="w-full text-left px-4 py-3 hover:bg-orange-50 transition border-b border-gray-50 last:border-0 flex items-start gap-2"
               >
-                <span className="text-orange-400 shrink-0 mt-0.5">📍</span>
+                <span className="text-orange-400 shrink-0 mt-0.5"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={60} height={60} className="inline-block" /></span>
                 <div>
                   <p className="text-sm font-medium text-gray-800">{place.shortName}</p>
                   <p className="text-xs text-gray-400 line-clamp-1">{place.displayName}</p>
@@ -158,7 +158,7 @@ export default function LocationSearch({ location, lat, lng, onLocationChange })
       </div>
 
       <p className="text-xs text-gray-400 flex items-center gap-1">
-        🗺️ Select from suggestions above, or click the map to place a pin manually
+        <img src="/icon-emoji/map.png" alt="" width={60} height={60} className="inline-block" /> Select from suggestions above, or click the map to place a pin manually
       </p>
 
       <div ref={mapRef} className="w-full h-52 rounded-xl border border-gray-200 z-0" />

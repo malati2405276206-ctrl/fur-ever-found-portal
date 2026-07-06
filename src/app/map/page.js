@@ -77,9 +77,9 @@ function MapPageContent() {
   ]
 
   const filters = [
-    { value: 'all',   label: 'All Cats',  emoji: '🐾', color: 'bg-[var(--police-blue)] text-white shadow-lg shadow-[var(--police-blue)]/20',  inactive: 'bg-white/80 text-[var(--police-blue)] border border-[var(--gold-light)] hover:border-[var(--gold)] hover:bg-white' },
-    { value: 'lost',  label: 'Lost',      emoji: '😿', color: 'bg-red-500 text-white shadow-lg shadow-red-500/20',                            inactive: 'bg-white/80 text-red-600 border border-red-200 hover:border-red-400 hover:bg-red-50' },
-    { value: 'found', label: 'Found',     emoji: '😊', color: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20',                    inactive: 'bg-white/80 text-emerald-600 border border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50' },
+    { value: 'all',   label: 'All Cats',  emoji: '/icon-emoji/cat-paw.png', color: 'bg-[var(--police-blue)] text-white shadow-lg shadow-[var(--police-blue)]/20',  inactive: 'bg-white/80 text-[var(--police-blue)] border border-[var(--gold-light)] hover:border-[var(--gold)] hover:bg-white' },
+    { value: 'lost',  label: 'Lost',      emoji: '/icon-emoji/lost-cat.png', color: 'bg-red-500 text-white shadow-lg shadow-red-500/20',                            inactive: 'bg-white/80 text-red-600 border border-red-200 hover:border-red-400 hover:bg-red-50' },
+    { value: 'found', label: 'Found',     emoji: '/icon-emoji/found-cat.png', color: 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20',                    inactive: 'bg-white/80 text-emerald-600 border border-emerald-200 hover:border-emerald-400 hover:bg-emerald-50' },
   ]
 
   return (
@@ -100,7 +100,7 @@ function MapPageContent() {
             {/* Title Section */}
             <div className="flex items-center gap-3">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-[var(--gold)] to-[var(--gold-light)] flex items-center justify-center shadow-md">
-                <span className="text-xl">🗺️</span>
+                <img src="/icon-emoji/map.png" alt="map" width={30} height={30} />
               </div>
               <div>
                 <h1 className="text-xl sm:text-2xl font-bold text-[var(--police-blue)] heading-artistic">
@@ -129,7 +129,7 @@ function MapPageContent() {
                     filter === f.value ? f.color : f.inactive
                   }`}
                 >
-                  <span className="text-sm">{f.emoji}</span>
+                  <img src={f.emoji} alt={f.label} width={16} height={16} className="inline-block" />
                   {f.label}
                   {filter === f.value && (
                     <span className="ml-1 bg-white/25 text-[10px] px-1.5 py-0.5 rounded-full font-bold">
@@ -195,8 +195,8 @@ function MapPageContent() {
 
               {/* Floating stats badge */}
               <div className="absolute bottom-4 left-4 z-20 bg-white/90 backdrop-blur-sm border border-[var(--gold-light)] rounded-xl shadow-lg px-3 py-2 flex items-center gap-2">
-                <span className="text-xs font-semibold text-[var(--police-blue)]">
-                  📍 {visibleCats.length} pins
+                <span className="text-xs font-semibold text-[var(--police-blue)] flex items-center gap-1">
+                  <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {visibleCats.length} pins
                 </span>
                 <span className="text-[10px] text-[var(--police-blue)]/50 border-l border-[var(--gold-light)] pl-2">
                   {lostCats.length} lost · {foundCats.length} found
@@ -210,7 +210,7 @@ function MapPageContent() {
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
               <div className="organic-card p-8 text-center max-w-sm mx-4 pointer-events-auto animate-fade-in-up">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-[var(--gold-light)] to-[var(--gold)] flex items-center justify-center">
-                  <span className="text-3xl">📍</span>
+                  <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} />
                 </div>
                 <h3 className="font-bold text-[var(--police-blue)] text-lg mb-2 heading-artistic">No pins yet</h3>
                 <p className="text-[var(--police-blue)]/60 text-sm leading-relaxed">
@@ -220,7 +220,7 @@ function MapPageContent() {
                   href="/report"
                   className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[var(--gold)] text-white font-semibold text-sm rounded-xl hover:bg-[var(--gold)]/90 transition-all shadow-md hover:shadow-lg"
                 >
-                  🐱 Report a Cat
+                  <img src="/icon-emoji/cat-face.png" alt="" width={30} height={30} className="inline-block" /> Report a Cat
                 </Link>
               </div>
             </div>
@@ -265,7 +265,7 @@ function MapPageContent() {
               ))
             ) : visibleCats.length === 0 ? (
               <div className="text-center py-8 text-[var(--police-blue)]/50 text-sm">
-                <span className="text-2xl block mb-2">🐾</span>
+                <span className="block mb-2"><img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} className="inline-block" /></span>
                 No cats for this filter
               </div>
             ) : (
@@ -294,7 +294,7 @@ function MapPageContent() {
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-lg">
-                          {cat._type === 'lost' ? '😿' : '😊'}
+                          <img src={cat._type === 'lost' ? '/icon-emoji/lost-cat.png' : '/icon-emoji/found-cat.png'} alt="" width={30} height={30} />
                         </div>
                       )}
                     </div>
@@ -313,8 +313,8 @@ function MapPageContent() {
                       <p className="text-sm font-semibold text-[var(--police-blue)] truncate">
                         {cat.name || 'Unknown Cat'}
                       </p>
-                      <p className="text-xs text-[var(--police-blue)]/50 truncate mt-0.5">
-                        📍 {cat.location || cat.city || 'Location unknown'}
+                      <p className="text-xs text-[var(--police-blue)]/50 truncate mt-0.5 flex items-center gap-1">
+                        <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={20} height={20} className="inline-block" /> {cat.location || cat.city || 'Location unknown'}
                       </p>
                     </div>
 
@@ -324,7 +324,7 @@ function MapPageContent() {
                         ? 'bg-[var(--gold)] text-white scale-110'
                         : 'bg-[var(--cream)] text-[var(--police-blue)]/40 group-hover:bg-[var(--gold-light)] group-hover:text-[var(--police-blue)]'
                     }`}>
-                      📍
+                      <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} />
                     </div>
                   </div>
                 </div>

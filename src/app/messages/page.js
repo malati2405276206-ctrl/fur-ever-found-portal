@@ -165,7 +165,7 @@ function MessagesContent() {
     return new Date(ts).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
   }
 
-  const typeLabel = { lost: '😿 Lost Cat', found: '😊 Found Cat', adoption: '🏠 Adoption' }
+  const typeLabel = { lost: 'Lost Cat', found: 'Found Cat', adoption: 'Adoption' }
   const typeColor = { lost: 'bg-red-50 text-red-600', found: 'bg-emerald-50 text-emerald-600', adoption: 'bg-amber-50 text-amber-700' }
 
   const getOtherUser = (convo) => {
@@ -184,8 +184,8 @@ function MessagesContent() {
 
         {/* Page Header */}
         <div className="mb-5 flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-xl" style={{ background: 'var(--buff)' }}>
-            💬
+          <div className="w-11 h-11 rounded-2xl flex items-center justify-center" style={{ background: 'var(--buff)' }}>
+            <img src="/icon-emoji/message-chat.png" alt="" width={60} height={60} />
           </div>
           <div>
             <h1 className="text-xl font-bold" style={{ color: 'var(--foreground)' }}>Messages</h1>
@@ -213,7 +213,7 @@ function MessagesContent() {
               {/* Search / Filter header */}
               <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--buff)' }}>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">🔍</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"><img src="/icon-emoji/search-icon.png" alt="" width={30} height={30} className="inline-block" /></span>
                   <input
                     type="text"
                     placeholder="Search conversations..."
@@ -247,7 +247,7 @@ function MessagesContent() {
                 {!loadingList && !listError && conversations.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full px-6 text-center">
                     <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--buff)' }}>
-                      <span className="text-3xl">🐾</span>
+                      <img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} />
                     </div>
                     <p className="font-semibold text-sm mb-1" style={{ color: 'var(--foreground)' }}>No conversations yet</p>
                     <p className="text-xs text-gray-400 leading-relaxed">
@@ -277,8 +277,8 @@ function MessagesContent() {
 
                       <div className="flex items-start gap-3">
                         {/* Avatar */}
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 text-lg" style={{ background: isActive ? '#ffffff' : 'var(--buff)' }}>
-                          {convo.cat_type === 'lost' ? '😿' : convo.cat_type === 'found' ? '😊' : '🏠'}
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style={{ background: isActive ? '#ffffff' : 'var(--buff)' }}>
+                          <img src={convo.cat_type === 'lost' ? '/icon-emoji/lost-cat.png' : convo.cat_type === 'found' ? '/icon-emoji/found-cat.png' : '/icon-emoji/house.png'} alt="" width={60} height={60} />
                         </div>
 
                         <div className="flex-1 min-w-0">
@@ -323,7 +323,7 @@ function MessagesContent() {
                 /* Empty State */
                 <div className="flex-1 flex flex-col items-center justify-center px-6">
                   <div className="w-24 h-24 rounded-full flex items-center justify-center mb-5 animate-float" style={{ background: 'var(--buff)' }}>
-                    <span className="text-4xl">🐱</span>
+                    <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
                   </div>
                   <p className="font-bold text-lg mb-1" style={{ color: 'var(--foreground)' }}>Select a conversation</p>
                   <p className="text-sm text-gray-400 text-center max-w-xs">
@@ -346,8 +346,8 @@ function MessagesContent() {
                     </button>
 
                     {/* Chat avatar */}
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-base" style={{ background: 'var(--buff)' }}>
-                      {activeConvo.cat_type === 'lost' ? '😿' : activeConvo.cat_type === 'found' ? '😊' : '🏠'}
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: 'var(--buff)' }}>
+                      <img src={activeConvo.cat_type === 'lost' ? '/icon-emoji/lost-cat.png' : activeConvo.cat_type === 'found' ? '/icon-emoji/found-cat.png' : '/icon-emoji/house.png'} alt="" width={60} height={60} />
                     </div>
 
                     <div className="flex-1 min-w-0">

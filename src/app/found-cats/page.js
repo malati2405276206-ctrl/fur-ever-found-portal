@@ -98,7 +98,7 @@ export default function FoundCatsPage() {
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="🔍 Search by location or description..."
+            placeholder="Search by location or description..."
             className="flex-1 px-4 py-3 rounded-full border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#E59D2C] transition text-sm bg-white"
           />
           <div className="flex gap-2">
@@ -116,7 +116,7 @@ export default function FoundCatsPage() {
               className="inline-flex items-center border px-5 py-3 rounded-full font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
               style={{ borderColor: '#2E4365', color: '#2E4365' }}
             >
-              🗺️ Map
+              <img src="/icon-emoji/map.png" alt="" width={30} height={30} className="inline-block mr-1" /> Map
             </Link>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function FoundCatsPage() {
               >
                 {location === 'all'
                   ? '🌍 All Locations'
-                  : `📍 ${location}`}
+                  : location}
               </button>
             ))}
           </div>
@@ -170,7 +170,7 @@ export default function FoundCatsPage() {
           {/* Empty state */}
           {!loading && filteredCats.length === 0 && (
             <div className="text-center py-20">
-              <div className="text-6xl mb-4">🐾</div>
+              <div className="mb-4"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></div>
               <h3 className="text-xl font-bold text-gray-700 mb-2">
                 No found cats reported yet
               </h3>
@@ -268,13 +268,13 @@ function RecipeStyleCard({ cat, onClick, type }) {
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-6xl">🐱</span>
+              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
             </div>
           )}
 
           {/* Status badge */}
-          <div className="absolute top-3 left-3 bg-green-200 text-green-800 text-xs font-bold px-3 py-1 rounded-full shadow-md">
-            😊 Found
+          <div className="absolute top-3 left-1 bg-green-200 text-green-800 text-xs font-bold px-3 py-1 rounded-full shadow-md">
+            <img src="/icon-emoji/found-cat.png" alt="" width={30} height={30} className="inline-block mr-1" />Found
           </div>
         </div>
 
@@ -340,17 +340,17 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
             />
           ) : (
             <div className="w-full h-80 flex items-center justify-center rounded-t-3xl" style={{ background: '#F3D58D' }}>
-              <span className="text-7xl">🐱</span>
+              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
             </div>
           )}
           <div className="absolute top-4 left-4 bg-green-200 text-green-800 text-sm font-bold px-4 py-1.5 rounded-full">
-            😊 Found
+            <img src="/icon-emoji/found-cat.png" alt="" width={30} height={30} className="inline-block mr-1" />Found
           </div>
         </div>
 
         {/* Details */}
         <div className="p-6">
-          <p className="text-sm font-bold text-green-600 mb-2">📍 {cat.location}</p>
+          <p className="text-sm font-bold text-green-600 mb-2 flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.location}</p>
           <p className="text-gray-600 text-sm leading-relaxed mb-4">{cat.description}</p>
 
           <p className="text-xs text-gray-400 mb-6">
@@ -365,7 +365,7 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
                 className="w-full text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
                 style={{ background: '#E59D2C' }}
               >
-                💬 This Might Be Mine!
+                <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block mr-1" /> This Might Be Mine!
               </button>
             )}
 
@@ -406,14 +406,14 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
                   href={`/profile/${cat.user_id}`}
                   className="flex items-center gap-2 text-xs text-gray-400 hover:text-green-500 transition"
                 >
-                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-xs">🐾</div>
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
                   <span>View reporter</span>
                 </Link>
                 <button
                   onClick={handleMessage}
-                  className="text-xs text-green-500 hover:text-green-600 font-medium transition"
+                  className="text-xs text-green-500 hover:text-green-600 font-medium transition flex items-center gap-1"
                 >
-                  💬 Message
+                  <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block" /> Message
                 </button>
               </div>
             )}

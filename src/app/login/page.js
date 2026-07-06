@@ -112,7 +112,7 @@ export default function LoginPage() {
               Hello! Welcome Back
             </h1>
             <p className="text-base" style={{ color: 'var(--police-blue)', opacity: 0.7 }}>
-              We are glad to see you 🐾
+              We are glad to see you <img src="/icon-emoji/cat-paw.png" alt="" width={30} height={30} className="inline-block" />
             </p>
           </div>
 
@@ -207,7 +207,7 @@ export default function LoginPage() {
                   Signing in...
                 </>
               ) : (
-                'Sign In 🐾'
+                'Sign In'
               )}
             </motion.button>
           </form>

@@ -122,7 +122,7 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
 
           {!loading && !error && messages.length === 0 && (
             <div className="text-center text-gray-400 text-sm mt-10">
-              <div className="text-3xl mb-2">💬</div>
+              <div className="text-3xl mb-2"><img src="/icon-emoji/message-chat.png" alt="" width={60} height={60} className="inline-block" /></div>
               Say hello! Start the conversation about {catLabel}.
             </div>
           )}

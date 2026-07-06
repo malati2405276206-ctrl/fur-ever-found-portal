@@ -64,7 +64,7 @@ export default function Navbar() {
 
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-xl sm:text-2xl">🐾</span>
+          <img src="/icon-emoji/cat-paw.png" alt="paw" width={50} height={50} className="inline-block" />
           <span className="text-base sm:text-lg font-bold whitespace-nowrap" style={{ color: '#F3D58D' }}>
             Fur Ever <span style={{ color: '#F3D58D' }}>Found</span>
           </span>

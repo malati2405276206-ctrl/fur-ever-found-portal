@@ -84,8 +84,8 @@ function DashboardContent() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="heading-artistic text-2xl sm:text-3xl" style={{ color: '#2E4365' }}>
-            🏢 NGO Dashboard
+          <h1 className="heading-artistic text-2xl sm:text-3xl flex items-center gap-2" style={{ color: '#2E4365' }}>
+            <img src="/icon-emoji/house.png" alt="" width={60} height={60} className="inline-block" /> NGO Dashboard
           </h1>
           <p className="text-sm mt-1" style={{ color: '#2E4365', opacity: 0.7 }}>
             Welcome, <strong>{ngoProfile?.org_name || 'Organisation'}</strong>
@@ -123,14 +123,14 @@ function DashboardContent() {
             className="rounded-full py-3 text-center text-sm font-bold transition hover:opacity-90"
             style={{ background: '#2E4365', color: '#F3D58D' }}
           >
-            ➕ Add Cat
+            + Add Cat
           </Link>
           <Link
             href="/adoption"
-            className="rounded-full py-3 text-center text-sm font-bold transition hover:opacity-90"
+            className="rounded-full py-3 text-center text-sm font-bold transition hover:opacity-90 flex items-center justify-center gap-1"
             style={{ background: '#F3D58D', color: '#2E4365' }}
           >
-            🏠 Adoption Feed
+            <img src="/icon-emoji/house.png" alt="" width={30} height={30} className="inline-block" /> Adoption Feed
           </Link>
         </div>
 
@@ -145,7 +145,7 @@ function DashboardContent() {
 
           {recentCats.length === 0 ? (
             <div className="text-center py-10">
-              <div className="text-4xl mb-3">🐾</div>
+              <div className="mb-3"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} className="inline-block" /></div>
               <p className="text-sm" style={{ color: '#2E4365', opacity: 0.6 }}>No cats listed yet.</p>
               <Link href="/ngo-dashboard/add-cat" className="mt-3 inline-block text-sm font-semibold" style={{ color: '#E59D2C' }}>
                 Add your first cat →
@@ -159,7 +159,7 @@ function DashboardContent() {
                   {cat.image_url ? (
                     <img src={cat.image_url} alt={cat.name} className="w-11 h-11 rounded-xl object-cover shrink-0" />
                   ) : (
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center text-lg shrink-0" style={{ background: '#F3D58D' }}>🐱</div>
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center shrink-0" style={{ background: '#F3D58D' }}><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
                   )}
 
                   <div className="flex-1 min-w-0">
@@ -180,16 +180,16 @@ function DashboardContent() {
                   {cat.status === 'available' && (
                     <button
                       onClick={() => handleMarkAdopted(cat.id)}
-                      className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-full transition hover:opacity-80"
+                      className="shrink-0 text-xs font-bold px-3 py-1.5 rounded-full transition hover:opacity-80 flex items-center gap-1"
                       style={{ background: '#2E4365', color: '#F3D58D' }}
                     >
-                      🎉 Adopted
+                       Adopted
                     </button>
                   )}
 
                   {cat.status === 'adopted' && (
                     <span className="shrink-0 text-xs font-medium" style={{ color: '#E59D2C' }}>
-                      ✅ Story live
+                       <img src="/icon-emoji/sparkle.png" alt="" width={20} height={20} className="inline-block" /> Story live
                     </span>
                   )}
                 </div>

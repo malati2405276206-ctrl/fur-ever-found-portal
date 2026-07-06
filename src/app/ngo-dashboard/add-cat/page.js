@@ -179,7 +179,7 @@ function AddCatForm() {
           <div>
             <div className="flex items-center gap-3 mb-12">
               <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'rgba(243, 213, 141, 0.2)', border: '2px solid rgba(243, 213, 141, 0.4)' }}>
-                <span className="text-lg">🐱</span>
+                <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} className="inline-block" />
               </div>
               <span className="text-lg font-bold" style={{ color: '#F3D58D' }}>Add Adoption Cat</span>
             </div>
@@ -212,7 +212,7 @@ function AddCatForm() {
             <div className="relative">
               <div className="absolute -bottom-10 -left-10 w-48 h-48 rounded-full opacity-10" style={{ background: '#F3D58D' }} />
               <div className="relative flex justify-center">
-                <span className="text-7xl opacity-40">🐾</span>
+                <span className="opacity-40"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></span>
               </div>
             </div>
             {(name || description || storyline) && (
@@ -325,8 +325,8 @@ function AddCatForm() {
                     onBlur={(e) => e.target.style.borderColor = '#ddd'}
                   >
                     <option value="unknown">Unknown</option>
-                    <option value="male">Male 🐱</option>
-                    <option value="female">Female 🐱</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
                   </select>
                 </div>
               </div>
@@ -386,7 +386,7 @@ function AddCatForm() {
               {/* Rescue Storyline */}
               <div className="space-y-1.5">
                 <label className="block text-sm font-semibold" style={{ color: '#2E4365' }}>
-                  Rescue Story ✨ <span style={{ color: '#7A9E7E' }}>*</span>
+                  Rescue Story <span style={{ color: '#7A9E7E' }}>*</span>
                 </label>
                 <p className="text-xs" style={{ color: '#2E4365', opacity: 0.5 }}>
                   How you found them, their recovery. This goes live on Stories page once adopted.
@@ -425,7 +425,7 @@ function AddCatForm() {
               className="px-8 py-2.5 rounded-full text-sm font-bold transition-all hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{ background: '#7A9E7E', color: 'white' }}
             >
-              {loading ? 'Listing...' : '🐱 List for Adoption'}
+              {loading ? 'Listing...' : 'List for Adoption'}
             </button>
           </div>
         </div>

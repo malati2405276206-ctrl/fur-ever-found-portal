@@ -141,7 +141,7 @@ export default function AIMatchButton({ lostCat }) {
           {/* No matches */}
           {matches.length === 0 && (
             <div className="bg-gray-50 rounded-xl p-4 text-center">
-              <p className="text-2xl mb-1">🔍</p>
+              <p className="mb-1"><img src="/icon-emoji/search-icon.png" alt="" width={60} height={60} className="inline-block" /></p>
               <p className="text-gray-500 text-xs">No strong matches found yet.</p>
               <p className="text-gray-400 text-xs mt-0.5">Check back as more found cats are reported.</p>
             </div>
@@ -163,7 +163,7 @@ export default function AIMatchButton({ lostCat }) {
                     {match.foundCat?.image_url ? (
                       <img src={match.foundCat.image_url} alt="Found cat" className="w-14 h-14 rounded-lg object-cover shrink-0" />
                     ) : (
-                      <div className="w-14 h-14 rounded-lg bg-indigo-100 flex items-center justify-center text-2xl shrink-0">🐱</div>
+                      <div className="w-14 h-14 rounded-lg bg-indigo-100 flex items-center justify-center shrink-0"><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
                     )}
 
                     {/* Match info */}
@@ -174,7 +174,7 @@ export default function AIMatchButton({ lostCat }) {
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 line-clamp-2 mb-1">{match.foundCat?.description}</p>
-                      <p className="text-xs text-indigo-500 font-medium">📍 {match.foundCat?.location}</p>
+                      <p className="text-xs text-indigo-500 font-medium flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={60} height={60} className="inline-block" /> {match.foundCat?.location}</p>
                       <p className="text-xs text-gray-400 mt-0.5 italic">{match.reason}</p>
                     </div>
                   </div>

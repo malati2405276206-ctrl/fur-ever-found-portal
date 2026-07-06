@@ -176,7 +176,7 @@ export default function StoriesPage() {
     fetchStories()
   }
 
-  const decorStickers = ['🌸', '🦋', '🌿', '🐾', '💛', '✨', '🌼', '🍃']
+  const decorStickers = ['/icon-emoji/sparkle.png', '/icon-emoji/blue-yarn.png', '/icon-emoji/yellow-yarn.png', '/icon-emoji/cat-paw.png', '/icon-emoji/paw-heart.png', '/icon-emoji/sparkle.png', '/icon-emoji/cat-face.png', '/icon-emoji/blue-yarn.png']
 
   const fadeVariants = {
     enter:  { opacity: 0 },
@@ -199,7 +199,7 @@ export default function StoriesPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
         <div className="scrapbook-case p-8 text-center max-w-md">
-          <div className="text-5xl mb-4">📖</div>
+          <div className="mb-4"><img src="/icon-emoji/open-book.png" alt="" width={60} height={60} className="inline-block" /></div>
           <h3 className="text-xl font-bold text-amber-900 mb-2">The storybook is empty</h3>
           <p className="text-amber-800/60 text-sm">Success stories will appear here when cats find their forever homes.</p>
         </div>
@@ -213,7 +213,7 @@ export default function StoriesPage() {
 
         {/* Page title */}
         <div className="text-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-900">📖 Story Book</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-amber-900 flex items-center justify-center gap-2"> Story Book</h1>
           <p className="text-amber-800/60 text-sm mt-1">Every rescued cat has a tale to tell</p>
         </div>
 
@@ -247,13 +247,13 @@ export default function StoriesPage() {
                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'40\' height=\'40\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cpath d=\'M0 0h20v20H0zM20 20h20v20H20z\' fill=\'%23000\' fill-opacity=\'.03\'/%3E%3C/svg%3E")' }}
               />
               <div className="absolute top-4 left-4 w-4 h-4 rounded-full bg-gradient-to-br from-yellow-400 to-yellow-600 shadow-md z-10" />
-              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 text-3xl opacity-70">🧭</div>
+              <div className="absolute top-4 right-4 sm:top-6 sm:right-6 opacity-70"><img src="/icon-emoji/direction.png" alt="" width={60} height={60} /></div>
               <div className="absolute bottom-4 left-4 w-16 h-12 rounded opacity-30"
                 style={{ background: 'linear-gradient(135deg, #8fbc8f, #6b8e6b)', border: '1px solid #4a6b4a' }}
               />
               <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10">
                 <div className="flex items-center gap-1.5 bg-[#1a3d3d] px-3 py-1.5 rounded-full border border-teal-700/50">
-                  <span className="text-xs">🐱</span>
+                  <span className="text-xs"><img src="/icon-emoji/cat-face.png" alt="" width={30} height={30} className="inline-block" /></span>
                   <span className="text-[9px] text-teal-300 uppercase tracking-widest font-bold">Fur-ever Home</span>
                 </div>
               </div>
@@ -329,20 +329,20 @@ export default function StoriesPage() {
                             {cat.image_url ? (
                               <img src={cat.image_url} alt={cat.name} className="w-36 h-36 sm:w-44 sm:h-44 object-cover" />
                             ) : (
-                              <div className="w-36 h-36 sm:w-44 sm:h-44 bg-amber-50 flex items-center justify-center text-5xl">🐱</div>
+                              <div className="w-36 h-36 sm:w-44 sm:h-44 bg-amber-50 flex items-center justify-center"><img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} /></div>
                             )}
                             <p className="text-center text-[10px] text-gray-500 mt-1" style={{ fontFamily: "'Comic Sans MS', 'Segoe Print', cursive" }}>
-                              {cat.name} 💛
+                              {cat.name} <img src="/icon-emoji/paw-heart.png" alt="" width={14} height={14} className="inline-block" />
                             </p>
                           </div>
                         </div>
                       </div>
 
-                      <div className="absolute bottom-6 left-4 text-lg opacity-50" style={{ transform: 'rotate(-15deg)' }}>
-                        {decorStickers[pageIndex % decorStickers.length]}
+                      <div className="absolute bottom-6 left-4 opacity-50" style={{ transform: 'rotate(-15deg)' }}>
+                        <img src={decorStickers[pageIndex % decorStickers.length]} alt="" width={20} height={20} />
                       </div>
-                      <div className="absolute top-20 right-6 text-sm opacity-40" style={{ transform: 'rotate(10deg)' }}>
-                        {decorStickers[(pageIndex + 3) % decorStickers.length]}
+                      <div className="absolute top-20 right-6 opacity-40" style={{ transform: 'rotate(10deg)' }}>
+                        <img src={decorStickers[(pageIndex + 3) % decorStickers.length]} alt="" width={16} height={16} />
                       </div>
                     </>
                   ) : null}
@@ -448,7 +448,7 @@ export default function StoriesPage() {
                         <div className="mt-6 flex justify-end">
                           <div className="inline-block border-green-600 text-green-700 px-4 py-2 uppercase font-black text-xs tracking-widest"
                             style={{ transform: 'rotate(-4deg)', borderWidth: '3px', borderStyle: 'solid', borderRadius: '4px', opacity: 0.8 }}
-                          >🎉 Adopted {timeAgo(cat.adopted_at)}</div>
+                          ><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-1" style={{display:'inline',verticalAlign:'middle'}} />Adopted {timeAgo(cat.adopted_at)}</div>
                         </div>
                       </div>
                     </>
@@ -561,7 +561,7 @@ export default function StoriesPage() {
 
               <button type="submit" disabled={addSubmitting}
                 className="w-full bg-amber-600 hover:bg-amber-700 disabled:bg-amber-300 text-white font-bold py-3 rounded-xl transition">
-                {addSubmitting ? 'Adding story...' : '📖 Add to Storybook'}
+                {addSubmitting ? 'Adding story...' : 'Add to Storybook'}
               </button>
             </form>
           </div>

@@ -3,20 +3,21 @@ import Link from 'next/link'
 import Image from 'next/image'
 import catInBox from './cat-in-the-box.png'
 import StoryWallGrid from '@/components/StoryWallGrid'
+import EmojiIcon from '@/components/EmojiIcon'
 
 
 export default function HomePage() {
   const stats = [
-    { number: '2,400+', label: 'Cats Reunited', icon: '🐱' },
-    { number: '850+', label: 'Active Reports', icon: '📋' },
-    { number: '120+', label: 'Cities Covered', icon: '🌿' },
-    { number: '5,000+', label: 'Community Members', icon: '🧡' },
+    { number: '2,400+', label: 'Cats Reunited', icon: 'cat-face' },
+    { number: '850+', label: 'Active Reports', icon: 'cat-paw' },
+    { number: '120+', label: 'Cities Covered', icon: 'location-pin' },
+    { number: '5,000+', label: 'Community Members', icon: 'paw-heart' },
   ]
 
   const steps = [
-    { step: '01', title: '📝 Post details about your lost cat or one you found nearby. Add a photo and location.', bg: 'bg-[#F3D58D]' },
-    { step: '02', title: '🔔 Our community gets notified. People near your location will see your report instantly.', bg: 'bg-[#d6e3f0]' },
-    { step: '03', title: '🏠 Get matched with people who spotted your cat. Bring them home safely.', bg: 'bg-[#EBDDC5]' },
+    { step: '01', title: 'Post details about your lost cat or one you found nearby. Add a photo and location.', bg: 'bg-[#F3D58D]', emoji: 'cat-paw' },
+    { step: '02', title: 'Our community gets notified. People near your location will see your report instantly.', bg: 'bg-[#d6e3f0]', emoji: 'notification' },
+    { step: '03', title: 'Get matched with people who spotted your cat. Bring them home safely.', bg: 'bg-[#EBDDC5]', emoji: 'house' },
   ]
 
   const reviews = [
@@ -42,12 +43,12 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative pt-16 sm:pt-24 pb-28 sm:pb-36 px-4 overflow-visible" style={{ background: '#EBDDC5' }}>
-        {/* Decorative flowers/stars */}
-        <div className="absolute top-12 right-20 text-2xl sm:text-3xl animate-float opacity-80">✿</div>
-        <div className="absolute top-24 right-1/3 text-xl animate-float-slow opacity-70" style={{ animationDelay: '1s' }}>✿</div>
-        <div className="absolute top-16 left-1/4 text-lg animate-float opacity-60" style={{ animationDelay: '0.5s' }}>✿</div>
-        <div className="absolute bottom-32 left-16 text-xl animate-float-slow opacity-70" style={{ animationDelay: '2s' }}>✿</div>
-        <div className="absolute bottom-40 right-16 text-lg animate-float opacity-60" style={{ animationDelay: '1.5s' }}>✿</div>
+        {/* Decorative yarn/sparkle icons */}
+        <div className="absolute top-12 right-20 animate-float opacity-80"><EmojiIcon name="yellow-yarn" size={28} /></div>
+        <div className="absolute top-24 right-1/3 animate-float-slow opacity-70" style={{ animationDelay: '1s' }}><EmojiIcon name="sparkle" size={22} /></div>
+        <div className="absolute top-16 left-1/4 animate-float opacity-60" style={{ animationDelay: '0.5s' }}><EmojiIcon name="blue-yarn" size={20} /></div>
+        <div className="absolute bottom-32 left-16 animate-float-slow opacity-70" style={{ animationDelay: '2s' }}><EmojiIcon name="sparkle" size={22} /></div>
+        <div className="absolute bottom-40 right-16 animate-float opacity-60" style={{ animationDelay: '1.5s' }}><EmojiIcon name="yellow-yarn" size={20} /></div>
 
         <div className="max-w-6xl mx-auto relative z-10">
           <div className="grid md:grid-cols-[1fr_2fr_1fr] gap-6 items-center">
@@ -69,15 +70,24 @@ export default function HomePage() {
                 with cats
               </h1>
               <p className="text-base sm:text-lg mb-8 max-w-lg mx-auto leading-relaxed italic" style={{ color: '#2E4365' }}>
-                India&apos;s community for reuniting lost cats with their families. Every whisker, every purr deserves a home.
+                Report lost pets, reunite families, discover adoptable cats, and success stories—all in one caring community built for cats and the people who love them.
               </p>
-              <Link
-                href="/report"
-                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-base transition-all hover:scale-105"
-                style={{ background: '#2E4365', color: '#F3D58D' }}
-              >
-                Report a lost/found cat 🐱
-              </Link>
+              <div className="flex flex-wrap items-center justify-center gap-4">
+                <a
+                  href="#explore"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-base transition-all hover:scale-105"
+                  style={{ background: '#2E4365', color: '#F3D58D' }}
+                >
+                  Explore <EmojiIcon name="cat-face" size={20} />
+                </a>
+                <a
+                  href="#happy-tails"
+                  className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full font-bold text-base transition-all hover:scale-105 border-2"
+                  style={{ background: '#F3D58D', color: '#2E4365', borderColor: '#2E4365' }}
+                >
+                  Happy Tails <EmojiIcon name="paw-heart" size={20} />
+                </a>
+              </div>
             </div>
 
             {/* Right: Blob-framed circle */}
@@ -85,7 +95,7 @@ export default function HomePage() {
               <div className="relative w-48 h-48 lg:w-56 lg:h-56">
                 <div className="absolute inset-0 blob-shape-2" style={{ background: '#F3D58D', border: '3px solid #8A3B08' }} />
                 <div className="absolute inset-3 blob-shape-2 overflow-hidden flex items-center justify-center" style={{ background: '#F3D58D' }}>
-                  <span className="text-7xl">🐱</span>
+                  <EmojiIcon name="cat-face" size={80} />
                 </div>
               </div>
             </div>
@@ -116,10 +126,10 @@ export default function HomePage() {
               Welcome to Fur Ever Found! Every year, thousands of cats go missing, and many are never reunited with their families due to the lack of a centralized place to report, search, and connect lost and found cat information. At the same time, shelters, rescuers, and animal welfare organizations often face challenges in finding loving homes for rescued cats and raising awareness for their adoption efforts.
             </p>
             <p className="text-sm sm:text-base leading-relaxed mb-4" style={{ color: '#2E4365' }}>
-              Fur Ever Found platform helps users report lost or found cats, search existing reports, and connect with cats in need of forever homes. We also celebrate heartwarming reunions, rescue journeys, and adoption stories while offering calming, cat-themed activities to provide comfort. 🐾
+              Fur Ever Found platform helps users report lost or found cats, search existing reports, and connect with cats in need of forever homes. We also celebrate heartwarming reunions, rescue journeys, and adoption stories while offering calming, cat-themed activities to provide comfort. <EmojiIcon name="cat-paw" size={16} />
             </p>
             <p className="text-sm font-medium" style={{ color: '#2E4365' }}>
-              Every whisker, every purr deserves a home. Join our community and help reunite cats with their families. 🐱
+              Every whisker, every purr deserves a home. Join our community and help reunite cats with their families. <EmojiIcon name="cat-face" size={16} />
             </p>
           </div>
         </div>
@@ -133,7 +143,7 @@ export default function HomePage() {
         </svg>
       </div>
       {/* Explore Section */}
-      <section className="py-16 sm:py-20 px-4" style={{ background: 'var(--cream)' }}>
+      <section id="explore" className="scroll-mt-16 pt-8 sm:pt-10 pb-16 sm:pb-20 px-4" style={{ background: 'var(--cream)' }}>
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="heading-artistic text-3xl sm:text-4xl mb-4" style={{ color: '#2E4365' }}>
             Explore
@@ -220,10 +230,10 @@ export default function HomePage() {
             {steps.map((item, i) => (
               <div key={item.step} className={`organic-card p-6 sm:p-8 animate-fade-in-up`} style={{ animationDelay: `${i * 0.2}s` }}>
                 <div className={`icon-circle ${item.bg} mx-auto mb-4`}>
-                  <span className="text-3xl">{item.emoji}</span>
+                  <EmojiIcon name={item.emoji} size={60} />
                 </div>
                 <div className="text-xs font-bold tracking-widest mb-2" style={{ color: 'var(--sage-400)' }}>STEP {item.step}</div>
-                <h3 className="text-lg sm:text-xl font-bold mb-2" style={{ color: 'var(--sage-900)' }}>{item.title}</h3>
+                <h3 className="text-sm sm:text-base font-medium mb-2" style={{ color: '#2E4365' }}>{item.title}</h3>
                 <p className="text-sm leading-relaxed" style={{ color: 'var(--sage-600)' }}>{item.desc}</p>
               </div>
             ))}
@@ -232,7 +242,9 @@ export default function HomePage() {
       </section>
 
       {/* Grid Wall Decor - Story Polaroids */}
-      <StoryWallGrid />
+      <div id="happy-tails" className="scroll-mt-16">
+        <StoryWallGrid />
+      </div>
 
       {/* Stats */}
       {/* <section className="py-12 sm:py-16 px-4" style={{ background: 'var(--cream)' }}>
@@ -261,7 +273,7 @@ export default function HomePage() {
             {/* Brand */}
             <div>
               <div className="text-white font-bold text-lg mb-2 flex items-center gap-2">
-                <span className="text-2xl">🐾</span> Fur Ever Found
+                <EmojiIcon name="cat-paw" size={50} /> Fur Ever Found
               </div>
               <p className="text-sm leading-relaxed text-gray-200">
                 India&apos;s community for reuniting lost cats with their loving families. Every cat deserves a home.
@@ -292,7 +304,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-6 border-t text-center text-xs sm:text-sm text-gray-200" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-            © 2024 Fur Ever Found. Built with 🧡 for cats and their humans.
+            © 2024 Fur Ever Found. Built with <EmojiIcon name="paw-heart" size={14} /> for cats and their humans.
           </div>
         </div>
         

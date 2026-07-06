@@ -11,7 +11,7 @@ function NotificationsContent() {
   const { notifications, loading, markAsRead, markAllAsRead } = useNotifications(user?.id)
   const router = useRouter()
 
-  const typeIcon = { new_message: '💬', ai_match: '🤖', ngo_verified: '🏢', cat_reunited: '🎉' }
+  const typeIcon = { new_message: '/icon-emoji/message-chat.png', ai_match: '/icon-emoji/search-icon.png', ngo_verified: '/icon-emoji/house.png', cat_reunited: '/icon-emoji/reunited.png' }
 
   const timeAgo = (dateStr) => {
     const diff = Date.now() - new Date(dateStr).getTime()
@@ -37,7 +37,7 @@ function NotificationsContent() {
       <div className="max-w-2xl mx-auto">
 
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">🔔 Notifications</h1>
+          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2"><img src="/icon-emoji/notification-bell.png" alt="" width={60} height={60} className="inline-block" /> Notifications</h1>
           {notifications.some((n) => !n.read) && (
             <button onClick={markAllAsRead} className="text-sm text-orange-500 hover:underline font-medium">
               Mark all as read
@@ -54,7 +54,7 @@ function NotificationsContent() {
 
           {!loading && notifications.length === 0 && (
             <div className="text-center py-16">
-              <div className="text-5xl mb-3">🔔</div>
+              <div className="mb-3"><img src="/icon-emoji/notification-bell.png" alt="" width={60} height={60} className="inline-block" /></div>
               <p className="text-gray-500 font-medium">No notifications yet</p>
               <p className="text-gray-400 text-sm mt-1">We&apos;ll let you know when something happens</p>
             </div>
@@ -66,7 +66,7 @@ function NotificationsContent() {
               onClick={() => handleClick(n)}
               className={`w-full text-left px-5 py-4 flex gap-4 items-start hover:bg-orange-50 transition ${i !== notifications.length - 1 ? 'border-b border-gray-50' : ''} ${!n.read ? 'bg-orange-50/40' : ''}`}
             >
-              <span className="text-2xl shrink-0">{typeIcon[n.type] || '🔔'}</span>
+              <span className="shrink-0"><img src={typeIcon[n.type] || '/icon-emoji/notification-bell.png'} alt="" width={60} height={60} className="inline-block" /></span>
               <div className="flex-1 min-w-0">
                 <p className={`text-sm leading-snug ${!n.read ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
                   {n.title}

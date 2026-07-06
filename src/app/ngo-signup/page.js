@@ -107,7 +107,7 @@ export default function NGOSignupPage() {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: '#EBDDC5' }}>
         <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🎉</div>
+          <div className="text-center mb-4"><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block" /></div>
           <h2 className="text-2xl font-bold text-gray-800 mb-2">Application Submitted!</h2>
           <p className="text-gray-500 text-sm mb-4">
             Thanks for registering <strong>{orgName}</strong>. Please confirm your email, then wait for admin verification.
@@ -134,7 +134,7 @@ export default function NGOSignupPage() {
       <div className="max-w-lg mx-auto">
 
         <div className="text-center mb-8">
-          <div className="text-5xl mb-3">🏢</div>
+          <div className="mb-3"><img src="/icon-emoji/house.png" alt="" width={60} height={60} className="inline-block" /></div>
           <h1 className="text-2xl font-bold text-gray-800">NGO Registration</h1>
           <p className="text-gray-500 text-sm mt-1">Register your rescue organisation</p>
         </div>
@@ -223,8 +223,8 @@ export default function NGOSignupPage() {
                 <input type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://yourorg.org" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-400 transition text-sm" />
               </div>
 
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs text-purple-700">
-                🔍 Our team reviews your details within 24–48 hours before granting NGO access.
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-3 text-xs text-purple-700 flex items-start gap-2">
+                <img src="/icon-emoji/search-icon.png" alt="" width={60} height={60} className="inline-block mt-0.5" /> Our team reviews your details within 24–48 hours before granting NGO access.
               </div>
 
               <div className="flex gap-3">
@@ -238,7 +238,7 @@ export default function NGOSignupPage() {
                       Submitting...
                     </>
                   ) : (
-                    'Submit Application 🏢'
+                    'Submit Application'
                   )}
                 </button>
               </div>

@@ -39,11 +39,11 @@ export default function NotificationBell({ userId }) {
   }
 
   const typeIcon = {
-    new_message: '💬',
-    ai_match: '🤖',
-    ngo_verified: '🏢',
-    cat_reunited: '🎉',
-    adoption_application: '📋',
+    new_message: '/icon-emoji/message-chat.png',
+    ai_match: '/icon-emoji/search-icon.png',
+    ngo_verified: '/icon-emoji/house.png',
+    cat_reunited: '/icon-emoji/reunited.png',
+    adoption_application: '/icon-emoji/cat-paw.png',
   }
 
   const timeAgo = (dateStr) => {
@@ -63,7 +63,7 @@ export default function NotificationBell({ userId }) {
     <div className="relative" ref={dropdownRef}>
       {/* Bell button */}
       <button onClick={() => setOpen(!open)} className="relative text-gray-500 hover:text-amber-600 transition p-2">
-        <span className="text-lg">🔔</span>
+        <img src="/icon-emoji/notification-bell.png" alt="notifications" width={30} height={30} className="inline-block" />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -93,7 +93,7 @@ export default function NotificationBell({ userId }) {
 
             {!loading && notifications.length === 0 && (
               <div className="text-center text-gray-400 text-sm py-10 px-4">
-                <div className="text-3xl mb-2">🔔</div>
+                <div className="mb-2"><img src="/icon-emoji/notification-bell.png" alt="bell" width={32} height={32} className="inline-block" /></div>
                 No notifications yet
               </div>
             )}
@@ -104,7 +104,7 @@ export default function NotificationBell({ userId }) {
                 onClick={() => handleNotificationClick(n)}
                 className={`w-full text-left px-4 py-3 border-b border-gray-50 hover:bg-amber-50 transition flex gap-3 ${!n.read ? 'bg-amber-50/50' : ''}`}
               >
-                <span className="text-lg shrink-0">{typeIcon[n.type] || '🔔'}</span>
+                <span className="shrink-0"><img src={typeIcon[n.type] || '/icon-emoji/notification-bell.png'} alt="" width={20} height={20} className="inline-block" /></span>
                 <div className="flex-1 min-w-0">
                   <p className={`text-sm leading-snug ${!n.read ? 'font-semibold text-gray-900' : 'text-gray-600'}`}>
                     {n.title}
