@@ -1,7 +1,7 @@
 // src/app/messages/page.js
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
@@ -17,57 +17,129 @@ function MessagesContent() {
   const [conversations, setConversations] = useState([])
   const [activeConvo, setActiveConvo] = useState(null)
   const [loadingList, setLoadingList] = useState(true)
+  const [listError, setListError] = useState(null)
   const [input, setInput] = useState('')
   const messagesEndRef = useRef(null)
+  const hasAutoOpened = useRef(false)
 
-  const { conversationId, messages, loading, sending, openConversation, sendMessage } = useChat(user?.id)
+  const { messages, loading, sending, error: chatError, openConversationById, sendMessage, closeConversation } = useChat(user?.id)
 
+  // ─── Fetch conversations ───
   useEffect(() => {
     if (user) fetchConversations()
   }, [user])
 
+  // ─── Auto-open from notification URL param ───
+  useEffect(() => {
+    if (targetConvoId && conversations.length > 0 && !hasAutoOpened.current) {
+      const found = conversations.find((c) => c.id === targetConvoId)
+      if (found) {
+        hasAutoOpened.current = true
+        handleOpenConvo(found)
+      }
+    }
+  }, [targetConvoId, conversations])
+
+  // ─── Scroll to bottom on new messages ───
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
 
   const fetchConversations = async () => {
     setLoadingList(true)
+    setListError(null)
 
-    const { data, error } = await supabase
-    .from('conversations')
-    .select(`
-      *,
-      initiator:profiles!conversations_initiator_id_fkey (
-        id,
-        full_name,
-        role
-      ),
-      recipient:profiles!conversations_recipient_id_fkey (
-        id,
-        full_name,
-        role
-      )
-    `)
-    .or(`initiator_id.eq.${user.id},recipient_id.eq.${user.id}`)
-    .order('last_message_at', { ascending: false })
+    // Step 1: Fetch conversations without any relationship joins
+    const { data: convos, error } = await supabase
+      .from('conversations')
+      .select('*')
+      .or(`initiator_id.eq.${user.id},recipient_id.eq.${user.id}`)
+      .order('last_message_at', { ascending: false, nullsFirst: false })
 
-    if (!error) {
-      setConversations(data || [])
-
-      // Auto-open conversation from notification link
-      if (targetConvoId) {
-        const found = data.find((c) => c.id === targetConvoId)
-        if (found) handleOpenConvo(found)
-      }
+    if (error) {
+      console.error('Error fetching conversations:', error.message)
+      setListError('Could not load conversations. Please refresh.')
+      setLoadingList(false)
+      return
     }
+
+    if (!convos || convos.length === 0) {
+      setConversations([])
+      setLoadingList(false)
+      return
+    }
+
+    // Step 2: Collect all unique user IDs from both sides
+    const userIds = new Set()
+    convos.forEach((c) => {
+      if (c.initiator_id) userIds.add(c.initiator_id)
+      if (c.recipient_id) userIds.add(c.recipient_id)
+    })
+
+    const userIdArray = Array.from(userIds)
+
+    // Step 3: Fetch profiles and ngo_profiles separately
+    const [profilesRes, ngoRes] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('id, full_name, role')
+        .in('id', userIdArray),
+      supabase
+        .from('ngo_profiles')
+        .select('user_id, org_name')
+        .in('user_id', userIdArray),
+    ])
+
+    // Build lookup maps
+    const profileMap = {}
+    ;(profilesRes.data || []).forEach((p) => {
+      profileMap[p.id] = p
+    })
+
+    const ngoMap = {}
+    ;(ngoRes.data || []).forEach((n) => {
+      ngoMap[n.user_id] = n.org_name
+    })
+
+    // Step 4: Merge profile data into conversations
+    const enriched = convos.map((c) => {
+      const initiatorProfile = profileMap[c.initiator_id]
+      const recipientProfile = profileMap[c.recipient_id]
+
+      return {
+        ...c,
+        initiator: {
+          id: c.initiator_id,
+          full_name: initiatorProfile?.full_name || ngoMap[c.initiator_id] || null,
+          role: initiatorProfile?.role || (ngoMap[c.initiator_id] ? 'ngo' : 'user'),
+        },
+        recipient: {
+          id: c.recipient_id,
+          full_name: recipientProfile?.full_name || ngoMap[c.recipient_id] || null,
+          role: recipientProfile?.role || (ngoMap[c.recipient_id] ? 'ngo' : 'user'),
+        },
+      }
+    })
+
+    const uniqueConversations = Array.from(
+      new Map(enriched.map(c => [c.id, c])).values()
+    )
+
+    setConversations(uniqueConversations)
+
+    setConversations(enriched)
     setLoadingList(false)
   }
 
-  const handleOpenConvo = async (convo) => {
+  const handleOpenConvo = useCallback(async (convo) => {
     setActiveConvo(convo)
-    const otherId = convo.initiator_id === user.id ? convo.recipient_id : convo.initiator_id
-    await openConversation(convo.cat_type, convo.cat_id, otherId)
-  }
+    await openConversationById(convo.id)
+  }, [openConversationById])
+
+  const handleBack = useCallback(() => {
+    setActiveConvo(null)
+    closeConversation()
+  }, [closeConversation])
 
   const handleSend = async (e) => {
     e.preventDefault()
@@ -75,18 +147,35 @@ function MessagesContent() {
     const text = input
     setInput('')
     await sendMessage(text)
+
+    // Update local conversation order
+    setConversations((prev) =>
+      prev
+        .map((c) =>
+          c.id === activeConvo?.id
+            ? { ...c, last_message_at: new Date().toISOString() }
+            : c
+        )
+        .sort((a, b) => new Date(b.last_message_at || 0) - new Date(a.last_message_at || 0))
+    )
   }
 
-  const formatTime = (ts) => new Date(ts).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  const formatTime = (ts) => {
+    if (!ts) return ''
+    return new Date(ts).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  }
 
   const typeLabel = { lost: '😿 Lost Cat', found: '😊 Found Cat', adoption: '🏠 Adoption' }
   const typeColor = { lost: 'bg-red-50 text-red-600', found: 'bg-emerald-50 text-emerald-600', adoption: 'bg-amber-50 text-amber-700' }
+
   const getOtherUser = (convo) => {
     if (!convo || !user) return null
+    return convo.initiator_id === user.id ? convo.recipient : convo.initiator
+  }
 
-    return convo.initiator_id === user.id
-      ? convo.recipient
-      : convo.initiator
+  const getOtherUserName = (convo) => {
+    const other = getOtherUser(convo)
+    return other?.full_name || other?.org_name || 'Unknown User'
   }
 
   return (
@@ -146,7 +235,16 @@ function MessagesContent() {
                   </div>
                 )}
 
-                {!loadingList && conversations.length === 0 && (
+                {listError && (
+                  <div className="flex flex-col items-center justify-center h-40 px-6 text-center">
+                    <p className="text-sm text-red-500 mb-2">⚠️ {listError}</p>
+                    <button onClick={fetchConversations} className="text-xs text-amber-600 hover:underline font-medium">
+                      Retry
+                    </button>
+                  </div>
+                )}
+
+                {!loadingList && !listError && conversations.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full px-6 text-center">
                     <div className="w-20 h-20 rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--buff)' }}>
                       <span className="text-3xl">🐾</span>
@@ -158,8 +256,11 @@ function MessagesContent() {
                   </div>
                 )}
 
-                {conversations.map((convo) => {
+                {!loadingList && conversations.map((convo) => {
                   const isActive = activeConvo?.id === convo.id
+                  const otherUserName = getOtherUserName(convo)
+                  const otherUser = getOtherUser(convo)
+
                   return (
                     <button
                       key={convo.id}
@@ -182,14 +283,11 @@ function MessagesContent() {
 
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2">
-                            <p
-                              className="font-semibold text-sm truncate"
-                              style={{ color: 'var(--foreground)' }}
-                            >
-                              {getOtherUser(convo)?.full_name || 'Unknown User'}
+                            <p className="font-semibold text-sm truncate" style={{ color: 'var(--foreground)' }}>
+                              {otherUserName}
                             </p>
 
-                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${typeColor[convo.cat_type]}`}>
+                            <span className={`inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold shrink-0 ${typeColor[convo.cat_type] || 'bg-gray-50 text-gray-600'}`}>
                               {convo.cat_type === 'lost'
                                 ? 'Lost'
                                 : convo.cat_type === 'found'
@@ -199,11 +297,7 @@ function MessagesContent() {
                           </div>
 
                           <p className="text-[11px] text-gray-500 mt-1 capitalize">
-                            {getOtherUser(convo)?.role || 'user'}
-                          </p>
-
-                          <p className="text-sm font-semibold mt-1" style={{ color: 'var(--foreground)' }}>
-                            {getOtherUser(convo)?.full_name || 'Unknown User'}
+                            {otherUser?.role === 'ngo' ? '🏢 NGO' : '👤 User'}
                           </p>
 
                           <p className="text-[11px] text-gray-400">
@@ -242,7 +336,7 @@ function MessagesContent() {
                   <div className="px-5 py-3.5 border-b flex items-center gap-3" style={{ borderColor: 'var(--buff)', background: '#fffcf7' }}>
                     {/* Mobile back button */}
                     <button
-                      onClick={() => setActiveConvo(null)}
+                      onClick={handleBack}
                       className="sm:hidden w-8 h-8 rounded-lg flex items-center justify-center transition-colors"
                       style={{ background: 'var(--buff)' }}
                     >
@@ -256,18 +350,32 @@ function MessagesContent() {
                       {activeConvo.cat_type === 'lost' ? '😿' : activeConvo.cat_type === 'found' ? '😊' : '🏠'}
                     </div>
 
-                    <div className="flex-1">
-                      <p className="font-semibold text-sm" style={{ color: 'var(--foreground)' }}>
-                        {getOtherUser(activeConvo)?.full_name || 'Unknown User'}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate" style={{ color: 'var(--foreground)' }}>
+                        {getOtherUserName(activeConvo)}
                       </p>
 
-                      <p className="text-[11px] text-gray-400">
-                        {typeLabel[activeConvo.cat_type]}
+                      <p className="text-[11px] text-gray-400 flex items-center gap-1">
+                        <span>
+                          {getOtherUser(activeConvo)?.role === 'ngo' ? '🏢 NGO' : '👤 User'}
+                        </span>
+                        <span>•</span>
+                        <span>{typeLabel[activeConvo.cat_type] || 'Chat'}</span>
                       </p>
                     </div>
-                    <button onClick={() => router.push(`/profile/${getOtherUser(activeConvo)?.id}`)} className="text-xs px-3 py-1.5 rounded-full border transition hover:bg-gray-50" style={{ borderColor: 'var(--buff)' }}> View Profile </button>
 
-                    {/* Optional status dot */}
+                    <button
+                      onClick={() => {
+                        const otherId = getOtherUser(activeConvo)?.id
+                        if (otherId) router.push(`/profile/${otherId}`)
+                      }}
+                      className="text-xs px-3 py-1.5 rounded-full border transition hover:bg-amber-50 hover:border-amber-300"
+                      style={{ borderColor: 'var(--buff)' }}
+                    >
+                      View Profile
+                    </button>
+
+                    {/* Status dot */}
                     <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-emerald-100" />
                   </div>
 
@@ -282,7 +390,13 @@ function MessagesContent() {
                       </div>
                     )}
 
-                    {!loading && messages.length === 0 && (
+                    {chatError && (
+                      <div className="text-center text-red-500 text-sm py-4">
+                        <p>⚠️ {chatError}</p>
+                      </div>
+                    )}
+
+                    {!loading && !chatError && messages.length === 0 && (
                       <div className="flex flex-col items-center justify-center h-full text-center">
                         <div className="w-16 h-16 rounded-full flex items-center justify-center mb-3" style={{ background: 'var(--buff)' }}>
                           <span className="text-2xl">👋</span>
@@ -298,7 +412,6 @@ function MessagesContent() {
 
                       return (
                         <div key={msg.id}>
-                          {/* Timestamp separator */}
                           {showTimestamp && (
                             <div className="flex items-center justify-center my-3">
                               <span className="text-[10px] px-3 py-1 rounded-full text-gray-400" style={{ background: 'rgba(243, 213, 141, 0.4)' }}>
@@ -308,10 +421,9 @@ function MessagesContent() {
                           )}
 
                           <div className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                            {/* Other user avatar */}
                             {!isMine && (
                               <div className="w-7 h-7 rounded-full flex items-center justify-center mr-2 mt-auto shrink-0 text-xs" style={{ background: 'var(--buff)' }}>
-                                🐾
+                                {getOtherUser(activeConvo)?.role === 'ngo' ? '🏢' : '👤'}
                               </div>
                             )}
 
@@ -342,7 +454,6 @@ function MessagesContent() {
                   {/* Message Input */}
                   <div className="px-4 py-3 border-t" style={{ borderColor: 'var(--buff)', background: '#ffffff' }}>
                     <form onSubmit={handleSend} className="flex items-end gap-2">
-                      {/* Input area */}
                       <div className="flex-1 relative">
                         <input
                           type="text"
@@ -357,7 +468,6 @@ function MessagesContent() {
                         />
                       </div>
 
-                      {/* Send button */}
                       <button
                         type="submit"
                         disabled={sending || !input.trim()}
@@ -378,7 +488,6 @@ function MessagesContent() {
                       </button>
                     </form>
 
-                    {/* Typing indicator area */}
                     <div className="h-5 mt-1 px-2">
                       {sending && (
                         <p className="text-[10px] text-gray-400 animate-pulse">Sending...</p>

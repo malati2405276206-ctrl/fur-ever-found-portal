@@ -1,107 +1,166 @@
 // src/hooks/useChat.js
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { supabase } from '@/lib/supabase'
 
+/**
+ * Core chat hook — handles conversation creation/reuse, message loading,
+ * real-time subscriptions, and sending.
+ *
+ * Key guarantees:
+ * - Never creates duplicate conversations (checks both directions + handles 23505)
+ * - Updates last_message_at on the conversation after sending
+ * - Supports opening by conversation ID directly (for notification redirects)
+ */
 export function useChat(currentUserId) {
   const [conversationId, setConversationId] = useState(null)
   const [messages, setMessages] = useState([])
   const [loading, setLoading] = useState(false)
   const [sending, setSending] = useState(false)
+  const [error, setError] = useState(null)
   const channelRef = useRef(null)
-  const subscribingRef = useRef(false) // guards against overlapping subscribe calls
+  const subscribingRef = useRef(false)
 
- const openConversation = async (catType, catId, recipientId) => {
-  setLoading(true)
+  // ─── Open by conversation ID directly (notification redirect) ───
+  const openConversationById = useCallback(async (convoId) => {
+    if (!convoId || !currentUserId) return null
+    setLoading(true)
+    setError(null)
 
-  // Try to find existing conversation first
-  const { data: existing } = await supabase
-    .from('conversations')
-    .select('*')
-    .eq('cat_type', catType)
-    .eq('cat_id', catId)
-    .or(`and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`)
-    .maybeSingle()
+    setConversationId(convoId)
+    await loadMessages(convoId)
+    await subscribeToMessages(convoId)
+    setLoading(false)
+    return convoId
+  }, [currentUserId])
 
-  let convoId = existing?.id
+  // ─── Open or create conversation by cat + recipient ───
+  const openConversation = useCallback(async (catType, catId, recipientId) => {
+    if (!currentUserId || !recipientId) return null
+    if (currentUserId === recipientId) return null // can't chat with yourself
 
-  if (!convoId) {
-    // Try to create — if duplicate key error, fetch existing
-    const { data: created, error } = await supabase
-      .from('conversations')
-      .insert({
-        cat_type:     catType,
-        cat_id:       catId,
-        initiator_id: currentUserId,
-        recipient_id: recipientId,
-      })
-      .select()
-      .maybeSingle()
+    setLoading(true)
+    setError(null)
 
-    if (error?.code === '23505') {
-      // Duplicate key — fetch the existing one
-      const { data: retry } = await supabase
+    try {
+      // Try to find existing conversation (check both directions)
+      const { data: existingList, error: findError } = await supabase
         .from('conversations')
         .select('*')
         .eq('cat_type', catType)
         .eq('cat_id', catId)
-        .or(`and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`)
-        .maybeSingle()
+        .or(
+          `and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`
+        )
+        .order('last_message_at', { ascending: false })
+        .limit(1)
+        .single()
 
-      convoId = retry?.id
-    } else if (error) {
-      console.error('Error creating conversation:', error.message)
+      const existing = existingList?.[0]
+
+      if (findError) {
+        console.error('Error finding conversation:', findError.message)
+      }
+
+      let convoId = existing?.id
+
+      if (!convoId) {
+        // Create new conversation
+        const { data: created, error: createError } = await supabase
+          .from('conversations')
+          .insert({
+            cat_type: catType,
+            cat_id: catId,
+            initiator_id: currentUserId,
+            recipient_id: recipientId,
+            last_message_at: new Date().toISOString(),
+          })
+          .select('id')
+          .maybeSingle()
+
+        if (createError?.code === '23505') {
+          // Duplicate key race condition — fetch existing
+          const { data: retryList } = await supabase
+              .from('conversations')
+              .select('*')
+              .eq('cat_type', catType)
+              .eq('cat_id', catId)
+              .or(
+                `and(initiator_id.eq.${currentUserId},recipient_id.eq.${recipientId}),and(initiator_id.eq.${recipientId},recipient_id.eq.${currentUserId})`
+              )
+              .order('last_message_at', { ascending: false })
+              .limit(1)
+              .single()
+
+            convoId = retryList?.[0]?.id
+
+        } else if (createError) {
+          console.error('Error creating conversation:', createError.message)
+          setError('Could not start conversation. Please try again.')
+          setLoading(false)
+          return null
+        } else {
+          convoId = created?.id
+        }
+      }
+
+      if (!convoId) {
+        setError('Could not open conversation.')
+        setLoading(false)
+        return null
+      }
+
+      setConversationId(convoId)
+      await loadMessages(convoId)
+      await subscribeToMessages(convoId)
+      setLoading(false)
+      return convoId
+    } catch (err) {
+      console.error('Unexpected error in openConversation:', err)
+      setError('Something went wrong. Please try again.')
       setLoading(false)
       return null
-    } else {
-      convoId = created?.id
     }
-  }
+  }, [currentUserId])
 
-  if (!convoId) { setLoading(false); return null }
-
-  setConversationId(convoId)
-  await loadMessages(convoId)
-  await subscribeToMessages(convoId)
-  setLoading(false)
-  return convoId
-}
-
+  // ─── Load messages for a conversation ───
   const loadMessages = async (convoId) => {
-    const { data, error } = await supabase
+    const { data, error: loadError } = await supabase
       .from('messages')
       .select('*')
       .eq('conversation_id', convoId)
       .order('created_at', { ascending: true })
 
-    if (error) {
-      console.error('Error loading messages:', error.message)
+    if (loadError) {
+      console.error('Error loading messages:', loadError.message)
       return
     }
 
     setMessages(data || [])
 
-    await supabase
-      .from('messages')
-      .update({ read: true })
-      .eq('conversation_id', convoId)
-      .neq('sender_id', currentUserId)
-      .eq('read', false)
+    // Mark unread messages as read
+    if (currentUserId) {
+      await supabase
+        .from('messages')
+        .update({ read: true })
+        .eq('conversation_id', convoId)
+        .neq('sender_id', currentUserId)
+        .eq('read', false)
+    }
   }
 
+  // ─── Real-time subscription ───
   const subscribeToMessages = async (convoId) => {
-    // Remove any existing channel fully before creating a new one
+    // Remove existing channel
     if (channelRef.current) {
       await supabase.removeChannel(channelRef.current)
       channelRef.current = null
     }
 
-    // Guard: don't start a second subscribe while one is in flight
     if (subscribingRef.current) return
     subscribingRef.current = true
 
-    // Unique channel name per conversation AND per mount to avoid collisions
     const channel = supabase
       .channel(`messages_${convoId}_${Date.now()}`)
       .on(
@@ -114,13 +173,17 @@ export function useChat(currentUserId) {
         },
         (payload) => {
           setMessages((prev) => {
-            // avoid duplicate inserts if the event fires twice
             if (prev.some((m) => m.id === payload.new.id)) return prev
             return [...prev, payload.new]
           })
 
+          // Auto-mark as read if it's from the other person
           if (payload.new.sender_id !== currentUserId) {
-            supabase.from('messages').update({ read: true }).eq('id', payload.new.id).then(() => {})
+            supabase
+              .from('messages')
+              .update({ read: true })
+              .eq('id', payload.new.id)
+              .then(() => {})
           }
         }
       )
@@ -130,12 +193,13 @@ export function useChat(currentUserId) {
     subscribingRef.current = false
   }
 
-  const sendMessage = async (content) => {
-    if (!conversationId || !content.trim()) return
+  // ─── Send a message ───
+  const sendMessage = useCallback(async (content) => {
+    if (!conversationId || !content.trim() || !currentUserId) return
 
     setSending(true)
 
-    const { error } = await supabase
+    const { error: sendError } = await supabase
       .from('messages')
       .insert({
         conversation_id: conversationId,
@@ -143,13 +207,21 @@ export function useChat(currentUserId) {
         content: content.trim(),
       })
 
-    if (error) {
-      console.error('Error sending message:', error.message)
+    if (sendError) {
+      console.error('Error sending message:', sendError.message)
+      setError('Failed to send message.')
+    } else {
+      // Update last_message_at on conversation for proper ordering
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', conversationId)
     }
 
     setSending(false)
-  }
+  }, [conversationId, currentUserId])
 
+  // ─── Cleanup on unmount ───
   useEffect(() => {
     return () => {
       if (channelRef.current) {
@@ -159,21 +231,25 @@ export function useChat(currentUserId) {
     }
   }, [])
 
-  const closeConversation = () => {
+  // ─── Close conversation ───
+  const closeConversation = useCallback(() => {
     if (channelRef.current) {
       supabase.removeChannel(channelRef.current)
       channelRef.current = null
     }
     setConversationId(null)
     setMessages([])
-  }
+    setError(null)
+  }, [])
 
   return {
     conversationId,
     messages,
     loading,
     sending,
+    error,
     openConversation,
+    openConversationById,
     sendMessage,
     closeConversation,
   }

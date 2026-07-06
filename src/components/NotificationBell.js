@@ -27,8 +27,14 @@ export default function NotificationBell({ userId }) {
       await markAsRead(notification.id)
     }
     setOpen(false)
+
+    // Handle navigation based on notification type and link
     if (notification.link) {
+      // Use router.push for reliable SPA navigation
       router.push(notification.link)
+    } else if (notification.type === 'new_message' && notification.conversation_id) {
+      // Fallback: if link is missing but we have a conversation_id
+      router.push(`/messages?conversation=${notification.conversation_id}`)
     }
   }
 
@@ -37,9 +43,11 @@ export default function NotificationBell({ userId }) {
     ai_match: '🤖',
     ngo_verified: '🏢',
     cat_reunited: '🎉',
+    adoption_application: '📋',
   }
 
   const timeAgo = (dateStr) => {
+    if (!dateStr) return ''
     const diff = Date.now() - new Date(dateStr).getTime()
     const mins = Math.floor(diff / 60000)
     if (mins < 1) return 'Just now'

@@ -25,7 +25,11 @@ function NotificationsContent() {
 
   const handleClick = async (n) => {
     if (!n.read) await markAsRead(n.id)
-    if (n.link) router.push(n.link)
+    if (n.link) {
+      router.push(n.link)
+    } else if (n.type === 'new_message' && n.conversation_id) {
+      router.push(`/messages?conversation=${n.conversation_id}`)
+    }
   }
 
   return (

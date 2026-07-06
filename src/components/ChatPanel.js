@@ -7,9 +7,10 @@ import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 
 export default function ChatPanel({ isOpen, onClose, currentUserId, catType, catId, recipientId, catLabel }) {
-  const { conversationId, messages, loading, sending, openConversation, sendMessage, closeConversation } = useChat(currentUserId)
+  const { conversationId, messages, loading, sending, error, openConversation, sendMessage, closeConversation } = useChat(currentUserId)
   const [input, setInput] = useState('')
   const [recipientName, setRecipientName] = useState('')
+  const [nameLoading, setNameLoading] = useState(true)
   const messagesEndRef = useRef(null)
   const router = useRouter()
 
@@ -21,11 +22,32 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
     return () => {
       closeConversation()
     }
-  }, [isOpen])
+  }, [isOpen, currentUserId, recipientId, catType, catId])
 
   const fetchRecipientName = async () => {
-    const { data } = await supabase.from('profiles').select('full_name').eq('id', recipientId).maybeSingle()
-    setRecipientName(data?.full_name || 'User')
+    setNameLoading(true)
+    // Try profiles first
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('full_name')
+      .eq('id', recipientId)
+      .maybeSingle()
+
+    if (profile?.full_name) {
+      setRecipientName(profile.full_name)
+      setNameLoading(false)
+      return
+    }
+
+    // Fallback to ngo_profiles
+    const { data: ngo } = await supabase
+      .from('ngo_profiles')
+      .select('org_name')
+      .eq('user_id', recipientId)
+      .maybeSingle()
+
+    setRecipientName(ngo?.org_name || 'User')
+    setNameLoading(false)
   }
 
   useEffect(() => {
@@ -38,6 +60,13 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
     const text = input
     setInput('')
     await sendMessage(text)
+  }
+
+  const handleExpandToFullPage = () => {
+    if (conversationId) {
+      onClose()
+      router.push(`/messages?conversation=${conversationId}`)
+    }
   }
 
   const formatTime = (ts) => new Date(ts).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })
@@ -54,19 +83,27 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
 
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100" style={{ background: 'var(--buff)' }}>
-          <div>
-            <button
-              onClick={() => router.push('/profile')}
-              className="font-bold text-gray-900 text-sm hover:underline text-left"
-            >
-              {recipientName}
-            </button>
-
-            <p className="text-xs text-gray-400">
+          <div className="flex-1 min-w-0">
+            <p className="font-bold text-gray-900 text-sm truncate">
+              {nameLoading ? '...' : recipientName}
+            </p>
+            <p className="text-xs text-gray-400 truncate">
               About: {catLabel}
             </p>
           </div>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl transition">✕</button>
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Expand to full page */}
+            {conversationId && (
+              <button
+                onClick={handleExpandToFullPage}
+                className="text-gray-400 hover:text-gray-600 text-sm transition p-1"
+                title="Open in full page"
+              >
+                ↗
+              </button>
+            )}
+            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl transition">✕</button>
+          </div>
         </div>
 
         {/* Messages */}
@@ -77,7 +114,13 @@ export default function ChatPanel({ isOpen, onClose, currentUserId, catType, cat
             </div>
           )}
 
-          {!loading && messages.length === 0 && (
+          {error && (
+            <div className="text-center text-red-500 text-sm mt-4 px-4">
+              <p>⚠️ {error}</p>
+            </div>
+          )}
+
+          {!loading && !error && messages.length === 0 && (
             <div className="text-center text-gray-400 text-sm mt-10">
               <div className="text-3xl mb-2">💬</div>
               Say hello! Start the conversation about {catLabel}.

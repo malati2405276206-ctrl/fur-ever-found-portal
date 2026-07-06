@@ -101,24 +101,60 @@ function AdoptionApplicationForm() {
       console.error(dbError.message)
     }
 
-    // Notify NGO via chat message regardless
-    const { data: convo } = await supabase
+    // Notify NGO via chat message — reuse existing conversation if present
+    let convoId = null
+
+    // Check for existing conversation first
+    const { data: existingConvo } = await supabase
       .from('conversations')
-      .insert({
-        cat_type:     'adoption',
-        cat_id:       id,
-        initiator_id: user.id,
-        recipient_id: cat.ngo_id,
-      })
-      .select()
+      .select('id')
+      .eq('cat_type', 'adoption')
+      .eq('cat_id', id)
+      .or(`and(initiator_id.eq.${user.id},recipient_id.eq.${cat.ngo_id}),and(initiator_id.eq.${cat.ngo_id},recipient_id.eq.${user.id})`)
       .maybeSingle()
 
-    if (convo?.id) {
+    if (existingConvo?.id) {
+      convoId = existingConvo.id
+    } else {
+      const { data: newConvo, error: convoError } = await supabase
+        .from('conversations')
+        .insert({
+          cat_type:     'adoption',
+          cat_id:       id,
+          initiator_id: user.id,
+          recipient_id: cat.ngo_id,
+          last_message_at: new Date().toISOString(),
+        })
+        .select('id')
+        .maybeSingle()
+
+      if (convoError?.code === '23505') {
+        // Race condition duplicate — fetch existing
+        const { data: retry } = await supabase
+          .from('conversations')
+          .select('id')
+          .eq('cat_type', 'adoption')
+          .eq('cat_id', id)
+          .or(`and(initiator_id.eq.${user.id},recipient_id.eq.${cat.ngo_id}),and(initiator_id.eq.${cat.ngo_id},recipient_id.eq.${user.id})`)
+          .maybeSingle()
+        convoId = retry?.id
+      } else {
+        convoId = newConvo?.id
+      }
+    }
+
+    if (convoId) {
       await supabase.from('messages').insert({
-        conversation_id: convo.id,
+        conversation_id: convoId,
         sender_id:       user.id,
         content: `Hi! I've submitted an adoption application for ${cat.name}. My details: Name: ${fullName}, Phone: ${phone}, City: ${city}, Home: ${homeType}, Experience: ${experience || 'None listed'}. Why I want to adopt: ${whyAdopt}`,
       })
+
+      // Update last_message_at for ordering
+      await supabase
+        .from('conversations')
+        .update({ last_message_at: new Date().toISOString() })
+        .eq('id', convoId)
     }
 
     setSuccess(true)

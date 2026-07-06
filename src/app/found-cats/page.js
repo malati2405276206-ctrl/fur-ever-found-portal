@@ -400,6 +400,23 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
                 📞 Call {cat.contact_phone}
               </a>
             )}
+            {!isOwner && currentUserId && (
+              <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100">
+                <Link
+                  href={`/profile/${cat.user_id}`}
+                  className="flex items-center gap-2 text-xs text-gray-400 hover:text-green-500 transition"
+                >
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-xs">🐾</div>
+                  <span>View reporter</span>
+                </Link>
+                <button
+                  onClick={handleMessage}
+                  className="text-xs text-green-500 hover:text-green-600 font-medium transition"
+                >
+                  💬 Message
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

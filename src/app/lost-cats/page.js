@@ -442,6 +442,23 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
                 🎉 This cat found their way home!
               </div>
             )}
+            {!isOwner && currentUserId && !isReunited && (
+              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                <Link
+                  href={`/profile/${cat.user_id}`}
+                  className="flex items-center gap-2 text-xs text-gray-400 hover:text-orange-500 transition"
+                >
+                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center text-xs">🐾</div>
+                  <span>View reporter</span>
+                </Link>
+                <button
+                  onClick={handleMessage}
+                  className="text-xs text-orange-500 hover:text-orange-600 font-medium transition"
+                >
+                  💬 Message
+                </button>
+              </div>
+            )}
 
             {!isReunited && (
               <AIMatchButton lostCat={cat} />

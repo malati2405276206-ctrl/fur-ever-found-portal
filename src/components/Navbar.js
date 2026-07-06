@@ -10,6 +10,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRole } from '@/hooks/useRole'
 import { logout } from '@/lib/auth'
 import NotificationBell from '@/components/NotificationBell'
+import AuthToggle from '@/components/AuthToggle'
 
 export default function Navbar() {
   const { user, loading: authLoading } = useAuth()
@@ -157,18 +158,7 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <>
-              <Link href="/login" className="text-sm font-medium transition px-2 hover:opacity-80" style={{ color: '#F3D58D' }}>
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-4 py-2 rounded-full text-sm font-semibold transition text-white hover:opacity-90"
-                style={{ background: '#F3D58D', color: '#2E4365' }}
-              >
-                Sign Up
-              </Link>
-            </>
+            <AuthToggle />
           )}
         </div>
 
@@ -237,14 +227,9 @@ export default function Navbar() {
                     </button>
                   </>
                 ) : (
-                  <>
-                    <Link href="/login" onClick={() => setMenuOpen(false)} className="block text-center border py-2.5 rounded-full text-sm font-medium transition" style={{ borderColor: 'rgba(243, 213, 141, 0.5)', color: '#F3D58D' }}>
-                      Login
-                    </Link>
-                    <Link href="/signup" onClick={() => setMenuOpen(false)} className="block text-center text-white py-2.5 rounded-full text-sm font-semibold transition" style={{ background: '#F3D58D', color: '#2E4365' }}>
-                      Sign Up
-                    </Link>
-                  </>
+                  <div className="flex justify-center">
+                    <AuthToggle />
+                  </div>
                 )}
               </div>
             </div>
