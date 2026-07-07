@@ -1,7 +1,7 @@
 // src/app/stories/page.js
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,7 +9,7 @@ import { useRole } from '@/hooks/useRole'
 import { useSearchParams } from 'next/navigation'
 import { ChevronLeft, ChevronRight, Plus, Trash2, Edit3 } from 'lucide-react'
 
-export default function StoriesPage() {
+function StoriesContent() {
   const { user } = useAuth()
   const { isNGO, isUser } = useRole()
   const searchParams = useSearchParams()
@@ -568,5 +568,21 @@ export default function StoriesPage() {
         </div>
       )}
     </div>
+  )
+}
+export default function StoriesPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center"
+          style={{ background: "#EBDDC5" }}
+        >
+          Opening storybook...
+        </div>
+      }
+    >
+      <StoriesContent />
+    </Suspense>
   )
 }
