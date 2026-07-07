@@ -441,71 +441,73 @@ function ProfileContent() {
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className="flex items-center gap-3 p-3 rounded-2xl border transition hover:shadow-sm"
+                  className="rounded-2xl border transition hover:shadow-sm"
                   style={{ borderColor: '#f0f0f0', background: '#fafafa' }}
                 >
-                  {/* Rank-style number */}
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
-                    style={{ background: 'var(--gold-light)', color: 'var(--police-blue)' }}>
-                    #{idx + 1}
+                  <div className="flex items-center gap-3 p-3">
+                    {/* Rank-style number */}
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                      style={{ background: 'var(--gold-light)', color: 'var(--police-blue)' }}>
+                      #{idx + 1}
+                    </div>
+
+                    {/* Cat image */}
+                    {cat.image_url ? (
+                      <img src={cat.image_url} alt={cat.name} className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-sm" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                        style={{ background: 'var(--gold-light)' }}>
+                        <img src="/icon-emoji/cat-face.png" alt="" width={28} height={28} />
+                      </div>
+                    )}
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-sm font-bold truncate" style={{ color: 'var(--police-blue)' }}>{cat.name}</h3>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0"
+                          style={cat.status === 'reunited'
+                            ? { background: '#dcfce7', color: '#16a34a' }
+                            : { background: '#fef3c7', color: '#d97706' }
+                          }>
+                          {cat.status === 'reunited' ? 'Reunited' : 'Lost'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <MapPin size={11} style={{ color: 'var(--gold)' }} />
+                        <span className="text-xs truncate" style={{ color: 'var(--gold)' }}>{cat.location}</span>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      {cat.status !== 'reunited' && (
+                        <button onClick={() => handleMarkReunited(cat.id)}
+                          className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
+                          style={{ background: '#dcfce7' }} title="Mark Reunited">
+                          <CheckCircle size={14} style={{ color: '#16a34a' }} />
+                        </button>
+                      )}
+                      <button onClick={() => handleOpenEditCat(cat, 'lost')}
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
+                        style={{ background: '#f3f4f6' }} title="Edit">
+                        <Edit3 size={13} style={{ color: 'var(--police-blue)' }} />
+                      </button>
+                      <button onClick={() => setDeleteId({ id: cat.id, type: 'lost', name: cat.name })}
+                        className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
+                        style={{ background: '#fef2f2' }} title="Delete">
+                        <Trash2 size={13} style={{ color: '#dc2626' }} />
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Cat image */}
-                  {cat.image_url ? (
-                    <img src={cat.image_url} alt={cat.name} className="w-12 h-12 rounded-xl object-cover shrink-0 shadow-sm" />
-                  ) : (
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
-                      style={{ background: 'var(--gold-light)' }}>
-                      <img src="/icon-emoji/cat-face.png" alt="" width={28} height={28} />
+                  {/* AI Match Button — inline with this report */}
+                  {cat.status !== 'reunited' && (
+                    <div className="px-3 pb-3">
+                      <AIMatchButton lostCat={cat} />
                     </div>
                   )}
-
-                  {/* Info */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-bold truncate" style={{ color: 'var(--police-blue)' }}>{cat.name}</h3>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold shrink-0"
-                        style={cat.status === 'reunited'
-                          ? { background: '#dcfce7', color: '#16a34a' }
-                          : { background: '#fef3c7', color: '#d97706' }
-                        }>
-                        {cat.status === 'reunited' ? 'Reunited' : 'Lost'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1 mt-0.5">
-                      <MapPin size={11} style={{ color: 'var(--gold)' }} />
-                      <span className="text-xs truncate" style={{ color: 'var(--gold)' }}>{cat.location}</span>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    {cat.status !== 'reunited' && (
-                      <button onClick={() => handleMarkReunited(cat.id)}
-                        className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
-                        style={{ background: '#dcfce7' }} title="Mark Reunited">
-                        <CheckCircle size={14} style={{ color: '#16a34a' }} />
-                      </button>
-                    )}
-                    <button onClick={() => handleOpenEditCat(cat, 'lost')}
-                      className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
-                      style={{ background: '#f3f4f6' }} title="Edit">
-                      <Edit3 size={13} style={{ color: 'var(--police-blue)' }} />
-                    </button>
-                    <button onClick={() => setDeleteId({ id: cat.id, type: 'lost', name: cat.name })}
-                      className="w-7 h-7 rounded-full flex items-center justify-center transition hover:scale-110"
-                      style={{ background: '#fef2f2' }} title="Delete">
-                      <Trash2 size={13} style={{ color: '#dc2626' }} />
-                    </button>
-                  </div>
                 </motion.div>
-              ))}
-
-              {/* AI Match Buttons for lost cats */}
-              {lostCats.filter(c => c.status !== 'reunited').map((cat) => (
-                <div key={`ai-${cat.id}`} className="mt-1">
-                  <AIMatchButton lostCat={cat} />
-                </div>
               ))}
             </motion.div>
           )}

@@ -376,7 +376,7 @@ function AdoptionCard({ cat, ngoName, currentUserId, isNGO, onClick, })
                 onClick={(e) => e.stopPropagation()}
                 className="block w-full text-center py-2 rounded-lg font-semibold text-xs bg-purple-100 hover:bg-purple-200 text-purple-700 transition"
               >
-                ✏️ Manage in Dashboard
+                 Manage in Dashboard
               </Link>
             ) : !isNGO ? (
               <button

@@ -15,6 +15,8 @@ export default function FoundCatsPage() {
   const [search, setSearch] = useState('')
   const [selectedLocation, setSelectedLocation] = useState('all')
   const [selectedCat, setSelectedCat] = useState(null)
+  const [deleteConfirm, setDeleteConfirm] = useState(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetchCats()
@@ -35,6 +37,27 @@ export default function FoundCatsPage() {
     }
 
     setLoading(false)
+  }
+
+  // Delete report (only owner can do this)
+  const handleDelete = async (catId) => {
+    setDeleting(true)
+    const { error } = await supabase
+      .from('found_cats')
+      .delete()
+      .eq('id', catId)
+      .eq('user_id', user.id)
+
+    if (error) {
+      console.error('Error deleting report:', error.message)
+      setDeleting(false)
+      return
+    }
+
+    setCats((prev) => prev.filter((cat) => cat.id !== catId))
+    setSelectedCat(null)
+    setDeleteConfirm(null)
+    setDeleting(false)
   }
 
   const locations = [
@@ -224,7 +247,40 @@ export default function FoundCatsPage() {
           cat={selectedCat}
           currentUserId={user?.id}
           onClose={() => setSelectedCat(null)}
+          onDeleteRequest={(cat) => setDeleteConfirm(cat)}
         />
+      )}
+
+      {/* ── Delete Confirmation Modal ── */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => !deleting && setDeleteConfirm(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
+            <div className="text-5xl mb-4">🗑️</div>
+            <h3 className="text-xl font-bold mb-2" style={{ color: '#2E4365' }}>Delete Report?</h3>
+            <p className="text-sm text-gray-500 mb-6">
+              Are you sure you want to delete this found cat report near <strong>{deleteConfirm.location || 'unknown location'}</strong>? This cannot be undone.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteConfirm(null)}
+                disabled={deleting}
+                className="flex-1 py-3 rounded-full font-semibold text-sm transition border-2 hover:opacity-80"
+                style={{ borderColor: '#2E4365', color: '#2E4365' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(deleteConfirm.id)}
+                disabled={deleting}
+                className="flex-1 py-3 rounded-full font-semibold text-sm transition hover:scale-[1.02] disabled:opacity-50"
+                style={{ background: '#dc2626', color: 'white' }}
+              >
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
@@ -302,7 +358,7 @@ function RecipeStyleCard({ cat, onClick, type }) {
 }
 
 // ── Detail Modal — Announcement/Poster Style ──────────────────────────────────────────
-function CatDetailModal({ cat, currentUserId, onClose }) {
+function CatDetailModal({ cat, currentUserId, onClose, onDeleteRequest }) {
   const { openChat } = useChatContext()
   const isOwner = currentUserId && currentUserId === cat.user_id
 
@@ -445,6 +501,15 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
                   <img src="/icon-emoji/message-chat.png" alt="" width={20} height={20} className="inline-block" /> Message
                 </button>
               </div>
+            )}
+
+            {isOwner && (
+              <button
+                onClick={() => onDeleteRequest(cat)}
+                className="w-full border-2 border-red-300 text-red-500 hover:bg-red-50 font-bold py-3 rounded-xl transition text-sm uppercase tracking-wide"
+              >
+                🗑️ Delete Report
+              </button>
             )}
           </div>
         </div>

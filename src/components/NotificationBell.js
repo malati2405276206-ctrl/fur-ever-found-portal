@@ -62,8 +62,14 @@ export default function NotificationBell({ userId }) {
   return (
     <div className="relative" ref={dropdownRef}>
       {/* Bell button */}
-      <button onClick={() => setOpen(!open)} className="relative text-gray-500 hover:text-amber-600 transition p-2">
-        <img src="/icon-emoji/notification-bell.png" alt="notifications" width={30} height={30} className="inline-block" />
+      <button onClick={() => setOpen(!open)} className="relative text-gray-500 hover:text-amber-600 transition p-2 bell-hover-trigger">
+        <img
+          src="/icon-emoji/notification-bell.png"
+          alt="notifications"
+          width={30}
+          height={30}
+          className="inline-block origin-top"
+        />
         {unreadCount > 0 && (
           <span className="absolute -top-0.5 -right-0.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}

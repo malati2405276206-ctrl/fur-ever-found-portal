@@ -79,9 +79,17 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
 
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 shrink-0">
-          <img src="/icon-emoji/cat-paw.png" alt="paw" width={50} height={50} className="inline-block" />
-          <span className="text-base sm:text-lg font-bold whitespace-nowrap" style={{ color: '#F3D58D' }}>
+        <Link href="/" className="flex items-center gap-2 shrink-0 group">
+          <motion.img
+            src="/icon-emoji/cat-paw.png"
+            alt="paw"
+            width={50}
+            height={50}
+            className="inline-block"
+            whileHover={{ rotate: 15, scale: 1.1 }}
+            transition={{ type: 'spring', stiffness: 300 }}
+          />
+          <span className="text-base sm:text-lg font-bold whitespace-nowrap transition-opacity duration-200 group-hover:opacity-80" style={{ color: '#F3D58D' }}>
             Fur Ever <span style={{ color: '#F3D58D' }}>Found</span>
           </span>
         </Link>
@@ -92,11 +100,19 @@ export default function Navbar() {
             const Icon = link.icon
             const active = isActive(link.href)
             return (
-              <Link key={link.href} href={link.href} className="relative px-3 py-2 text-sm font-medium transition flex items-center gap-1.5">
-                <span className={`flex items-center gap-1.5 transition-colors`} style={{ color: active ? '#F3D58D' : '#F3D58D' }}>
+              <Link key={link.href} href={link.href} className="relative px-3 py-2 text-sm font-medium flex items-center gap-1.5 group">
+                <motion.span
+                  className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors duration-200"
+                  style={{
+                    color: '#F3D58D',
+                    background: active ? 'rgba(243, 213, 141, 0.15)' : 'transparent',
+                  }}
+                  whileHover={{ scale: 1.08, background: 'rgba(243, 213, 141, 0.15)' }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   <Icon size={15} strokeWidth={2.2} />
                   {link.label}
-                </span>
+                </motion.span>
                 {active && (
                   <motion.div
                     layoutId="navbar-active-underline"
@@ -117,18 +133,23 @@ export default function Navbar() {
             const Icon = link.icon
             const active = isActive(link.href)
             return (
-              <Link
+              <motion.div
                 key={link.href}
-                href={link.href}
-                title={link.label}
-                className="p-2 rounded-lg transition"
-                style={{
-                  color: active ? '#F3D58D' : '#F3D58D',
-                  background: active ? 'rgba(243, 213, 141, 0.15)' : 'transparent',
-                }}
+                whileHover={{ scale: 1.15, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
               >
-                <Icon size={17} strokeWidth={2.2} />
-              </Link>
+                <Link
+                  href={link.href}
+                  title={link.label}
+                  className="p-2 rounded-lg block transition-colors duration-200"
+                  style={{
+                    color: '#F3D58D',
+                    background: active ? 'rgba(243, 213, 141, 0.15)' : 'transparent',
+                  }}
+                >
+                  <Icon size={17} strokeWidth={2.2} />
+                </Link>
+              </motion.div>
             )
           })}
         </div>
@@ -141,41 +162,55 @@ export default function Navbar() {
             <>
               <NotificationBell userId={user.id} />
 
-              <Link href="/messages" title="Messages" className="p-2 rounded-lg transition hover:opacity-80" style={{ color: '#F3D58D' }}>
-                <MessageCircle size={17} strokeWidth={2.2} />
-              </Link>
+              <motion.div whileHover={{ scale: 1.15, rotate: -5 }} whileTap={{ scale: 0.9 }}>
+                <Link href="/messages" title="Messages" className="p-2 rounded-lg block transition-colors duration-200 hover:bg-[rgba(243,213,141,0.15)]" style={{ color: '#F3D58D' }}>
+                  <MessageCircle size={17} strokeWidth={2.2} />
+                </Link>
+              </motion.div>
 
               <div className="w-px h-5" style={{ background: 'rgba(243, 213, 141, 0.3)' }} />
 
               {isNGO ? (
-                <Link
-                  href="/ngo-dashboard"
-                  className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
-                  style={{ background: '#F3D58D', color: '#2E4365' }}
-                >
-                  <Building2 size={15} /> Dashboard
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href="/ngo-dashboard"
+                    className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-shadow duration-200 hover:shadow-lg hover:shadow-[rgba(243,213,141,0.3)]"
+                    style={{ background: '#F3D58D', color: '#2E4365' }}
+                  >
+                    <Building2 size={15} /> Dashboard
+                  </Link>
+                </motion.div>
               ) : (
-                <Link
-                  href="/report"
-                  className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap text-white hover:opacity-90"
-                  style={{ background: '#F3D58D', color: '#2E4365' }}
-                >
-                  <PlusCircle size={15} /> Report
-                </Link>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link
+                    href="/report"
+                    className="px-3 xl:px-4 py-2 rounded-full text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap transition-shadow duration-200 hover:shadow-lg hover:shadow-[rgba(243,213,141,0.3)]"
+                    style={{ background: '#F3D58D', color: '#2E4365' }}
+                  >
+                    <PlusCircle size={15} /> Report
+                  </Link>
+                </motion.div>
               )}
 
-              <Link href="/profile" title="Profile" className="p-1.5 rounded-full transition hover:opacity-80 overflow-hidden" style={{ color: '#F3D58D' }}>
-                {avatarUrl ? (
-                  <img src={avatarUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: '#F3D58D' }} />
-                ) : (
-                  <User size={17} strokeWidth={2.2} />
-                )}
-              </Link>
+              <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                <Link href="/profile" title="Profile" className="p-1.5 rounded-full block transition-colors duration-200 hover:bg-[rgba(243,213,141,0.15)] overflow-hidden" style={{ color: '#F3D58D' }}>
+                  {avatarUrl ? (
+                    <img src={avatarUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2" style={{ borderColor: '#F3D58D' }} />
+                  ) : (
+                    <User size={17} strokeWidth={2.2} />
+                  )}
+                </Link>
+              </motion.div>
 
-              <button onClick={handleLogout} title="Logout" className="p-2 rounded-lg transition text-red-400 hover:text-red-500 hover:bg-red-50">
+              <motion.button
+                onClick={handleLogout}
+                title="Logout"
+                className="p-2 rounded-lg transition-colors duration-200 text-red-400 hover:text-red-500 hover:bg-red-50/10"
+                whileHover={{ scale: 1.1, rotate: -10 }}
+                whileTap={{ scale: 0.9 }}
+              >
                 <LogOut size={17} strokeWidth={2.2} />
-              </button>
+              </motion.button>
             </>
           ) : (
             <AuthToggle />
