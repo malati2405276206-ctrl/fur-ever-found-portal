@@ -474,3 +474,26 @@ button,
   0%, 100% { opacity: 0.7; }
   50% { opacity: 0.3; }
 }
+
+/* Add this at the bottom of your globals.css */
+@keyframes pixelWaddle {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-4px) rotate(-3deg);
+  }
+  50% {
+    transform: translateY(0) rotate(0deg);
+  }
+  75% {
+    transform: translateY(-4px) rotate(3deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+.cat-walking {
+  animation: pixelWaddle 0.4s infinite linear;
+}

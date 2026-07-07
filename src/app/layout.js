@@ -5,6 +5,7 @@ import NavbarWrapper from '@/components/NavbarWrapper'
 import LogoIntro from '@/components/LogoIntro'
 import { ChatProvider } from '@/context/ChatContext'
 import 'leaflet/dist/leaflet.css'
+import RoamingCat from '@/components/RoamingCat'; // Fixed case sensitivity to match your component
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,6 +23,8 @@ export default function RootLayout({ children }) {
           <NavbarWrapper />
           <main>{children}</main>
         </ChatProvider>
+        {/* The updated waddling/walking cat component */}
+        <RoamingCat />
       </body>
     </html>
   )

@@ -54,6 +54,32 @@ function DashboardContent() {
     fetchData()
   }, [])
 
+  // Real-time subscription: auto-hide verification banner when admin approves
+  useEffect(() => {
+    if (!ngoProfile?.user_id) return
+
+    const channel = supabase
+      .channel(`ngo_verification_${ngoProfile.user_id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'ngo_profiles',
+          filter: `user_id=eq.${ngoProfile.user_id}`,
+        },
+        (payload) => {
+          // Update local ngoProfile when admin changes verified status
+          setNgoProfile((prev) => ({ ...prev, ...payload.new }))
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [ngoProfile?.user_id])
+
   const handleMarkAdopted = async (catId) => {
     const { error } = await supabase
       .from('adoption_cats')
@@ -129,21 +155,13 @@ function DashboardContent() {
         setRecentCats((prev) => prev.filter((cat) => cat.id !== catId))
         setCatCount((prev) => Math.max(0, prev - 1))
 
-        // 5. Update applications state — mark approved one, reject others for same cat
-        setApplications((prev) =>
-          prev.map((app) => {
-            if (app.id === appId) return { ...app, status: 'approved' }
-            if (app.cat_id === catId && app.status === 'pending') return { ...app, status: 'rejected' }
-            return app
-          })
-        )
+        // 5. Remove all applications for this cat from the UI (cat is now adopted)
+        setApplications((prev) => prev.filter((app) => app.cat_id !== catId))
 
         setActionMsg('🎉 Application approved! Cat marked as adopted and other applicants notified.')
       } else if (newStatus === 'rejected') {
-        // Just update this one application in local state
-        setApplications((prev) =>
-          prev.map((app) => app.id === appId ? { ...app, status: 'rejected' } : app)
-        )
+        // Remove rejected application from UI
+        setApplications((prev) => prev.filter((app) => app.id !== appId))
         setActionMsg('Application rejected.')
       }
 
