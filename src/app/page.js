@@ -292,7 +292,7 @@ export default function HomePage() {
                 <EmojiIcon name="cat-paw" size={50} /> Fur Ever Found
               </div>
               <p className="text-sm leading-relaxed text-gray-200">
-                India&apos;s community for reuniting lost cats with their loving families. Every cat deserves a home.
+                Community for reuniting lost cats with their loving families. Every cat deserves a home.
               </p>
             </div>
 
@@ -320,7 +320,7 @@ export default function HomePage() {
           </div>
 
           <div className="pt-6 border-t text-center text-xs sm:text-sm text-gray-200" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-            © 2024 Fur Ever Found. Built with <EmojiIcon name="paw-heart" size={14} /> for cats and their humans.
+            © 2026 Fur Ever Found. Built with <EmojiIcon name="paw-heart" size={14} /> for cats and their humans.
           </div>
         </div>
         
