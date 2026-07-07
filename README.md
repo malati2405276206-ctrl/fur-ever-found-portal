@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🐱 Fur Ever Found
+
+A community-driven web platform to reunite lost and found cats, support adoption, and empower shelters and NGOs — built for #hackthekitty 2026.
+
+## What it does
+
+Fur Ever Found combines an AI-assisted lost-and-found matching system, interactive map-based reporting (Leaflet.js), and a full adoption pipeline into one platform for cat owners, finders, shelters, NGOs, and adopters.
+
+**Key features:**
+- Lost & Found Portal with map-based location pinning
+- Adoption Center for verified shelters/NGOs
+- AI-powered matching between lost and found reports
+- Community Stories feed for reunions, rescues, and adoptions
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js (App Router), React, Tailwind CSS |
+| Mapping | Leaflet.js + React-Leaflet |
+| Backend & Auth | Supabase (PostgreSQL, Auth, Row Level Security) |
+| Storage & Media | Supabase Storage, Cloudinary |
+| Deployment | Vercel |
+
+## Prerequisites
+
+- Node.js 18.x or later
+- npm / yarn / pnpm / bun
+- A [Supabase](https://supabase.com) project (URL + anon key)
+- A [Cloudinary](https://cloudinary.com) account (optional, for media transforms)
 
 ## Getting Started
 
-First, run the development server:
-
+1. Clone the repo and install dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+   npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Create a `.env.local` file in the project root with:
+```bash
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   CLOUDINARY_URL=your_cloudinary_url   # optional
+```
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+3. Run the development server:
+```bash
+   npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Open [http://localhost:3000](http://localhost:3000) to see the app.
 
-## Learn More
+## Project Structure
 
-To learn more about Next.js, take a look at the following resources:
+- `src/` — application source code
+- `documentation/` — project report and supporting docs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Team / Acknowledgments
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Built with support from Kiro IDE, Aikido Security, and the open-source teams behind Next.js, Supabase, Leaflet.js, and Vercel.
 
-## Deploy on Vercel
+## Development Process
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+During development, we transitioned to Kiro IDE and used it to accelerate feature development, debugging, SQL migration generation, UI improvements, and code refactoring.
