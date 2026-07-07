@@ -32,7 +32,7 @@ export default function AdoptionPage() {
     const { data, error } = await supabase
       .from('adoption_cats')
       .select('*')
-      .neq('status', 'deleted')
+      .eq('status', 'available')
       .order('created_at', { ascending: false })
 
     if (error) {
