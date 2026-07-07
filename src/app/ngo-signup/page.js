@@ -80,16 +80,17 @@ export default function NGOSignupPage() {
     const userId = data?.user?.id
 
     if (userId) {
+      // Insert NGO verification request (NOT ngo_profiles — admin will promote)
       const { error: ngoError } = await supabase
-        .from('ngo_profiles')
+        .from('ngo_verification_requests')
         .insert({
           user_id:         userId,
           org_name:        clean.orgName,
           org_description: clean.orgDescription,
           city:            clean.city,
           website:         clean.website || null,
-          contact_phone:   clean.contactPhone,
-          verified:        false,
+          phone:           clean.contactPhone,
+          status:          'pending',
         })
 
       if (ngoError) {
