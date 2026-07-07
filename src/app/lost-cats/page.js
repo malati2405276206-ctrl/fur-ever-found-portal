@@ -118,15 +118,13 @@ export default function LostCatsPage() {
               />
             </div>
             <div className="flex gap-2 shrink-0">
-              {user && (
-                <Link
-                  href="/report"
-                  className="inline-flex items-center text-white px-5 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
-                  style={{ background: '#2E4365' }}
-                >
-                  + Report Lost
-                </Link>
-              )}
+              <Link
+                href={user ? "/report" : "/login"}
+                className="inline-flex items-center text-white px-5 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
+                style={{ background: '#2E4365' }}
+              >
+                + Report Lost
+              </Link>
               <Link
                 href="/map?type=lost"
                 className="inline-flex items-center border px-4 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
@@ -372,72 +370,107 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
 
-      {/* Modal content */}
+      {/* Modal — Lost Poster Style */}
       <div
-        className="relative bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="relative max-w-md w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
+        style={{
+          background: '#fffef5',
+          border: '3px solid #d4c9a8',
+          borderRadius: '6px',
+          boxShadow: '0 24px 80px rgba(0,0,0,0.3), inset 0 0 60px rgba(210,190,140,0.1)',
+          backgroundImage: 'radial-gradient(ellipse at 20% 80%, rgba(180,150,100,0.06) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(180,150,100,0.06) 0%, transparent 60%)',
+        }}
       >
+        {/* Tape decorations */}
+        <div className="absolute -top-2 left-6 w-14 h-5 bg-yellow-200/70 border border-yellow-300/50 rotate-[-4deg] z-10 shadow-sm" />
+        <div className="absolute -top-2 right-6 w-14 h-5 bg-yellow-200/70 border border-yellow-300/50 rotate-[3deg] z-10 shadow-sm" />
+
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-900 transition shadow-sm"
+          className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-900 transition shadow-md border border-gray-200"
           aria-label="Close"
         >
           ✕
         </button>
 
-        {/* Image */}
-        <div className="relative">
-          {cat.image_url ? (
-            <img
-              src={cat.image_url}
-              alt={cat.name}
-              className={`w-full h-80 object-contain bg-gray-50 rounded-t-3xl ${isReunited ? 'opacity-70 grayscale' : ''}`}
-            />
-          ) : (
-            <div className="w-full h-80 flex items-center justify-center rounded-t-3xl" style={{ background: '#F3D58D' }}>
-              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
-            </div>
-          )}
-          <div className={`absolute top-4 left-4 text-sm font-bold px-4 py-1.5 rounded-full ${
-            isReunited ? 'bg-green-200 text-green-800' : 'bg-rose-200 text-rose-800'
-          }`}>
-            {isReunited ? <><img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-1" />Reunited</> : <><img src="/icon-emoji/lost-cat.png" alt="" width={60} height={60} className="inline-block mr-1" />Lost</>}
+        {/* Poster Content */}
+        <div className="p-6 pt-8">
+          {/* LOST / FOUND Header */}
+          <div className="text-center border-b-2 border-dashed border-[#c9b896] pb-3 mb-5">
+            <h2
+              className="text-4xl tracking-[8px] uppercase"
+              style={{
+                fontFamily: "'Impact', 'Arial Black', sans-serif",
+                color: isReunited ? '#27ae60' : '#c0392b',
+                textShadow: '1px 1px 0 rgba(0,0,0,0.1)',
+              }}
+            >
+              {isReunited ? 'FOUND!' : 'LOST'}
+            </h2>
           </div>
-        </div>
 
-        {/* Details */}
-        <div className="p-6">
-          <h2 className="text-2xl font-black text-gray-900 mb-1">{cat.name}</h2>
-          <p className="text-sm text-orange-500 font-semibold mb-4 flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.location}</p>
+          {/* Photo — large polaroid */}
+          <div className="mx-auto mb-4" style={{ border: '5px solid #fff', boxShadow: '0 3px 12px rgba(0,0,0,0.12)' }}>
+            {cat.image_url ? (
+              <img
+                src={cat.image_url}
+                alt={cat.name}
+                className={`w-full h-64 object-contain bg-gray-50 ${isReunited ? 'opacity-60 grayscale' : ''}`}
+              />
+            ) : (
+              <div className="w-full h-64 flex items-center justify-center" style={{ background: '#f5f5f0' }}>
+                <img src="/icon-emoji/cat-face.png" alt="" width={70} height={70} />
+              </div>
+            )}
+          </div>
 
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">{cat.description}</p>
+          {/* Name */}
+          <div className="text-center border-t border-b border-[#d4c9a8] py-2 mb-4">
+            <h3 className="text-2xl font-black uppercase tracking-[3px] text-gray-900" style={{ fontFamily: "'Georgia', serif" }}>
+              {cat.name || 'Unknown'}
+            </h3>
+          </div>
 
-          <p className="text-xs text-gray-400 mb-6">
-            Reported {new Date(cat.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-          </p>
+          {/* Details */}
+          <div className="text-center space-y-2 mb-5">
+            <p className="text-sm font-semibold text-gray-700 flex items-center justify-center gap-1.5">
+              <img src="/icon-emoji/paw-shaped location pin.png" alt="" width={22} height={22} />
+              Last seen: {cat.location}
+            </p>
+            {cat.description && (
+              <p className="text-sm text-gray-600 leading-relaxed px-2">
+                {cat.description}
+              </p>
+            )}
+            <p className="text-xs text-gray-400 pt-1">
+              Reported {new Date(cat.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </p>
+          </div>
 
           {/* Action buttons */}
-          <div className="space-y-2">
+          <div className="space-y-2 border-t-2 border-dashed border-[#c9b896] pt-4">
             {!isReunited && !isOwner && currentUserId && (
               <button
                 onClick={handleMessage}
-                className="w-full text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
-                style={{ background: '#E59D2C' }}
+                className="w-full text-white font-bold py-3 rounded-lg transition text-sm hover:opacity-90 uppercase tracking-wide"
+                style={{ background: '#c0392b' }}
               >
-                <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block mr-1" /> I Spotted This Cat!
+                <img src="/icon-emoji/message-chat.png" alt="" width={24} height={24} className="inline-block mr-2" />
+                I Spotted This Cat!
               </button>
             )}
 
             {!isReunited && !currentUserId && (
               <a
                 href="/login"
-                className="block w-full text-center text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
-                style={{ background: '#E59D2C' }}
+                className="block w-full text-center text-white font-bold py-3 rounded-lg transition text-sm hover:opacity-90 uppercase tracking-wide"
+                style={{ background: '#c0392b' }}
               >
-                Login to Message
+                Login to Report a Sighting
               </a>
             )}
 
@@ -446,41 +479,46 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
                 href={getDirectionsUrl(cat.latitude, cat.longitude)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center border font-semibold py-3 rounded-xl transition text-sm hover:opacity-80"
+                className="block w-full text-center border-2 font-bold py-3 rounded-lg transition text-sm hover:opacity-80 uppercase tracking-wide"
                 style={{ borderColor: '#2E4365', color: '#2E4365' }}
               >
-                🧭 Get Directions
+                 Get Directions →
               </a>
             )}
 
             {isOwner && !isReunited && (
               <button
                 onClick={() => onMarkReunited(cat.id)}
-                className="w-full border border-green-300 text-green-600 hover:bg-green-50 font-semibold py-3 rounded-xl transition text-sm"
+                className="w-full border-2 border-green-400 text-green-600 hover:bg-green-50 font-bold py-3 rounded-lg transition text-sm uppercase tracking-wide"
               >
-                <img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block mr-1" /> Mark as Reunited
+                <img src="/icon-emoji/reunited.png" alt="" width={24} height={24} className="inline-block mr-2" />
+                Mark as Reunited
               </button>
             )}
 
             {isReunited && (
-              <div className="text-center text-green-600 font-semibold text-sm py-3 flex items-center justify-center gap-1">
-                <img src="/icon-emoji/reunited.png" alt="" width={60} height={60} className="inline-block" /> This cat found their way home!
+              <div className="text-center text-green-600 font-bold text-sm py-3 flex items-center justify-center gap-2 uppercase tracking-wide">
+                <img src="/icon-emoji/reunited.png" alt="" width={28} height={28} className="inline-block" />
+                This cat found their way home!
               </div>
             )}
+
             {!isOwner && currentUserId && !isReunited && (
-              <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-3 border-t border-[#d4c9a8]">
                 <Link
                   href={`/profile/${cat.user_id}`}
-                  className="flex items-center gap-2 text-xs text-gray-400 hover:text-orange-500 transition"
+                  className="flex items-center gap-2 text-xs text-gray-500 hover:text-[#c0392b] transition"
                 >
-                  <div className="w-6 h-6 rounded-full bg-orange-100 flex items-center justify-center"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
+                  <div className="w-6 h-6 rounded-full bg-red-50 flex items-center justify-center">
+                    <img src="/icon-emoji/cat-paw.png" alt="" width={16} height={16} />
+                  </div>
                   <span>View reporter</span>
                 </Link>
                 <button
                   onClick={handleMessage}
-                  className="text-xs text-orange-500 hover:text-orange-600 font-medium transition flex items-center gap-1"
+                  className="text-xs text-[#c0392b] hover:text-red-700 font-semibold transition flex items-center gap-1"
                 >
-                  <img src="/icon-emoji/message-chat.png" alt="" width={40} height={40} className="inline-block" /> Message
+                  <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block" /> Message
                 </button>
               </div>
             )}
@@ -490,6 +528,15 @@ function CatDetailModal({ cat, type, currentUserId, onClose, onMarkReunited }) {
             )}
           </div>
         </div>
+
+        {/* Reunited stamp */}
+        {isReunited && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -rotate-12 border-4 border-green-500 rounded-xl px-6 py-2 pointer-events-none">
+            <span className="text-3xl font-black text-green-500 tracking-[6px] uppercase" style={{ fontFamily: "'Impact', sans-serif" }}>
+              REUNITED
+            </span>
+          </div>
+        )}
       </div>
     </div>
   )

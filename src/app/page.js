@@ -219,6 +219,14 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Wavy divider into How it Works */}
+      <div className="wave-divider" style={{ marginBottom: '-1px' }}>
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,0 L0,60 C180,120 360,80 540,90 C720,100 900,40 1080,60 C1260,80 1380,100 1440,80 L1440,0 Z" fill="var(--cream)" />
+          <path d="M0,80 C180,120 360,80 540,100 C720,120 900,60 1080,80 C1260,100 1380,110 1440,90 L1440,120 L0,120 Z" fill="var(--sage-50)" />
+        </svg>
+      </div>
+
       {/* How it Works */}
       <section className="py-16 sm:py-20 px-4" style={{ background: 'var(--sage-50)' }}>
         <div className="max-w-4xl mx-auto text-center">
@@ -240,6 +248,14 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Wavy divider out of How it Works */}
+      <div className="wave-divider" style={{ marginTop: '-1px' }}>
+        <svg viewBox="0 0 1440 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M0,0 L0,60 C180,120 360,80 540,90 C720,100 900,40 1080,60 C1260,80 1380,100 1440,80 L1440,0 Z" fill="var(--sage-50)" />
+          <path d="M0,80 C180,120 360,80 540,100 C720,120 900,60 1080,80 C1260,100 1380,110 1440,90 L1440,120 L0,120 Z" fill="var(--cream)" />
+        </svg>
+      </div>
 
       {/* Grid Wall Decor - Story Polaroids */}
       <div id="happy-tails" className="scroll-mt-16">

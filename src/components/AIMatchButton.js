@@ -65,7 +65,7 @@ export default function AIMatchButton({ lostCat }) {
             await supabase.from('notifications').insert({
               user_id: user.id,
               type: 'ai_match',
-              title: `Strong match found for ${lostCat.name}! 🤖`,
+              title: `Strong match found for ${lostCat.name}!`,
               body: `${strongMatches[0].score}% match — ${strongMatches[0].reason}`,
               link: '/lost-cats',
             })
@@ -109,7 +109,7 @@ export default function AIMatchButton({ lostCat }) {
               AI is searching...
             </>
           ) : (
-            '🤖 Find AI Matches'
+            <><img src="/icon-emoji/robot-icon.png" alt="" width={26} height={26} className="inline-block" /> Find AI Matches</>
           )}
         </button>
       )}
@@ -128,7 +128,7 @@ export default function AIMatchButton({ lostCat }) {
           {/* Header */}
           <div className="flex items-center justify-between mb-2">
             <p className="text-xs font-bold text-indigo-600 uppercase tracking-widest">
-              🤖 AI Match Results
+              <img src="/icon-emoji/robot-icon.png" alt="" width={16} height={16} className="inline-block mr-1" /> AI Match Results
             </p>
             <button
               onClick={() => { setSearched(false); setMatches([]); setError('') }}

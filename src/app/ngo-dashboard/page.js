@@ -377,7 +377,7 @@ function DashboardContent() {
 
                   {/* Details grid */}
                   <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs mb-3" style={{ color: '#2E4365', opacity: 0.75 }}>
-                    <p>📞 {app.phone || '—'}</p>
+                    <p><img src="/icon-emoji/phone-call-icon.png" alt="" width={14} height={14} className="inline-block mr-0.5" /> {app.phone || '—'}</p>
                     <p>📍 {app.city || '—'}</p>
                     <p>🏠 {app.home_type || '—'}</p>
                     <p>💼 {app.occupation || '—'}</p>

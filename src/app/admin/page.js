@@ -288,7 +288,7 @@ export default function AdminPage() {
                         <p className="text-gray-400 text-sm mb-1">📧 {ngo.profiles?.email}</p>
                         <p className="text-gray-400 text-sm mb-1">👤 {ngo.profiles?.full_name}</p>
                         <p className="text-gray-400 text-sm mb-1">📍 {ngo.city}</p>
-                        <p className="text-gray-400 text-sm mb-1">📞 {ngo.contact_phone}</p>
+                        <p className="text-gray-400 text-sm mb-1"><img src="/icon-emoji/phone-call-icon.png" alt="" width={14} height={14} className="inline-block mr-0.5" /> {ngo.contact_phone}</p>
                         {ngo.website && <p className="text-amber-400 text-sm mb-2">🌐 {ngo.website}</p>}
                         <p className="text-gray-300 text-sm mt-3 leading-relaxed">{ngo.org_description}</p>
                         <p className="text-gray-600 text-xs mt-2">Applied {formatDate(ngo.created_at)}</p>

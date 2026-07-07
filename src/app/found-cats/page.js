@@ -95,15 +95,13 @@ export default function FoundCatsPage() {
               />
             </div>
             <div className="flex gap-2 shrink-0">
-              {user && (
-                <Link
-                  href="/report"
-                  className="inline-flex items-center text-white px-5 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
-                  style={{ background: '#2E4365' }}
-                >
-                  + Report Found
-                </Link>
-              )}
+              <Link
+                href={user ? "/report" : "/login"}
+                className="inline-flex items-center text-white px-5 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-90"
+                style={{ background: '#2E4365' }}
+              >
+                + Report Found
+              </Link>
               <Link
                 href="/map?type=found"
                 className="inline-flex items-center border px-4 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
@@ -303,7 +301,7 @@ function RecipeStyleCard({ cat, onClick, type }) {
   )
 }
 
-// ── Detail Modal ──────────────────────────────────────────
+// ── Detail Modal — Announcement/Poster Style ──────────────────────────────────────────
 function CatDetailModal({ cat, currentUserId, onClose }) {
   const { openChat } = useChatContext()
   const isOwner = currentUserId && currentUserId === cat.user_id
@@ -320,68 +318,89 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
 
-      {/* Modal content */}
+      {/* Modal — Announcement Card */}
       <div
-        className="relative bg-white rounded-3xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl"
+        className="relative max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl rounded-lg"
         onClick={(e) => e.stopPropagation()}
+        style={{ background: '#2E4365' }}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-600 hover:bg-white hover:text-gray-900 transition shadow-sm"
+          className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-white hover:bg-white/40 transition"
           aria-label="Close"
         >
           ✕
         </button>
 
-        {/* Image */}
-        <div className="relative">
-          {cat.image_url ? (
-            <img
-              src={cat.image_url}
-              alt="Found cat"
-              className="w-full h-80 object-contain bg-gray-50 rounded-t-3xl"
-            />
-          ) : (
-            <div className="w-full h-80 flex items-center justify-center rounded-t-3xl" style={{ background: '#F3D58D' }}>
-              <img src="/icon-emoji/cat-face.png" alt="" width={60} height={60} />
-            </div>
-          )}
-          <div className="absolute top-4 left-4 bg-green-200 text-green-800 text-sm font-bold px-4 py-1.5 rounded-full">
-            <img src="/icon-emoji/found-cat.png" alt="" width={30} height={30} className="inline-block mr-1" />Found
+        {/* Image section — dark frame */}
+        <div className="relative p-3 pb-0">
+          <div className="rounded-md overflow-hidden">
+            {cat.image_url ? (
+              <img
+                src={cat.image_url}
+                alt="Found cat"
+                className="w-full max-h-[60vh] object-contain"
+                style={{ background: '#1a2d45' }}
+              />
+            ) : (
+              <div className="w-full h-64 sm:h-72 flex items-center justify-center" style={{ background: '#1a2d45' }}>
+                <img src="/icon-emoji/cat-face.png" alt="" width={70} height={70} />
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Details */}
-        <div className="p-6">
-          <p className="text-sm font-bold text-green-600 mb-2 flex items-center gap-1"><img src="/icon-emoji/paw-shaped location pin.png" alt="" width={30} height={30} className="inline-block" /> {cat.location}</p>
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">{cat.description}</p>
+        {/* Scalloped / torn edge divider */}
+        <div className="found-poster-scallop" />
 
-          <p className="text-xs text-gray-400 mb-6">
-            Found on {new Date(cat.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-          </p>
+        {/* White content area */}
+        <div className="bg-white rounded-b-lg px-6 pt-5 pb-6">
+          {/* Tag + Date row */}
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold uppercase tracking-wider text-green-600">
+              Found Cat
+            </span>
+            <span className="text-xs text-gray-400 font-medium">
+              {new Date(cat.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+            </span>
+          </div>
+
+          {/* Location as title */}
+          <h2 className="text-2xl font-black text-gray-900 leading-tight mb-3">
+            {cat.location || 'Unknown Location'}
+          </h2>
+
+          {/* Description */}
+          {cat.description && (
+            <p className="text-sm text-gray-500 leading-relaxed mb-5">
+              {cat.description}
+            </p>
+          )}
 
           {/* Action buttons */}
-          <div className="space-y-2">
+          <div className="space-y-3 pt-3 border-t border-gray-100">
             {!isOwner && currentUserId && (
               <button
                 onClick={handleMessage}
-                className="w-full text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
-                style={{ background: '#E59D2C' }}
+                className="w-full flex items-center justify-center gap-2 font-bold py-3 rounded-xl transition text-sm hover:opacity-90 text-white"
+                style={{ background: '#2E4365' }}
               >
-                <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block mr-1" /> This Might Be Mine!
+                <span className="border-white flex items-center justify-center text-xs"></span>
+                This Might Be Mine!
               </button>
             )}
 
             {!currentUserId && (
               <a
                 href="/login"
-                className="block w-full text-center text-white font-semibold py-3 rounded-xl transition text-sm hover:opacity-90"
-                style={{ background: '#E59D2C' }}
+                className="flex items-center justify-center gap-2 w-full text-center font-bold py-3 rounded-xl transition text-sm hover:opacity-90 text-white"
+                style={{ background: '#2E4365' }}
               >
-                Login to Message
+                <span className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-xs">→</span>
+                Login to Claim
               </a>
             )}
 
@@ -390,36 +409,40 @@ function CatDetailModal({ cat, currentUserId, onClose }) {
                 href={getDirectionsUrl(cat.latitude, cat.longitude)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full text-center border font-semibold py-3 rounded-xl transition text-sm hover:opacity-80"
+                className="flex items-center justify-center gap-2 w-full text-center border-2 font-bold py-3 rounded-xl transition text-sm hover:bg-gray-50"
                 style={{ borderColor: '#2E4365', color: '#2E4365' }}
               >
-                🧭 Get Directions
+                <span className=" flex items-center justify-center text-xs"></span>
+                Get Directions →
               </a>
             )}
 
             {cat.contact_phone && (
               <a
                 href={`tel:${cat.contact_phone}`}
-                className="block w-full text-center border font-semibold py-3 rounded-xl transition text-sm hover:opacity-80"
+                className="flex items-center justify-center gap-2 w-full text-center border-2 font-bold py-3 rounded-xl transition text-sm hover:bg-gray-50"
                 style={{ borderColor: '#E59D2C', color: '#E59D2C' }}
               >
-                📞 Call {cat.contact_phone}
+                <img src="/icon-emoji/phone-call-icon.png" alt="" width={16} height={16} className="inline-block" /> Call {cat.contact_phone}
               </a>
             )}
+
             {!isOwner && currentUserId && (
-              <div className="flex items-center justify-between pt-2 mt-2 border-t border-gray-100">
+              <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                 <Link
                   href={`/profile/${cat.user_id}`}
                   className="flex items-center gap-2 text-xs text-gray-400 hover:text-green-500 transition"
                 >
-                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center"><img src="/icon-emoji/cat-paw.png" alt="" width={60} height={60} /></div>
+                  <div className="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
+                    <img src="/icon-emoji/cat-paw.png" alt="" width={16} height={16} />
+                  </div>
                   <span>View reporter</span>
                 </Link>
                 <button
                   onClick={handleMessage}
-                  className="text-xs text-green-500 hover:text-green-600 font-medium transition flex items-center gap-1"
+                  className="text-xs text-[#2E4365] hover:text-blue-800 font-semibold transition flex items-center gap-1"
                 >
-                  <img src="/icon-emoji/message-chat.png" alt="" width={30} height={30} className="inline-block" /> Message
+                  <img src="/icon-emoji/message-chat.png" alt="" width={20} height={20} className="inline-block" /> Message
                 </button>
               </div>
             )}
