@@ -161,9 +161,9 @@ export default function AdminPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
-          {[{l:'Users',v:stats.users,i:'U'},{l:'Lost',v:stats.lostCats,i:'L'},{l:'Found',v:stats.foundCats,i:'F'},{l:'Adoption',v:stats.adoptionCats,i:'A'},{l:'Messages',v:stats.messages,i:'M'},{l:'NGOs',v:stats.totalNGOs,i:'N'},{l:'Pending',v:stats.pendingNGOs,i:'P'},{l:'Verified',v:stats.verifiedNGOs,i:'V'}].map(s=>(
+          {[{l:'Users',v:stats.users,i:'\u{1F464}'},{l:'Lost',v:stats.lostCats,i:'\u{1F63F}'},{l:'Found',v:stats.foundCats,i:'\u{1F60A}'},{l:'Adoption',v:stats.adoptionCats,i:'\u{1F3E0}'},{l:'Messages',v:stats.messages,i:'\u{1F4AC}'},{l:'NGOs',v:stats.totalNGOs,i:'\u{1F3E2}'},{l:'Pending',v:stats.pendingNGOs,i:'\u{231B}'},{l:'Verified',v:stats.verifiedNGOs,i:'\u{2705}'}].map(s=>(
             <div key={s.l} className="rounded-2xl border p-3 text-center" style={{background:'white',borderColor:'var(--cream-dark)'}}>
-              <div className="text-sm font-bold mb-0.5" style={{color:'var(--gold)'}}>{s.i}</div>
+              <div className="text-lg mb-0.5" style={{color:'var(--gold)'}}>{s.i}</div>
               <div className="text-xl font-extrabold" style={{color:'var(--foreground)'}}>{s.v}</div>
               <div className="text-[10px] mt-0.5" style={{color:'var(--foreground)',opacity:0.5}}>{s.l}</div>
             </div>

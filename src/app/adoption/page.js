@@ -4,7 +4,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useChatContext } from '@/context/ChatContext'
-import { getDirectionsUrl } from '@/lib/directions'
 import Link from 'next/link'
 import { useAuth } from '@/hooks/useAuth'
 import { useRole } from '@/hooks/useRole'
@@ -119,15 +118,6 @@ export default function AdoptionPage() {
                 placeholder="Search by city..."
                 className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2E4365] focus:border-transparent transition text-sm bg-white shadow-sm"
               />
-            </div>
-            <div className="flex gap-2 shrink-0">
-              <Link
-                href="/map?type=adoption"
-                className="inline-flex items-center border px-4 py-3 rounded-xl font-semibold transition text-sm whitespace-nowrap hover:opacity-80"
-                style={{ borderColor: '#2E4365', color: '#2E4365' }}
-              >
-                <img src="/icon-emoji/map.png" alt="" width={18} height={18} className="inline-block mr-1.5" /> Map
-              </Link>
             </div>
           </div>
         </div>
@@ -571,17 +561,6 @@ function CatDetailModal({ cat, ngoName, currentUserId, isNGO, onClose })
                   <img src="/icon-emoji/cat-face.png" alt="" width={30} height={30} className="inline-block" /> I Want to Adopt
                 </button>
               ) : null}
-
-              {cat.latitude && cat.longitude && (
-                <a
-                  href={getDirectionsUrl(cat.latitude, cat.longitude)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full text-center py-3.5 rounded-2xl font-semibold text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center justify-center gap-1"
-                >
-                  <img src="/icon-emoji/direction.png" alt="" width={30} height={30} className="inline-block" /> Get Directions
-                </a>
-              )}
             </div>
           </div>
         </div>
