@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 
-const ADMIN_PASSWORD = 'furever2024admin'
+const ADMIN_PASSWORD = process.env.NEXT_PUBLIC_ADMIN_PASSWORD
 
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
