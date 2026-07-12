@@ -104,13 +104,13 @@ export default function HomePage() {
 
         {/* Scalloped/rounded bottom edge that overlaps the About section */}
         <div className="absolute -bottom-8 sm:-bottom-10 left-0 right-0 z-20">
-          <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-10 sm:h-16 md:h-20" preserveAspectRatio="none" viewBox="0 0 1200 60" style={{ filter: 'drop-shadow(0 6px 4px rgba(0, 0, 0, 0.15))', clipPath: 'inset(0px -10px -20px -10px)' }}>
-            <defs>
-              <pattern id="scallop" x="0" y="0" width="100" height="60" patternUnits="userSpaceOnUse">
-                <path d="M0,0 C25,55 75,55 100,0 Z" fill="#EBDDC5" />
-              </pattern>
-            </defs>
-            <rect width="1200" height="60" fill="url(#scallop)" />
+          {/* Mobile: fewer semicircles */}
+          <svg viewBox="0 0 480 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-10 sm:hidden" style={{ filter: 'drop-shadow(0 6px 4px rgba(0, 0, 0, 0.15))', clipPath: 'inset(-0px -10px -20px -10px)' }}>
+            <path d="M0,0 C60,55 120,55 180,0 C240,55 300,55 360,0 C420,55 460,55 480,0 L480,0 L0,0 Z" fill="#EBDDC5" />
+          </svg>
+          {/* Desktop: full semicircles */}
+          <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-14 sm:h-20 hidden sm:block" style={{ filter: 'drop-shadow(0 6px 4px rgba(0, 0, 0, 0.15))', clipPath: 'inset(-0px -10px -20px -10px)' }}>
+            <path d="M0,0 C40,70 80,70 120,0 C160,70 200,70 240,0 C280,70 320,70 360,0 C400,70 440,70 480,0 C520,70 560,70 600,0 C640,70 680,70 720,0 C760,70 800,70 840,0 C880,70 920,70 960,0 C1000,70 1040,70 1080,0 C1120,70 1160,70 1200,0 C1240,70 1280,70 1320,0 C1360,70 1400,70 1440,0 L1440,0 L0,0 Z" fill="#EBDDC5" />
           </svg>
         </div>
       </section>
